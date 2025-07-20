@@ -11,6 +11,7 @@ public:
         bool isTrigger = false;
         std::shared_ptr<Collider> colliderOne;
         std::shared_ptr<Collider> colliderTwo;
+        Math::Vector3f overlap;
 
         bool operator==(const Collision& aOtherCollision)
         {
@@ -28,6 +29,7 @@ public:
 private:
     void AddActiveCollisions(Scene& aScene);
     void CompareCollisions();
+    void ResolveCollision(const Collision& aCollision);
 
     std::vector<Collision> myActiveCollisionsThisFrame;
     std::vector<Collision> myActiveCollisionsLastFrame;

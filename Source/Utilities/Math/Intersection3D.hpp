@@ -7,6 +7,9 @@
 #include "Ray.hpp"
 #include "PlaneVolume.hpp"
 
+#undef min
+#undef max
+
 namespace Math
 {
 	struct IntersectionInfo
@@ -202,7 +205,8 @@ namespace Math
 		if (distanceSqr <= sqrdRadii)
 		{
 			Vector3<T> centerDelta = Vector3<T>::Abs(aSphereOne.GetPoint() - aSphereTwo.GetPoint());
-			Vector3<T> overlap = Vector3<T>(aSphereOne.GetRadius()) + Vector3<T>(aSphereTwo.GetRadius()) - centerDelta;
+			Vector3<T> radiusSumAsVector = { radiusSum, radiusSum, radiusSum };
+			Vector3<T> overlap = radiusSumAsVector - centerDelta;
 
 			IntersectionInfo info;
 			info.intersected = true;

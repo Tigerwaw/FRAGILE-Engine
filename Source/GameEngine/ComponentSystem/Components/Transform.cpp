@@ -25,10 +25,7 @@ void Transform::UpdateToWorldMatrix(const Math::Matrix4x4f& aToWorldMatrix, cons
 	myToWorldMatrix = aToWorldMatrix;
 	myToWorldMatrixNoScale = aToWorldMatrixNoScale;
 
-	for (auto& child : myChildren)
-	{
-		child->UpdateToWorldMatrix(GetMatrixInternal(false) * aToWorldMatrix, GetMatrixInternal(true) * aToWorldMatrixNoScale);
-	}
+	UpdateChildrenToWorldMatrix();
 }
 
 void Transform::UpdateChildrenToWorldMatrix()
@@ -346,10 +343,10 @@ void Transform::AddUniformScale(float aScale)
 
 const bool Transform::IsScaled() const
 {
-	float tolerance = 0.005f;
+	float tolerance = 0.001f;
 	float scaleLength = myScale.LengthSqr();
 
-	return (scaleLength < 1.0f - tolerance || scaleLength > 1.0f + tolerance);
+	return (scaleLength < (3.0f - tolerance) || scaleLength > (3.0f + tolerance));
 }
 
 bool Transform::Serialize(nl::json& outJsonObject)

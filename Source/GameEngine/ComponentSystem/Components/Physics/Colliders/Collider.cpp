@@ -58,6 +58,8 @@ void Collider::OnCollisionEnter()
 
 void Collider::OnCollisionStay()
 {
+	myIsOverlappingDebug = true;
+
 	if (myOnCollisionStayResponse)
 	{
 		myOnCollisionStayResponse();

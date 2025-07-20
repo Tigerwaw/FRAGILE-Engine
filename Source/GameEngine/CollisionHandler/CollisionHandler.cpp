@@ -5,6 +5,7 @@
 #include "ComponentSystem/Component.h"
 #include "ComponentSystem/Components/Transform.h"
 #include "ComponentSystem/Components/Physics/Colliders/Collider.h"
+#include "ComponentSystem/Components/Physics/Rigidbody.h"
 #include "Math/Intersection3D.hpp"
 
 CollisionHandler::CollisionHandler()
@@ -110,15 +111,14 @@ void CollisionHandler::CompareCollisions()
 			{
 				activeCollisionThisFrame.colliderOne->OnCollisionEnter();
 				activeCollisionThisFrame.colliderTwo->OnCollisionEnter();
-
-				printf("Collided\n");
-				// Resolve Collision
 			}
 			else
 			{
 				activeCollisionThisFrame.colliderOne->OnCollisionStay();
 				activeCollisionThisFrame.colliderTwo->OnCollisionStay();
 			}
+
+			ResolveCollision(activeCollisionThisFrame);
 		}
 	}
 
@@ -142,5 +142,28 @@ void CollisionHandler::CompareCollisions()
 				activeCollisionLastFrame.colliderTwo->OnCollisionExit();
 			}
 		}
+	}
+}
+
+void CollisionHandler::ResolveCollision(const Collision& aCollision)
+{
+	auto rbOne = aCollision.colliderOne->gameObject->GetComponent<Rigidbody>();
+	auto rbTwo = aCollision.colliderTwo->gameObject->GetComponent<Rigidbody>();
+
+	if (rbOne && rbTwo)
+	{
+		Math::Vector3f impulseOne = rbTwo->GetVelocity() - rbOne->GetVelocity();
+		Math::Vector3f impulseTwo = rbOne->GetVelocity() - rbTwo->GetVelocity();
+
+		rbOne->ApplyImpulse(impulseOne);
+		rbTwo->ApplyImpulse(impulseTwo);
+	}
+	else if (rbOne)
+	{
+		rbOne->ApplyImpulse(aCollision.overlap * 100.0f);
+	}
+	else if (rbTwo)
+	{
+		rbTwo->ApplyImpulse(aCollision.overlap * 100.0f);
 	}
 }

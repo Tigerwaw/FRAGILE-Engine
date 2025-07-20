@@ -15,7 +15,6 @@ namespace Math
 		T z;
 
 		Vector3<T>();
-		Vector3<T>(const T& aValue);
 		Vector3<T>(const T& aX, const T& aY, const T& aZ);
 		Vector3<T>(const Vector3<T>& aVector) = default;
 		Vector3<T>& operator=(const Vector3<T>& aVector3) = default;
@@ -38,7 +37,7 @@ namespace Math
 		static T Distance(const Vector3<T>& aVector0, const Vector3<T>& aVector1);
 		static T DistanceSqr(const Vector3& aCurrent, const Vector3& aTarget);
 		static T DistanceSqrToLine(const Vector3& aStart, const Vector3& aEnd, const Vector3& aPoint);
-		static Vector3<T> Lerp(const Vector3<T>& aStart, const Vector3<T>& aEnd, const float aPercent);
+		static Vector3<T> Lerp(const Vector3<T>& aStart, const Vector3<T>& aEnd, const T aPercent);
 		static Vector3 ClosestPointOnLine(const Vector3& aStart, const Vector3& aEnd, const Vector3& aPoint);
 		static Vector3 ClosestPointOnSegment(const Vector3& aStart, const Vector3& aEnd, const Vector3& aPoint);
 		static std::tuple<Vector3, Vector3> ClosestPointsSegmentSegment(const Vector3& aFirstStart, const Vector3& aFirstEnd, const Vector3& aSecondStart, const Vector3& aSecondEnd);
@@ -51,14 +50,6 @@ namespace Math
 		x = 0;
 		y = 0;
 		z = 0;
-	}
-
-	template<class T>
-	inline Vector3<T>::Vector3(const T& aValue)
-	{
-		x = aValue;
-		y = aValue;
-		z = aValue;
 	}
 
 	template<class T>
@@ -145,7 +136,7 @@ namespace Math
 	}
 
 	template<class T>
-	inline Vector3<T> Vector3<T>::Lerp(const Vector3<T>& aStart, const Vector3<T>& aEnd, const float aPercent)
+	inline Vector3<T> Vector3<T>::Lerp(const Vector3<T>& aStart, const Vector3<T>& aEnd, const T aPercent)
 	{
 		return (aStart + aPercent * (aEnd - aStart));
 	}
