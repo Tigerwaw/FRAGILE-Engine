@@ -25,7 +25,7 @@ Collider::CollisionInfo SphereCollider::CheckOverlap(const SphereCollider* aColl
 {
     std::shared_ptr<Transform> transform = gameObject->GetComponent<Transform>();
     std::shared_ptr<Transform> collTransform = aCollider->gameObject->GetComponent<Transform>();
-    Math::Sphere<float> otherSphereInMySpace = aCollider->GetSphere().GetSphereinNewSpace(collTransform->GetWorldMatrix() * transform->GetWorldMatrix().GetFastInverse());
+    Math::Sphere<float> otherSphereInMySpace = aCollider->GetSphere().GetSphereinNewSpace(collTransform->GetWorldMatrix() * transform->GetWorldMatrixInverse());
 
     return Math::IntersectionBetweenSpheres(GetSphere(), otherSphereInMySpace);
 }
@@ -33,7 +33,7 @@ Collider::CollisionInfo SphereCollider::CheckOverlap(const SphereCollider* aColl
 Collider::CollisionInfo SphereCollider::CheckOverlap(const Math::Ray<float> aRay) const
 {
     std::shared_ptr<Transform> transform = gameObject->GetComponent<Transform>();
-    Math::Ray<float> rayInMySpace = aRay.GetRayinNewSpace(transform->GetWorldMatrix().GetFastInverse());
+    Math::Ray<float> rayInMySpace = aRay.GetRayinNewSpace(transform->GetWorldMatrixInverse());
     
     return Math::IntersectionSphereRay(mySphere, rayInMySpace);
 }

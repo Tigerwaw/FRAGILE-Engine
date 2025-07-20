@@ -22,6 +22,7 @@
 #include "AssetTypes/MeshAsset.h"
 #include "AssetTypes/AnimationAsset.h"
 #include "AssetTypes/MaterialAsset.h"
+#include <ComponentSystem/Components/Physics/Rigidbody.h>
 
 static int sRamUsage = 0;
 static int sRamUsageChange = 0;
@@ -101,6 +102,16 @@ void FeatureShowcase::InitializeApplication()
 	}
 
 	Engine::Get().GetSceneHandler().Instantiate(instancedModelObj);
+
+	Engine::Get().DrawColliders = true;
+	std::shared_ptr<GameObject> physicsObject = std::make_shared<GameObject>();
+	auto transform = physicsObject->AddComponent<Transform>();
+	transform->SetTranslation(0.0f, 50.0f, -200.0f);
+	transform->SetUniformScale(50.0f);
+	physicsObject->AddComponent<Rigidbody>(50.0f);
+	physicsObject->AddComponent<Model>(GraphicsEngine::Get().GetCubePrimitive());
+	physicsObject->AddComponent<BoxCollider>(Math::Vector3f(2.0f, 2.0f, 2.0f));
+	Engine::Get().GetSceneHandler().Instantiate(physicsObject);
 }
 
 void FeatureShowcase::UpdateApplication()

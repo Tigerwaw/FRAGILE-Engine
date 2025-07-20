@@ -138,21 +138,7 @@ Math::PlaneVolume<float> Camera::GetFrustumPlaneVolume(Math::Matrix4x4f aToObjec
 
 bool Camera::GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB)
 {
-	std::shared_ptr<Transform> goTransform = gameObject->GetComponent<Transform>();
-	Math::Matrix4x4f objectMatrix = aObjectTransform->GetWorldMatrix();
-
-	if (goTransform->IsScaled())
-	{
-		PIXScopedEvent(PIX_COLOR_INDEX(6), "Matrix Get Slow Inverse");
-		objectMatrix = objectMatrix.GetInverse();
-	}
-	else
-	{
-		objectMatrix = objectMatrix.GetFastInverse();
-	}
-
-	PIXScopedEvent(PIX_COLOR_INDEX(6), "Plane Volume AABB Intersection");
-	return Math::IntersectionBetweenPlaneVolumeAABB(GetFrustumPlaneVolume(objectMatrix), aObjectAABB);
+	return Math::IntersectionBetweenPlaneVolumeAABB(GetFrustumPlaneVolume(aObjectTransform->GetWorldMatrixInverse()), aObjectAABB);
 }
 
 bool Camera::Serialize(nl::json& outJsonObject)

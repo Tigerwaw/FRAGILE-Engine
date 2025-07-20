@@ -1336,19 +1336,8 @@ bool RenderAssembler::IsInsideRadius(std::shared_ptr<PointLight> aPointLight, st
 	std::shared_ptr<Camera> pointLightCam = aPointLight->gameObject->GetComponent<Camera>();
 	if (!pointLightTransform) return true;
 
-	Math::Matrix4x4f objectMatrix = aObjectTransform->GetWorldMatrix();
-
-	if (aObjectTransform->IsScaled())
-	{
-		objectMatrix = objectMatrix.GetInverse();
-	}
-	else
-	{
-		objectMatrix = objectMatrix.GetFastInverse();
-	}
-
 	Math::Sphere<float> sphere(pointLightTransform->GetTranslation(), pointLightCam->GetFarPlane());
-	sphere = sphere.GetSphereinNewSpace(pointLightTransform->GetWorldMatrix() * objectMatrix);
+	sphere = sphere.GetSphereinNewSpace(pointLightTransform->GetWorldMatrix() * aObjectTransform->GetWorldMatrixInverse());
 	return Math::IntersectionSphereAABB(sphere, aObjectAABB);
 }
 

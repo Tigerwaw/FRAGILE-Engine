@@ -20,14 +20,14 @@ void Transform::Update()
 
 }
 
-void Transform::UpdateToWorldMatrix(Math::Matrix4x4f aToWorldMatrix, Math::Matrix4x4f aToWorldMatrixNoScale)
+void Transform::UpdateToWorldMatrix(const Math::Matrix4x4f& aToWorldMatrix, const Math::Matrix4x4f& aToWorldMatrixNoScale)
 {
 	myToWorldMatrix = aToWorldMatrix;
 	myToWorldMatrixNoScale = aToWorldMatrixNoScale;
 
 	for (auto& child : myChildren)
 	{
-		child->UpdateToWorldMatrix(GetMatrix() * aToWorldMatrix, GetMatrix(true) * aToWorldMatrixNoScale);
+		child->UpdateToWorldMatrix(GetMatrixInternal(false) * aToWorldMatrix, GetMatrixInternal(true) * aToWorldMatrixNoScale);
 	}
 }
 
@@ -35,7 +35,7 @@ void Transform::UpdateChildrenToWorldMatrix()
 {
 	for (auto& child : myChildren)
 	{
-		child->UpdateToWorldMatrix(GetMatrix() * myToWorldMatrix, GetMatrix(true) * myToWorldMatrixNoScale);
+		child->UpdateToWorldMatrix(GetMatrixInternal(false) * myToWorldMatrix, GetMatrixInternal(true) * myToWorldMatrixNoScale);
 	}
 }
 
@@ -46,66 +46,51 @@ void Transform::SetIsDirty()
 	UpdateChildrenToWorldMatrix();
 }
 
-const Math::Matrix4x4f& Transform::GetMatrix(bool aNoScale)
+const Math::Matrix4x4f& Transform::GetMatrix()
 {
-	if (myIsDirty)
+	if (IsScaled())
 	{
-		myCachedMatrix = Math::Matrix4x4f();
-		myCachedMatrixNoScale = Math::Matrix4x4f();
-
-		Math::Matrix4x4f scaleMatrix;
-		scaleMatrix(1, 1) = myScale.x;
-		scaleMatrix(2, 2) = myScale.y;
-		scaleMatrix(3, 3) = myScale.z;
-
-		myCachedMatrix *= scaleMatrix;
-
-		Math::Matrix4x4f rotationMatrix = Math::Matrix4x4f::CreateRollPitchYawMatrix(myRotation);
-		myCachedMatrix *= rotationMatrix;
-		myCachedMatrixNoScale *= rotationMatrix;
-
-		Math::Matrix4x4f translationMatrix;
-		translationMatrix(4, 1) = myPosition.x;
-		translationMatrix(4, 2) = myPosition.y;
-		translationMatrix(4, 3) = myPosition.z;
-
-		myCachedMatrix *= translationMatrix;
-		myCachedMatrixNoScale *= translationMatrix;
-
-		myIsDirty = false;
-	}
-
-	if (aNoScale)
-	{
-		return myCachedMatrixNoScale;
+		return GetMatrixInternal(false);
 	}
 	else
 	{
-		return myCachedMatrix;
+		return GetMatrixInternal(true);
 	}
 }
 
-const Math::Matrix4x4f Transform::GetWorldMatrix(bool aNoScale)
+const Math::Matrix4x4f Transform::GetWorldMatrix()
 {
-	if (aNoScale)
+	if (IsScaled())
 	{
-		return GetMatrix(true) * myToWorldMatrixNoScale;
+		return GetWorldMatrixInternal(false);
 	}
 	else
 	{
-		return GetMatrix(false) * myToWorldMatrix;
+		return GetWorldMatrixInternal(true);
 	}
 }
 
-const Math::Matrix4x4f Transform::GetToWorldMatrix(bool aNoScale)
+const Math::Matrix4x4f Transform::GetMatrixInverse()
 {
-	if (aNoScale)
+	if (IsScaled())
 	{
-		return myToWorldMatrixNoScale;
+		return GetMatrixInternal(false).GetInverse();
 	}
 	else
 	{
-		return myToWorldMatrix;
+		return GetMatrixInternal(true).GetFastInverse();
+	}
+}
+
+const Math::Matrix4x4f Transform::GetWorldMatrixInverse()
+{
+	if (IsScaled())
+	{
+		return GetWorldMatrixInternal(false).GetInverse();
+	}
+	else
+	{
+		return GetWorldMatrixInternal(true).GetFastInverse();
 	}
 }
 
@@ -395,4 +380,55 @@ bool Transform::Deserialize(nl::json& aJsonObject)
 	}
 
 	return true;
+}
+
+const Math::Matrix4x4f& Transform::GetMatrixInternal(bool aNoScale)
+{
+	if (myIsDirty)
+	{
+		myCachedMatrix = Math::Matrix4x4f();
+		myCachedMatrixNoScale = Math::Matrix4x4f();
+
+		Math::Matrix4x4f scaleMatrix;
+		scaleMatrix(1, 1) = myScale.x;
+		scaleMatrix(2, 2) = myScale.y;
+		scaleMatrix(3, 3) = myScale.z;
+
+		myCachedMatrix *= scaleMatrix;
+
+		Math::Matrix4x4f rotationMatrix = Math::Matrix4x4f::CreateRollPitchYawMatrix(myRotation);
+		myCachedMatrix *= rotationMatrix;
+		myCachedMatrixNoScale *= rotationMatrix;
+
+		Math::Matrix4x4f translationMatrix;
+		translationMatrix(4, 1) = myPosition.x;
+		translationMatrix(4, 2) = myPosition.y;
+		translationMatrix(4, 3) = myPosition.z;
+
+		myCachedMatrix *= translationMatrix;
+		myCachedMatrixNoScale *= translationMatrix;
+
+		myIsDirty = false;
+	}
+
+	if (aNoScale)
+	{
+		return myCachedMatrixNoScale;
+	}
+	else
+	{
+		return myCachedMatrix;
+	}
+}
+
+const Math::Matrix4x4f Transform::GetWorldMatrixInternal(bool aNoScale)
+{
+	if (aNoScale)
+	{
+		return GetMatrixInternal(true) * myToWorldMatrixNoScale;
+	}
+	else
+	{
+		return GetMatrixInternal(false) * myToWorldMatrix;
+	}
 }

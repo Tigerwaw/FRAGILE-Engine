@@ -15,6 +15,7 @@ namespace Math
 		T z;
 
 		Vector3<T>();
+		Vector3<T>(const T& aValue);
 		Vector3<T>(const T& aX, const T& aY, const T& aZ);
 		Vector3<T>(const Vector3<T>& aVector) = default;
 		Vector3<T>& operator=(const Vector3<T>& aVector3) = default;
@@ -50,6 +51,14 @@ namespace Math
 		x = 0;
 		y = 0;
 		z = 0;
+	}
+
+	template<class T>
+	inline Vector3<T>::Vector3(const T& aValue)
+	{
+		x = aValue;
+		y = aValue;
+		z = aValue;
 	}
 
 	template<class T>

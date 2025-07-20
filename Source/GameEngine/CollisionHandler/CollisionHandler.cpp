@@ -110,6 +110,9 @@ void CollisionHandler::CompareCollisions()
 			{
 				activeCollisionThisFrame.colliderOne->OnCollisionEnter();
 				activeCollisionThisFrame.colliderTwo->OnCollisionEnter();
+
+				printf("Collided\n");
+				// Resolve Collision
 			}
 			else
 			{

@@ -21,9 +21,10 @@ public:
 	const Transform* GetParent() const { return myParent; }
 	const std::vector<Transform*> GetChildren() const { return myChildren; }
 
-	const Math::Matrix4x4f& GetMatrix(bool aNoScale = false);
-	const Math::Matrix4x4f GetWorldMatrix(bool aNoScale = false);
-	const Math::Matrix4x4f GetToWorldMatrix(bool aNoScale = false);
+	const Math::Matrix4x4f& GetMatrix();
+	const Math::Matrix4x4f GetWorldMatrix();
+	const Math::Matrix4x4f GetMatrixInverse();
+	const Math::Matrix4x4f GetWorldMatrixInverse();
 
 	const Math::Vector3f GetRightVector(bool aInWorldSpace = false);
 	const Math::Vector3f GetUpVector(bool aInWorldSpace = false);
@@ -54,7 +55,9 @@ public:
 	bool Serialize(nl::json& outJsonObject) override;
 	bool Deserialize(nl::json& aJsonObject) override;
 private:
-	void UpdateToWorldMatrix(Math::Matrix4x4f aToWorldMatrix, Math::Matrix4x4f aToWorldMatrixNoScale);
+	const Math::Matrix4x4f& GetMatrixInternal(bool aNoScale);
+	const Math::Matrix4x4f GetWorldMatrixInternal(bool aNoScale);
+	void UpdateToWorldMatrix(const Math::Matrix4x4f& aToWorldMatrix, const Math::Matrix4x4f& aToWorldMatrixNoScale);
 	void UpdateChildrenToWorldMatrix();
 	void SetIsDirty();
 	void SetParentInternal(Transform* aTransform);
@@ -72,4 +75,3 @@ private:
 	Transform* myParent = nullptr;
 	std::vector<Transform*> myChildren;
 };
-

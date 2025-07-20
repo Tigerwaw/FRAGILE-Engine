@@ -63,7 +63,10 @@ namespace Math
 	{
 		Vector3<T> newCenter = ToVector3(ToVector4(myPoint) * aMatrix);
 		newCenter += { aMatrix(4, 1), aMatrix(4, 2), aMatrix(4, 3) };
-		Sphere<T> newSphere(newCenter, GetRadius());
+		Vector3<T> scale = Matrix4x4<T>::CreateScaleVector(aMatrix);
+		T maxScale = static_cast<T>(std::max(scale.x, std::max(scale.y, scale.z)));
+		T newRadius = GetRadius() * maxScale;
+		Sphere<T> newSphere(newCenter, newRadius);
 		return newSphere;
 	}
 

@@ -13,6 +13,7 @@ namespace Math
 	{
 		bool intersected = false;
 		Vector3f intersectionPoint;
+		Vector3f overlap;
 
 		operator bool() const
 		{
@@ -146,9 +147,17 @@ namespace Math
 
 		if (aSphere.IsInside(closestPoint))
 		{
+			Vector3<T> centerDelta = Vector3<T>::Abs(aAABB3D.GetCenter() - aSphere.GetPoint());
+			Vector3<T> aabbExtents = aAABB3D.GetExtents();
+			Vector3<T> overlap;
+			overlap.x = aabbExtents.x + aSphere.GetRadius() - centerDelta.x;
+			overlap.y = aabbExtents.y + aSphere.GetRadius() - centerDelta.y;
+			overlap.z = aabbExtents.z + aSphere.GetRadius() - centerDelta.z;
+
 			IntersectionInfo info;
 			info.intersected = true;
 			info.intersectionPoint = closestPoint;
+			info.overlap = overlap;
 			return info;
 		}
 
@@ -166,9 +175,20 @@ namespace Math
 		bool y = minA.y <= maxB.y && maxA.y >= minB.y;
 		bool z = minA.z <= maxB.z && maxA.z >= minB.z;
 
-		IntersectionInfo info;
-		info.intersected = x && y && z;
-		return info;
+		if (x && y && z)
+		{
+			Vector3<T> centerDelta = Vector3<T>::Abs(aBoundingBoxOne.GetCenter() - aBoundingBoxTwo.GetCenter());
+			Vector3<T> aabbOneExtents = aBoundingBoxOne.GetExtents();
+			Vector3<T> aabbTwoExtents = aBoundingBoxTwo.GetExtents();
+			Vector3<T> overlap = aabbOneExtents + aabbTwoExtents - centerDelta;
+
+			IntersectionInfo info;
+			info.intersected = true;
+			info.overlap = overlap;
+			return info;
+		}
+		
+		return IntersectionInfo();
 	}
 
 	template<class T>
@@ -179,9 +199,18 @@ namespace Math
 		T radiusSum = aSphereOne.GetRadius() + aSphereTwo.GetRadius();
 		T sqrdRadii = radiusSum * radiusSum;
 
-		IntersectionInfo info;
-		info.intersected = (distanceSqr <= sqrdRadii);
-		return info;
+		if (distanceSqr <= sqrdRadii)
+		{
+			Vector3<T> centerDelta = Vector3<T>::Abs(aSphereOne.GetPoint() - aSphereTwo.GetPoint());
+			Vector3<T> overlap = Vector3<T>(aSphereOne.GetRadius()) + Vector3<T>(aSphereTwo.GetRadius()) - centerDelta;
+
+			IntersectionInfo info;
+			info.intersected = true;
+			info.overlap = overlap;
+			return info;
+		}
+		
+		return IntersectionInfo();
 	}
 
 	template<class T>

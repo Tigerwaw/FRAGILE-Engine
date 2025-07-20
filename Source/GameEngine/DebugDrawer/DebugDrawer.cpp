@@ -109,8 +109,9 @@ void DebugDrawer::DrawBoundingSphere(Math::Sphere<float> aSphere, Math::Matrix4x
 {
     int numPoints = 20;
     float angleinc = 2.0f * Math::PI / static_cast<float>(numPoints);
-    float radius = aSphere.GetRadius();
-    Math::Vector3f center = aSphere.GetSphereinNewSpace(aWorldMatrix).GetPoint();
+    Math::Sphere<float> sphereInNewSpace = aSphere.GetSphereinNewSpace(aWorldMatrix);
+    Math::Vector3f center = sphereInNewSpace.GetPoint();
+    float radius = sphereInNewSpace.GetRadius();
 
     {
         Math::Vector3f previousPointRight;

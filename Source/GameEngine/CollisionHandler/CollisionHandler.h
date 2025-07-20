@@ -6,16 +6,16 @@ class Scene;
 class CollisionHandler
 {
 public:
-    struct CollisionHandle
+    struct Collision
     {
         bool isTrigger = false;
         std::shared_ptr<Collider> colliderOne;
         std::shared_ptr<Collider> colliderTwo;
 
-        bool operator==(const CollisionHandle& aOtherHandle)
+        bool operator==(const Collision& aOtherCollision)
         {
-            return (colliderOne == aOtherHandle.colliderOne && colliderTwo == aOtherHandle.colliderTwo)
-                || (colliderOne == aOtherHandle.colliderTwo && colliderTwo == aOtherHandle.colliderOne);
+            return (colliderOne == aOtherCollision.colliderOne && colliderTwo == aOtherCollision.colliderTwo)
+                || (colliderOne == aOtherCollision.colliderTwo && colliderTwo == aOtherCollision.colliderOne);
         }
     };
 
@@ -29,7 +29,7 @@ private:
     void AddActiveCollisions(Scene& aScene);
     void CompareCollisions();
 
-    std::vector<CollisionHandle> myActiveCollisionsThisFrame;
-    std::vector<CollisionHandle> myActiveCollisionsLastFrame;
+    std::vector<Collision> myActiveCollisionsThisFrame;
+    std::vector<Collision> myActiveCollisionsLastFrame;
 };
 
