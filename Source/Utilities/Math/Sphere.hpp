@@ -23,17 +23,19 @@ namespace Math
 		// sphere surface or inside of the sphere.
 		bool IsInside(const Vector3<T>& aPosition) const;
 		const Vector3<T> GetPoint() const;
-		const T GetRadiusSqr() const;
 		const T GetRadius() const;
+		const T GetRadiusSqr() const;
 	private:
 		Vector3<T> myPoint;
 		T myRadiusSqr;
+		T myRadius;
 	};
 
 	template <class T>
 	Sphere<T>::Sphere()
 	{
 		myPoint = Vector3<T>();
+		myRadius = 0;
 		myRadiusSqr = 0;
 	}
 
@@ -41,6 +43,7 @@ namespace Math
 	Sphere<T>::Sphere(const Sphere<T>& aSphere)
 	{
 		myPoint = aSphere.myPoint;
+		myRadius = aSphere.myRadius;
 		myRadiusSqr = aSphere.myRadiusSqr;
 	}
 
@@ -48,6 +51,7 @@ namespace Math
 	Sphere<T>::Sphere(const Vector3<T>& aCenter, T aRadius)
 	{
 		myPoint = aCenter;
+		myRadius = aRadius;
 		myRadiusSqr = aRadius * aRadius;
 	}
 
@@ -55,6 +59,7 @@ namespace Math
 	void Sphere<T>::InitWithCenterAndRadius(const Vector3<T>& aCenter, T aRadius)
 	{
 		myPoint = aCenter;
+		myRadius = aRadius;
 		myRadiusSqr = aRadius * aRadius;
 	}
 
@@ -92,14 +97,15 @@ namespace Math
 		return myPoint;
 	}
 
+	template<class T>
+	inline const T Sphere<T>::GetRadius() const
+	{
+		return myRadius;
+	}
+
 	template <class T>
 	const T Sphere<T>::GetRadiusSqr() const
 	{
 		return myRadiusSqr;
-	}
-	template<class T>
-	inline const T Sphere<T>::GetRadius() const
-	{
-		return static_cast<T>(sqrt(myRadiusSqr));
 	}
 }

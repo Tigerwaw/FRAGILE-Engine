@@ -69,12 +69,14 @@ void CollisionHandler::AddActiveCollisions(Scene& aScene)
 			std::shared_ptr<Collider> colliderB = goB->GetComponent<Collider>();
 			if (!colliderB || !colliderB->GetActive()) continue;
 
-			if (colliderA->CheckOverlap(colliderB.get()))
+			Collider::CollisionInfo info = colliderA->CheckOverlap(colliderB.get());
+			if (info.collided)
 			{
 				auto& newCollision = myActiveCollisionsThisFrame.emplace_back();
 				newCollision.colliderOne = colliderA;
 				newCollision.colliderTwo = colliderB;
 				newCollision.isTrigger = colliderA->IsTrigger() || colliderB->IsTrigger();
+				newCollision.info = info;
 			}
 		}
 	}
@@ -147,23 +149,56 @@ void CollisionHandler::CompareCollisions()
 
 void CollisionHandler::ResolveCollision(const Collision& aCollision)
 {
+	ResolveInterpenetration(aCollision);
+	ResolveImpulse(aCollision);
+}
+
+void CollisionHandler::ResolveInterpenetration(const Collision& aCollision)
+{
+	auto rbOne = aCollision.colliderOne->gameObject->GetComponent<Rigidbody>();
+	auto rbTwo = aCollision.colliderTwo->gameObject->GetComponent<Rigidbody>();
+
+	Math::Vector3f correctionVector = aCollision.info.normal * aCollision.info.depth;
+	if (rbOne && rbTwo)
+	{
+		correctionVector *= 0.5f;
+	}
+
+	if (rbOne)
+	{
+		aCollision.colliderOne->gameObject->GetComponent<Transform>()->AddTranslation(-correctionVector);
+		rbOne->ResetVelocity();
+	}
+
+	if (rbTwo)
+	{
+		aCollision.colliderTwo->gameObject->GetComponent<Transform>()->AddTranslation(correctionVector);
+		rbTwo->ResetVelocity();
+	}
+}
+
+void CollisionHandler::ResolveImpulse(const Collision& aCollision)
+{
 	auto rbOne = aCollision.colliderOne->gameObject->GetComponent<Rigidbody>();
 	auto rbTwo = aCollision.colliderTwo->gameObject->GetComponent<Rigidbody>();
 
 	if (rbOne && rbTwo)
 	{
-		Math::Vector3f impulseOne = rbTwo->GetVelocity() - rbOne->GetVelocity();
-		Math::Vector3f impulseTwo = rbOne->GetVelocity() - rbTwo->GetVelocity();
+		Math::Vector3f relativeVelocity = rbOne->GetVelocity() - rbTwo->GetVelocity();
+		float dot = relativeVelocity.Dot(aCollision.info.normal);
+		float restitution = 1.0f * 1.0f;
+		float j = -(1.0f + restitution) * dot / (rbOne->GetInvMass() + rbTwo->GetInvMass());
+		Math::Vector3f impulse = j * aCollision.info.normal;
 
-		rbOne->ApplyImpulse(impulseOne);
-		rbTwo->ApplyImpulse(impulseTwo);
+		rbOne->ApplyImpulse(-impulse * rbOne->GetInvMass());
+		rbTwo->ApplyImpulse(impulse * rbTwo->GetInvMass());
 	}
 	else if (rbOne)
 	{
-		rbOne->ApplyImpulse(aCollision.overlap * 100.0f);
+		rbOne->ApplyImpulse(-aCollision.info.normal * aCollision.info.depth);
 	}
 	else if (rbTwo)
 	{
-		rbTwo->ApplyImpulse(aCollision.overlap * 100.0f);
+		rbTwo->ApplyImpulse(aCollision.info.normal * aCollision.info.depth);
 	}
 }

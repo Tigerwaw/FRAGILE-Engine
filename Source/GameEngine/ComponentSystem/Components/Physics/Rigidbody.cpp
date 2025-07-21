@@ -4,9 +4,10 @@
 #include "ComponentSystem/Components/Transform.h"
 #include "ComponentSystem/GameObject.h"
 
-Rigidbody::Rigidbody(float aMass)
+Rigidbody::Rigidbody(float aMass, bool aAffectedByGravity)
 {
 	SetMass(aMass);
+	SetIsAffectedByGravity(aAffectedByGravity);
 }
 
 void Rigidbody::Start()
@@ -20,7 +21,7 @@ void Rigidbody::ApplyForce(Math::Vector3f aForce)
 
 void Rigidbody::ApplyImpulse(Math::Vector3f aImpulse)
 {
-	myVelocity += aImpulse / myMass;
+	myImpulse += aImpulse;
 }
 
 void Rigidbody::SetMass(float aMass)
@@ -32,8 +33,16 @@ void Rigidbody::SetMass(float aMass)
 void Rigidbody::Update()
 {
 	float dt = Engine::Get().GetTimer().GetDeltaTime();
-	myVelocity += myForce / myMass * dt;
+	myVelocity += myForce * myInvMass * dt;
+	myVelocity += myImpulse * myInvMass;
+
+	if (myIsAffectedByGravity)
+	{
+		myVelocity.y -= myTempGravity * myMass * dt;
+	}
+
 	gameObject->GetComponent<Transform>()->AddTranslation(myVelocity * dt);
 	myForce = { 0.0f, 0.0f, 0.0f };
+	myImpulse = { 0.0f, 0.0f, 0.0f };
 	myVelocity *= 1.0f - myTempFriction;
 }

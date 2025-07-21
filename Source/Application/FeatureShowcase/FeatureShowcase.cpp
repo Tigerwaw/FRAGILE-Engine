@@ -24,6 +24,7 @@
 #include "AssetTypes/MaterialAsset.h"
 #include <ComponentSystem/Components/Physics/Rigidbody.h>
 #include <ComponentSystem/Components/Movement/PhysicsController.h>
+#include "CommonUtilities/Random.hpp"
 
 static int sRamUsage = 0;
 static int sRamUsageChange = 0;
@@ -105,29 +106,6 @@ void FeatureShowcase::InitializeApplication()
 	Engine::Get().GetSceneHandler().Instantiate(instancedModelObj);
 
 	Engine::Get().DrawColliders = true;
-
-	{
-		std::shared_ptr<GameObject> physicsObject = std::make_shared<GameObject>();
-		auto transform = physicsObject->AddComponent<Transform>();
-		transform->SetTranslation(0.0f, 50.0f, -200.0f);
-		transform->SetUniformScale(50.0f);
-		physicsObject->AddComponent<Rigidbody>(1.0f);
-		physicsObject->AddComponent<Model>(GraphicsEngine::Get().GetCubePrimitive());
-		physicsObject->AddComponent<BoxCollider>(Math::Vector3f(2.0f, 2.0f, 2.0f));
-		physicsObject->AddComponent<PhysicsController>(1000.0f, 1.0f);
-		Engine::Get().GetSceneHandler().Instantiate(physicsObject);
-	}
-
-	{
-		std::shared_ptr<GameObject> physicsObject = std::make_shared<GameObject>();
-		auto transform = physicsObject->AddComponent<Transform>();
-		transform->SetTranslation(-200.0f, 50.0f, -100.0f);
-		transform->SetUniformScale(50.0f);
-		physicsObject->AddComponent<Rigidbody>(1.0f);
-		physicsObject->AddComponent<Model>(GraphicsEngine::Get().GetCubePrimitive());
-		physicsObject->AddComponent<BoxCollider>(Math::Vector3f(2.0f, 2.0f, 2.0f));
-		Engine::Get().GetSceneHandler().Instantiate(physicsObject);
-	}
 }
 
 void FeatureShowcase::UpdateApplication()
@@ -179,6 +157,9 @@ void FeatureShowcase::UpdateDebug()
 
 	if (myShowResolutionOptions)
 		ResolutionOptions();
+
+	if (myShowPhysicsPlayground)
+		PhysicsPlayground();
 }
 
 void FeatureShowcase::TopMenuBar()
@@ -200,6 +181,9 @@ void FeatureShowcase::TopMenuBar()
 		if (ImGui::MenuItem("Resolution Options"))
 			myShowResolutionOptions = !myShowResolutionOptions;
 
+		if (ImGui::MenuItem("Physics Playground"))
+			myShowPhysicsPlayground = !myShowPhysicsPlayground;
+
 		ImGui::EndMainMenuBar();
 	}
 }
@@ -215,6 +199,8 @@ void FeatureShowcase::FeatureOptions()
 		ImGui::Checkbox("Draw Bounding Boxes", &Engine::Get().DrawBoundingBoxes);
 		ImGui::Checkbox("Draw Camera Frustums", &Engine::Get().DrawCameraFrustums);
 		ImGui::Checkbox("Draw Colliders", &Engine::Get().DrawColliders);
+
+		
 
 		PostProcessingSettings& ppSettings = GraphicsEngine::Get().GetPostProcessingSettings();
 
@@ -729,6 +715,69 @@ void FeatureShowcase::ResolutionOptions()
 			GraphicsEngine::Get().SetResolution(3840.0f, 2160.0f);
 			Engine::Get().SetResolution(3840.0f, 2160.0f);
 		}
+	}
+	ImGui::End();
+}
+
+void FeatureShowcase::PhysicsPlayground()
+{
+	Math::Vector2f resolution = Engine::Get().GetResolution();
+	ImGui::SetNextWindowPos({ 0.8f * resolution.x, 0.32f * resolution.y });
+	ImGui::SetNextWindowContentSize({ 0.15f * resolution.x, 0.24f * resolution.y });
+	if (ImGui::Begin("Resolution", &myShowResolutionOptions))
+	{
+		if (ImGui::Button("Spawn Physics Cube"))
+		{
+			std::shared_ptr<GameObject> physicsObject = std::make_shared<GameObject>();
+			auto transform = physicsObject->AddComponent<Transform>();
+			transform->SetTranslation(2000.0f, 1000.0f, Utilities::RandomInRange<float>(-100.0f, 100.0f));
+			transform->SetUniformScale(50.0f);
+			physicsObject->AddComponent<Rigidbody>(1.0f);
+			physicsObject->AddComponent<Model>(GraphicsEngine::Get().GetCubePrimitive());
+			physicsObject->AddComponent<BoxCollider>(Math::Vector3f(2.0f, 2.0f, 2.0f));
+			Engine::Get().GetSceneHandler().Instantiate(physicsObject);
+		}
+
+		if (ImGui::Button("Spawn Physics Sphere"))
+		{
+			std::shared_ptr<GameObject> physicsObject = std::make_shared<GameObject>();
+			auto transform = physicsObject->AddComponent<Transform>();
+			transform->SetTranslation(2000.0f, 1000.0f, Utilities::RandomInRange<float>(-100.0f, 100.0f));
+			transform->SetUniformScale(50.0f);
+			physicsObject->AddComponent<Rigidbody>(1.0f);
+			physicsObject->AddComponent<Model>(AssetManager::Get().GetAsset<MeshAsset>("sm_sphere.fbx")->mesh);
+			physicsObject->AddComponent<SphereCollider>(1.0f);
+			Engine::Get().GetSceneHandler().Instantiate(physicsObject);
+		}
+
+		ImGui::BeginDisabled(myControllablePhysicsObject != nullptr);
+		if (ImGui::Button("Spawn Controllable Physics Object"))
+		{
+			if (!myControllablePhysicsObject)
+			{
+				myControllablePhysicsObject = std::make_shared<GameObject>();
+				auto transform = myControllablePhysicsObject->AddComponent<Transform>();
+				transform->SetTranslation(2000.0f, 1000.0f, -200.0f);
+				transform->SetUniformScale(50.0f);
+				myControllablePhysicsObject->AddComponent<Rigidbody>(1.0f);
+				myControllablePhysicsObject->AddComponent<Model>(GraphicsEngine::Get().GetCubePrimitive());
+				myControllablePhysicsObject->AddComponent<BoxCollider>(Math::Vector3f(2.0f, 2.0f, 2.0f));
+				myControllablePhysicsObject->AddComponent<PhysicsController>(1000.0f, 1.0f);
+				Engine::Get().GetSceneHandler().Instantiate(myControllablePhysicsObject);
+			}
+		}
+		ImGui::EndDisabled();
+
+		ImGui::BeginDisabled(myControllablePhysicsObject == nullptr);
+		if (ImGui::Button("Toggle Physics Objects Controls"))
+		{
+			if (myControllablePhysicsObject)
+			{
+				auto cont = myControllablePhysicsObject->GetComponent<PhysicsController>();
+				cont->SetActive(!cont->GetActive());
+			}
+		}
+		ImGui::EndDisabled();
 	}
 	ImGui::End();
 }

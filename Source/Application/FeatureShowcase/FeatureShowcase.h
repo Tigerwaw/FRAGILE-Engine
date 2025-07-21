@@ -18,12 +18,14 @@ private:
 	void PerformanceInfo();
 	void ControlsInfo();
 	void ResolutionOptions();
+	void PhysicsPlayground();
 
 	bool myShowFeatureOptions = false;
 	bool myShowLightingSettings = false;
 	bool myShowPerformanceInfo = true;
 	bool myShowControlsInfo = false;
 	bool myShowResolutionOptions = false;
+	bool myShowPhysicsPlayground = true;
 
 	int currentAnimation = 0;
 	std::vector<std::string> animationNames = {
@@ -35,4 +37,6 @@ private:
 
 	unsigned currentDebugMode = 0;
 	unsigned currentTonemapper = 1;
+
+	std::shared_ptr<GameObject> myControllablePhysicsObject;
 };

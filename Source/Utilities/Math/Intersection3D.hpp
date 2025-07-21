@@ -6,6 +6,7 @@
 #include "AABB3D.hpp"
 #include "Ray.hpp"
 #include "PlaneVolume.hpp"
+#include "ArithmeticUtilities.hpp"
 
 #undef min
 #undef max
@@ -16,7 +17,10 @@ namespace Math
 	{
 		bool intersected = false;
 		Vector3f intersectionPoint;
-		Vector3f overlap;
+		Vector3f pointA; // Furthest point of A into B
+		Vector3f pointB; // Furthest point of B into A
+		Vector3f normal; // B - A normalized
+		float depth; // Length of B - A
 
 		operator bool() const
 		{
@@ -150,22 +154,78 @@ namespace Math
 
 		if (aSphere.IsInside(closestPoint))
 		{
-			Vector3<T> centerDelta = Vector3<T>::Abs(aAABB3D.GetCenter() - aSphere.GetPoint());
+			Vector3<T> centerDelta = aSphere.GetPoint() - aAABB3D.GetCenter();
 			Vector3<T> aabbExtents = aAABB3D.GetExtents();
-			Vector3<T> overlap;
-			overlap.x = aabbExtents.x + aSphere.GetRadius() - centerDelta.x;
-			overlap.y = aabbExtents.y + aSphere.GetRadius() - centerDelta.y;
-			overlap.z = aabbExtents.z + aSphere.GetRadius() - centerDelta.z;
+			Vector3<T> radiusAsVector = { aSphere.GetRadius(), aSphere.GetRadius(), aSphere.GetRadius() };
+			Vector3<T> overlap = aabbExtents + radiusAsVector - Vector3<T>::Abs(centerDelta);
+
+			T minOverlap = std::min(overlap.x, std::min(overlap.y, overlap.z));
+			Vector3<T> correctionVector;
+			if (Equal(minOverlap, overlap.x, static_cast<T>(0.01)))
+			{
+				correctionVector.x = Sign(centerDelta.x) * overlap.x;
+			}
+			else if (Equal(minOverlap, overlap.z, static_cast<T>(0.01)))
+			{
+				correctionVector.z = Sign(centerDelta.z) * overlap.z;
+			}
+			else
+			{
+				correctionVector.y = Sign(centerDelta.y) * overlap.y;
+			}
 
 			IntersectionInfo info;
-			info.intersected = true;
 			info.intersectionPoint = closestPoint;
-			info.overlap = overlap;
+			info.intersected = true;
+			info.normal = correctionVector.GetNormalized();
+			info.depth = correctionVector.Length();
+			//info.pointA = overlap - aabbExtents;
+			//info.pointB = overlap - radiusAsVector;
 			return info;
 		}
 
 		return IntersectionInfo();
 	}
+
+	/*template <class T>
+	IntersectionInfo IntersectionSpherePlane(const Sphere<T>& aSphere, const Plane<T>& aPlane)
+	{
+		Vector3f closestPointOnPlane = aPlane.ClosestPointOnPlane(aSphere.GetPoint());
+		Vector3f distanceToSphere = aSphere.GetPoint() - closestPointOnPlane;
+		if (distanceToSphere.LengthSqr() <= aSphere.GetRadiusSqr())
+		{
+			IntersectionInfo info;
+			info.intersected = true;
+			info.intersectionPoint = closestPointOnPlane;
+			info.pointA = aSphere.GetRadius() * -distanceToSphere.GetNormalized();
+			info.pointB = closestPointOnPlane;
+			info.normal = distanceToSphere.GetNormalized();
+			info.depth = distanceToSphere.Length();
+			return info;
+		}
+
+		return IntersectionInfo();
+	}
+
+	template <class T>
+	IntersectionInfo IntersectionAABBPlane(const AABB3D<T>& aAABB, const Plane<T>& aPlane)
+	{
+		Vector3<T> closestPointOnPlane = aPlane.ClosestPointOnPlane(aAABB.GetCenter());
+		Vector3<T> distanceToAABB = aAABB.GetCenter() - closestPointOnPlane;
+		if (aAABB.IsInside(closestPointOnPlane))
+		{
+			IntersectionInfo info;
+			info.intersected = true;
+			info.intersectionPoint = closestPointOnPlane;
+			info.pointA = aAABB.GetExtents() * -distanceToAABB.GetNormalized();
+			info.pointB = closestPointOnPlane;
+			info.normal = distanceToAABB.GetNormalized();
+			info.depth = distanceToAABB.Length();
+			return info;
+		}
+
+		return IntersectionInfo();
+	}*/
 
 	template<class T>
 	IntersectionInfo IntersectionBetweenAABBS(const AABB3D<T>& aBoundingBoxOne, const AABB3D<T>& aBoundingBoxTwo)
@@ -180,14 +240,31 @@ namespace Math
 
 		if (x && y && z)
 		{
-			Vector3<T> centerDelta = Vector3<T>::Abs(aBoundingBoxOne.GetCenter() - aBoundingBoxTwo.GetCenter());
-			Vector3<T> aabbOneExtents = aBoundingBoxOne.GetExtents();
-			Vector3<T> aabbTwoExtents = aBoundingBoxTwo.GetExtents();
-			Vector3<T> overlap = aabbOneExtents + aabbTwoExtents - centerDelta;
+			Vector3<T> centerDelta = aBoundingBoxOne.GetCenter() - aBoundingBoxTwo.GetCenter();
+			Vector3<T> combinedExtents = aBoundingBoxOne.GetExtents() + aBoundingBoxTwo.GetExtents();
+			Vector3<T> overlap = combinedExtents - Vector3<T>::Abs(centerDelta);
+
+			T minOverlap = std::min(overlap.x, std::min(overlap.y, overlap.z));
+			Vector3<T> correctionVector;
+			if (Equal(minOverlap, overlap.x, static_cast<T>(0.01)))
+			{
+				correctionVector.x = Sign(centerDelta.x) * overlap.x;
+			}
+			else if (Equal(minOverlap, overlap.z, static_cast<T>(0.01)))
+			{
+				correctionVector.z = Sign(centerDelta.z) * overlap.z;
+			}
+			else
+			{
+				correctionVector.y = Sign(centerDelta.y) * overlap.y;
+			}
 
 			IntersectionInfo info;
 			info.intersected = true;
-			info.overlap = overlap;
+			info.normal = correctionVector.GetNormalized();
+			info.depth = correctionVector.Length();
+			//info.pointA = overlap - info.normal * aabbTwoExtents;
+			//info.pointB = overlap - info.normal * aabbOneExtents;
 			return info;
 		}
 		
@@ -204,13 +281,18 @@ namespace Math
 
 		if (distanceSqr <= sqrdRadii)
 		{
-			Vector3<T> centerDelta = Vector3<T>::Abs(aSphereOne.GetPoint() - aSphereTwo.GetPoint());
+			Vector3<T> centerDelta = aSphereOne.GetPoint() - aSphereTwo.GetPoint();
+			Vector3<T> radiusOneAsVector = { aSphereOne.GetRadius(), aSphereOne.GetRadius(), aSphereOne.GetRadius() };
+			Vector3<T> radiusTwoAsVector = { aSphereTwo.GetRadius(), aSphereTwo.GetRadius(), aSphereTwo.GetRadius() };
 			Vector3<T> radiusSumAsVector = { radiusSum, radiusSum, radiusSum };
-			Vector3<T> overlap = radiusSumAsVector - centerDelta;
+			Vector3<T> overlap = radiusSumAsVector - Vector3<T>::Abs(centerDelta);
 
 			IntersectionInfo info;
 			info.intersected = true;
-			info.overlap = overlap;
+			info.normal = overlap.GetNormalized();
+			info.depth = overlap.Length();
+			//info.pointA = overlap - radiusTwoAsVector;
+			//info.pointB = overlap - radiusOneAsVector;
 			return info;
 		}
 		

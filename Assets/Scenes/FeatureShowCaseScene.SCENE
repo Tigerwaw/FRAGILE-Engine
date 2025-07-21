@@ -17,6 +17,16 @@
           "Model": "SM_PlanePrimitive",
           "Materials": [
           ]
+        },
+        {
+          "Type": "BoxCollider",
+          "IsTrigger": false,
+          "CenterOffset": [ 0.0, 0.0, 0.0 ],
+          "Extents": {
+            "Width": 2.0,
+            "Height": 0.001,
+            "Depth": 2.0
+          }
         }
       ]
     },
@@ -264,7 +274,7 @@
       "Components": [
         {
           "Type": "Transform",
-          "Position": [ 500.0, 40.0, 200.0 ],
+          "Position": [ 500.0, 50.0, 200.0 ],
           "Rotation": [ -90.0, 0.0, 0.0 ],
           "Scale": [ 1.0, 1.0, 1.0 ]
         },
@@ -281,7 +291,7 @@
         },
         {
           "Type": "BoxCollider",
-          "IsTrigger": false,
+          "IsTrigger": true,
           "CenterOffset": [ 0.0, 0.0, 5.0 ],
           "Extents": {
             "Width": 60.0,
@@ -348,7 +358,7 @@
             },
             {
               "Type": "SphereCollider",
-              "IsTrigger":  false,
+              "IsTrigger":  true,
               "CenterOffset": [ 0.0, 70.0, 0.0 ],
               "Radius": 55.0
             }
