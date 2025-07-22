@@ -17,10 +17,8 @@ namespace Math
 	{
 		bool intersected = false;
 		Vector3f intersectionPoint;
-		Vector3f pointA; // Furthest point of A into B
-		Vector3f pointB; // Furthest point of B into A
-		Vector3f normal; // B - A normalized
-		float depth; // Length of B - A
+		Vector3f normal;
+		float depth;
 
 		operator bool() const
 		{
@@ -154,33 +152,15 @@ namespace Math
 
 		if (aSphere.IsInside(closestPoint))
 		{
-			Vector3<T> centerDelta = aSphere.GetPoint() - aAABB3D.GetCenter();
-			Vector3<T> aabbExtents = aAABB3D.GetExtents();
-			Vector3<T> radiusAsVector = { aSphere.GetRadius(), aSphere.GetRadius(), aSphere.GetRadius() };
-			Vector3<T> overlap = aabbExtents + radiusAsVector - Vector3<T>::Abs(centerDelta);
-
-			T minOverlap = std::min(overlap.x, std::min(overlap.y, overlap.z));
-			Vector3<T> correctionVector;
-			if (Equal(minOverlap, overlap.x, static_cast<T>(0.01)))
-			{
-				correctionVector.x = Sign(centerDelta.x) * overlap.x;
-			}
-			else if (Equal(minOverlap, overlap.z, static_cast<T>(0.01)))
-			{
-				correctionVector.z = Sign(centerDelta.z) * overlap.z;
-			}
-			else
-			{
-				correctionVector.y = Sign(centerDelta.y) * overlap.y;
-			}
+			Vector3<T> sphereCenterToClosestPoint = closestPoint - aSphere.GetPoint();
+			Vector3<T> furthestPointOfSphereInAABB = sphereCenterToClosestPoint.GetNormalized() * aSphere.GetRadius();
+			Vector3<T> overlap = sphereCenterToClosestPoint - furthestPointOfSphereInAABB;
 
 			IntersectionInfo info;
 			info.intersectionPoint = closestPoint;
 			info.intersected = true;
-			info.normal = correctionVector.GetNormalized();
-			info.depth = correctionVector.Length();
-			//info.pointA = overlap - aabbExtents;
-			//info.pointB = overlap - radiusAsVector;
+			info.normal = overlap.GetNormalized();
+			info.depth = overlap.Length();
 			return info;
 		}
 
@@ -263,8 +243,6 @@ namespace Math
 			info.intersected = true;
 			info.normal = correctionVector.GetNormalized();
 			info.depth = correctionVector.Length();
-			//info.pointA = overlap - info.normal * aabbTwoExtents;
-			//info.pointB = overlap - info.normal * aabbOneExtents;
 			return info;
 		}
 		
@@ -291,8 +269,6 @@ namespace Math
 			info.intersected = true;
 			info.normal = overlap.GetNormalized();
 			info.depth = overlap.Length();
-			//info.pointA = overlap - radiusTwoAsVector;
-			//info.pointB = overlap - radiusOneAsVector;
 			return info;
 		}
 		

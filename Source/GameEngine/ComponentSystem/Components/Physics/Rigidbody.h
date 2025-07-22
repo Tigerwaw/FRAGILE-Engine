@@ -10,7 +10,7 @@ public:
 	void Update() override;
 	void ApplyForce(Math::Vector3f aForce);
 	void ApplyImpulse(Math::Vector3f aImpulse);
-	void ResetVelocity() { myVelocity = { 0.0f, 0.0f, 0.0f }; }
+	void ResetVelocity() { myResetVelocity = true; }
 
 	Math::Vector3f GetVelocity() const { return myVelocity; }
 	void SetMass(float aMass);
@@ -22,6 +22,7 @@ public:
 
 private:
 	bool myIsAffectedByGravity = true;
+	bool myResetVelocity = true;
 
 	Math::Vector3f myVelocity;
 	Math::Vector3f myForce;

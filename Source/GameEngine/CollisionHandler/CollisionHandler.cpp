@@ -190,15 +190,15 @@ void CollisionHandler::ResolveImpulse(const Collision& aCollision)
 		float j = -(1.0f + restitution) * dot / (rbOne->GetInvMass() + rbTwo->GetInvMass());
 		Math::Vector3f impulse = j * aCollision.info.normal;
 
-		rbOne->ApplyImpulse(-impulse * rbOne->GetInvMass());
-		rbTwo->ApplyImpulse(impulse * rbTwo->GetInvMass());
+		rbOne->ApplyImpulse(impulse * rbOne->GetInvMass());
+		rbTwo->ApplyImpulse(-impulse * rbTwo->GetInvMass());
 	}
 	else if (rbOne)
 	{
-		rbOne->ApplyImpulse(-aCollision.info.normal * aCollision.info.depth);
+		rbOne->ApplyImpulse(aCollision.info.normal * aCollision.info.depth);
 	}
 	else if (rbTwo)
 	{
-		rbTwo->ApplyImpulse(aCollision.info.normal * aCollision.info.depth);
+		rbTwo->ApplyImpulse(-aCollision.info.normal * aCollision.info.depth);
 	}
 }

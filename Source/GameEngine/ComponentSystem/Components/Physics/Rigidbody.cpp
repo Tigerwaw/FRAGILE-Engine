@@ -32,6 +32,12 @@ void Rigidbody::SetMass(float aMass)
 
 void Rigidbody::Update()
 {
+	if (myResetVelocity)
+	{
+		myVelocity = { 0.0f, 0.0f, 0.0f };
+		myResetVelocity = false;
+	}
+
 	float dt = Engine::Get().GetTimer().GetDeltaTime();
 	myVelocity += myForce * myInvMass * dt;
 	myVelocity += myImpulse * myInvMass;

@@ -16,10 +16,8 @@ public:
         Collider* collB;
         bool collided = false;
         Math::Vector3f hitPoint;
-        Math::Vector3f pointA; // Furthest point of A into B
-        Math::Vector3f pointB; // Furthest point of B into A
-        Math::Vector3f normal; // B - A normalized
-        float depth; // Length of B - A
+        Math::Vector3f normal;
+        float depth;
 
         operator bool() const
         {
@@ -31,8 +29,6 @@ public:
         {
             collided = aInfo.intersected;
             hitPoint = aInfo.intersectionPoint;
-            pointA = aInfo.pointA;
-            pointB = aInfo.pointB;
             normal = aInfo.normal;
             depth = aInfo.depth;
         }
