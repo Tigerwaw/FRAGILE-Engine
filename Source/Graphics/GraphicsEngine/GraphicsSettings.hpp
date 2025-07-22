@@ -38,6 +38,7 @@ enum class PSOType
 	ParticleSpritesheet,
 	VFXSpritesheet,
 	DebugLine,
+	Skybox,
 
 	DeferredDirectionalLight,
 	DeferredPointlight,
@@ -135,6 +136,13 @@ enum class CullMode
 	Back = 3
 };
 
+enum class DepthMode
+{
+	None = 1,
+	ReadOnly = 2,
+	Skybox = 3
+};
+
 enum class VertexType
 {
 	MeshVertex,
@@ -179,6 +187,7 @@ namespace GraphicsSettings
 		{	PSOType::ParticleSpritesheet,		"Particle Spritesheet"			},
 		{	PSOType::VFXSpritesheet,			"VFX Spritesheet"				},
 		{	PSOType::DebugLine,					"Debug Line"					},
+		{	PSOType::Skybox,					"Skybox"						},
 		{	PSOType::DeferredDirectionalLight,	"Deferred Directional Light"	},
 		{	PSOType::DeferredPointlight,		"Deferred Pointlight"			},
 		{	PSOType::DeferredSpotlight,			"Deferred Spotlight"			},
@@ -262,6 +271,13 @@ namespace GraphicsSettings
 		{	"none",				CullMode::None,		},
 		{	"front",			CullMode::Front,	},
 		{	"back",				CullMode::Back,		},
+	};
+
+	static const std::unordered_map<const char*, DepthMode> globalDepthModeNameToEnum
+	{
+		{	"none",					DepthMode::None,		},
+		{	"read only",			DepthMode::ReadOnly,	},
+		{	"skybox",				DepthMode::Skybox,		},
 	};
 
 	static const std::unordered_map<const char*, VertexType> globalVertexTypeNameToEnum
@@ -349,6 +365,14 @@ inline CullMode CullModeFromName(const char* aCullModeName)
 	Utilities::ToLowerCopy(aCullModeName, cullModeName);
 	assert(GraphicsSettings::globalCullModeNameToEnum.contains(cullModeName));
 	return GraphicsSettings::globalCullModeNameToEnum.find(cullModeName)->second;
+}
+
+inline DepthMode DepthModeFromName(const char* aDepthModeName)
+{
+	char depthModeName[512]{ 0 };
+	Utilities::ToLowerCopy(aDepthModeName, depthModeName);
+	assert(GraphicsSettings::globalDepthModeNameToEnum.contains(depthModeName));
+	return GraphicsSettings::globalDepthModeNameToEnum.find(depthModeName)->second;
 }
 
 inline VertexType VertexTypeFromName(const char* aVertexTypeName)

@@ -48,8 +48,6 @@ bool Collider::Deserialize(nl::json& aJsonObject)
 
 void Collider::OnCollisionEnter()
 {
-	myIsOverlappingDebug = true;
-
 	if (myOnCollisionEnterResponse)
 	{
 		myOnCollisionEnterResponse();

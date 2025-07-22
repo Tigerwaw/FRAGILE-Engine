@@ -1,6 +1,7 @@
 #pragma once
 
 class Mesh;
+class Texture;
 class Material;
 class DynamicVertexBuffer;
 class Text;
@@ -11,6 +12,7 @@ class Drawer
 {
 public:
 	void RenderQuad();
+	void RenderSkybox(const Mesh& aMesh, const std::shared_ptr<Texture> aTexture);
 	void RenderMesh(const Mesh& aMesh, const std::vector<std::shared_ptr<Material>>& aMaterialList);
 	void RenderMeshShadow(const Mesh& aMesh);
 	void RenderMeshDebugPass(const Mesh& aMesh, const std::vector<std::shared_ptr<Material>>& aMaterialList);

@@ -5,8 +5,7 @@
 #include "ComponentSystem/Components/Transform.h"
 #include "Math/Intersection3D.hpp"
 #include "SceneHandler/SceneHandler.h"
-
-#define PI 3.14159265358979323846
+#include <Math/MathConstants.hpp>
 
 static Camera* sInstance = nullptr;
 
@@ -52,7 +51,7 @@ void Camera::InitPerspectiveProjection(float aFOV, float aNearPlane, float aFarP
 {
 	myNearPlane = aNearPlane;
 	myFarPlane = aFarPlane;
-	float fov = aFOV * static_cast<float>((PI / 180));
+	float fov = aFOV * Math::DEGREES_TO_RADIANS;
 	float aspectRatio = aResolution.x / aResolution.y;
 	float horizontalFOV = 1 / tanf(fov / 2);
 	myHFOV = horizontalFOV;

@@ -14,10 +14,10 @@ struct PSODescription
 	FillMode fillMode = FillMode::Solid;
 	CullMode cullMode = CullMode::Back;
 	BlendMode blendMode = BlendMode::None;
+	DepthMode depthMode = DepthMode::None;
 	bool antiAliasedLine = false;
 	bool alphaToCoverage = false;
 	bool independentBlend = false;
-	bool useReadOnlyDepthStencilState = false;
 };
 
 class ResourceVendor
@@ -50,9 +50,9 @@ public:
 	bool CreateDynamicVertexBuffer(std::string_view aName, const std::vector<VertexType>& aVertexList, Microsoft::WRL::ComPtr<ID3D11Buffer>& outVxBuffer, size_t aMaxVertexCount) const;
 	bool CreateIndexBuffer(std::string_view aName, const std::vector<unsigned>& aIndexList, Microsoft::WRL::ComPtr<ID3D11Buffer>& outIxBuffer, bool aIsDynamic = false);
 
-	Mesh CreatePlanePrimitive();
-	Mesh CreateCubePrimitive();
-	Mesh CreateRampPrimitive();
+	Mesh CreatePlanePrimitive() const;
+	Mesh CreateCubePrimitive() const;
+	Mesh CreateRampPrimitive() const;
 private:
 	std::shared_ptr<RenderHardwareInterface> myRHI;
 };

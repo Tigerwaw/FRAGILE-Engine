@@ -70,6 +70,12 @@ struct Quad_VS_to_PS
     float2 UV : TEXCOORD;
 };
 
+struct Skybox_VS_to_PS
+{
+    float4 Position : SV_Position;
+    float3 TexCoord : TEXCOORD;
+};
+
 static const float2 defaultUVs[4] =
 {
     float2(0.0f, 1.0f),

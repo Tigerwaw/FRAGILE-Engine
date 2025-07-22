@@ -24,6 +24,7 @@
 #include "Render/RenderFullscreenQuad.h"
 #include "Render/RenderParticles.h"
 #include "Render/RenderTrail.h"
+#include "Render/RenderSkybox.h"
 #include "Resource/SetTextureResource.h"
 #include "Resource/ClearTextureResource.h"
 #include "Resource/SetGBufferAsRenderTarget.h"

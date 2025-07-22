@@ -129,7 +129,7 @@ bool PSOAsset::Load()
 
     if (data.contains("UseReadOnlyDepthStencil"))
     {
-        psoDesc.useReadOnlyDepthStencilState = data["UseReadOnlyDepthStencil"].get<bool>();
+        psoDesc.depthMode = DepthModeFromName(data["UseReadOnlyDepthStencil"].get<std::string>().c_str());
     }
 
     if (data.contains("Samplers"))

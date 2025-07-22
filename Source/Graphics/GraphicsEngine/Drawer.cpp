@@ -26,6 +26,25 @@ void Drawer::RenderQuad()
 	ge.ClearTextureResource_PS(127);
 }
 
+void Drawer::RenderSkybox(const Mesh& aMesh, const std::shared_ptr<Texture> aTexture)
+{
+	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Skybox");
+	GraphicsEngine& ge = GraphicsEngine::Get();
+	ge.ChangePipelineState(ge.GetPSO(PSOType::Skybox));
+	ge.myRHI->SetVertexBuffer(aMesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
+	ge.myRHI->SetIndexBuffer(aMesh.GetIndexBuffer());
+	ge.myRHI->SetPrimitiveTopology(Topology::TRIANGLELIST);
+
+	for (const auto& element : aMesh.GetElements())
+	{
+		ge.SetTextureResource_PS(0, *aTexture);
+		ge.myRHI->DrawIndexed(element.IndexOffset, element.NumIndices);
+		ge.myDrawcallAmount++;
+
+		ge.ClearTextureResource_PS(0);
+	}
+}
+
 void Drawer::RenderMesh(const Mesh& aMesh, const std::vector<std::shared_ptr<Material>>& aMaterialList)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Mesh");

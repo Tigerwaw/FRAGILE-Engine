@@ -4,6 +4,7 @@
 #include "GraphicsEngine.h"
 #include "Objects/Texture.h"
 #include "AssetTypes/TextureAsset.h"
+#include "AssetTypes/MeshAsset.h"
 
 AmbientLight::AmbientLight(std::shared_ptr<Texture> aCubemap, Math::Vector3f aColor, float aIntensity)
 {
@@ -12,13 +13,9 @@ AmbientLight::AmbientLight(std::shared_ptr<Texture> aCubemap, Math::Vector3f aCo
 	myIntensity = aIntensity;
 }
 
-AmbientLight::~AmbientLight()
-{
-	myCubemap = nullptr;
-}
-
 void AmbientLight::Start()
 {
+	mySkyboxMesh = AssetManager::Get().GetAsset<MeshAsset>("sm_sphere.fbx")->mesh;
 }
 
 void AmbientLight::Update()
@@ -43,6 +40,11 @@ void AmbientLight::SetCubemap(std::shared_ptr<Texture> aCubemap)
 std::shared_ptr<Texture> AmbientLight::GetCubemap() const
 {
 	return myCubemap;
+}
+
+std::shared_ptr<Mesh> AmbientLight::GetSkyboxMesh() const
+{
+	return mySkyboxMesh;
 }
 
 bool AmbientLight::Serialize(nl::json& outJsonObject)

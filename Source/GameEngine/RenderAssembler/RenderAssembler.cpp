@@ -474,6 +474,22 @@ void RenderAssembler::RenderDeferred(SceneRenderData& aRenderData)
 
 		myShouldUpdateStaticShadows = false;
 	}
+
+	{
+		PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Draw Skybox");
+		gfxList.Enqueue<BeginEvent>("Draw Skybox");
+		gfxList.Enqueue<SetRenderTarget>(gfx.GetIntermediateTexture(IntermediateTexture::HDR), gfx.GetDepthBuffer(), false, false);
+		RenderSkybox::RenderSkyboxData skyboxData;
+		skyboxData.mesh = aRenderData.ambientLight->GetSkyboxMesh();
+		skyboxData.texture = aRenderData.ambientLight->GetCubemap();
+		skyboxData.transform = aRenderData.ambientLight->gameObject->GetComponent<Transform>()->GetWorldMatrix();
+		auto mainCamTransform = aRenderData.mainCamera->gameObject->GetComponent<Transform>()->GetWorldMatrix();
+		skyboxData.transform(4, 1) = mainCamTransform(4, 1);
+		skyboxData.transform(4, 2) = mainCamTransform(4, 2);
+		skyboxData.transform(4, 3) = mainCamTransform(4, 3);
+		gfxList.Enqueue<RenderSkybox>(std::move(skyboxData));
+		gfxList.Enqueue<EndEvent>();
+	}
 	
 	// Forward objects
 	{

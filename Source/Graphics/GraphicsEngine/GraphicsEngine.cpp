@@ -465,6 +465,24 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 	}
 	CacheShader(quadVSPath, quadVS);
 	
+	std::filesystem::path skyboxVSPath = aContentRoot / "EngineAssets/Shaders/Skybox_VS.cso";
+	std::shared_ptr<Shader> skyboxVS = std::make_shared<Shader>();
+	if (!rv.LoadShader(skyboxVSPath, *skyboxVS))
+	{
+		LOG(LogGraphicsEngine, Error, "Failed to load shader {}", skyboxVSPath.filename().string());
+		return false;
+	}
+	CacheShader(skyboxVSPath, skyboxVS);
+	
+	std::filesystem::path skyboxPSPath = aContentRoot / "EngineAssets/Shaders/Skybox_PS.cso";
+	std::shared_ptr<Shader> skyboxPS = std::make_shared<Shader>();
+	if (!rv.LoadShader(skyboxPSPath, *skyboxPS))
+	{
+		LOG(LogGraphicsEngine, Error, "Failed to load shader {}", skyboxPSPath.filename().string());
+		return false;
+	}
+	CacheShader(skyboxPSPath, skyboxPS);
+	
 	std::filesystem::path deferredDirectionalLightPSPath = aContentRoot / "EngineAssets/Shaders/Deferred_DirectionalLight_PS.cso";
 	std::shared_ptr<Shader> deferredDirectionalLightPS = std::make_shared<Shader>();
 	if (!rv.LoadShader(deferredDirectionalLightPSPath, *deferredDirectionalLightPS))
@@ -653,7 +671,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.samplerList[14] = SamplerName(SamplerType::LUT);
 		desc.samplerList[15] = SamplerName(SamplerType::Shadow);
 		desc.blendMode = BlendMode::Alpha;
-		desc.useReadOnlyDepthStencilState = true;
+		desc.depthMode = DepthMode::ReadOnly;
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -769,7 +787,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.psShader = particlePS;
 		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
 		desc.blendMode = BlendMode::Alpha;
-		desc.useReadOnlyDepthStencilState = true;
+		desc.depthMode = DepthMode::ReadOnly;
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -793,7 +811,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.fillMode = FillMode::Solid;
 		desc.cullMode = CullMode::None;
 		desc.blendMode = BlendMode::Alpha;
-		desc.useReadOnlyDepthStencilState = true;
+		desc.depthMode = DepthMode::ReadOnly;
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -815,7 +833,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.psShader = particleSpritesheetPS;
 		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
 		desc.blendMode = BlendMode::Alpha;
-		desc.useReadOnlyDepthStencilState = true;
+		desc.depthMode = DepthMode::ReadOnly;
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -860,6 +878,27 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.fillMode = FillMode::Solid;
 		desc.cullMode = CullMode::None;
 		desc.antiAliasedLine = true;
+
+		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
+		if (!rv.CreatePSO(*pso, desc))
+		{
+			LOG(LogGraphicsEngine, Error, "Failed to create {} PSO", desc.name);
+			return false;
+		}
+
+		RegisterPSO(desc.name.c_str(), pso);
+	}
+
+	{
+		PSODescription desc;
+		desc.name = PSOName(PSOType::Skybox);
+		desc.vertexType = VertexType::MeshVertex;
+		desc.vsPath = skyboxVSPath;
+		desc.vsShader = skyboxVS;
+		desc.psShader = skyboxPS;
+		desc.fillMode = FillMode::Solid;
+		desc.cullMode = CullMode::None;
+		desc.depthMode = DepthMode::Skybox;
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))

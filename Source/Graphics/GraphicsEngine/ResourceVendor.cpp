@@ -175,14 +175,23 @@ bool ResourceVendor::CreatePSO(PipelineStateObject& aPSO, PSODescription& aPSOde
 		LOG(LogGraphicsEngine, Log, "Successfully created blend state for PSO {}!", aPSOdesc.name);
 	}
 
-	if (aPSOdesc.useReadOnlyDepthStencilState)
+	if (aPSOdesc.depthMode != DepthMode::None)
 	{
 		D3D11_DEPTH_STENCIL_DESC depthStencilDesc = CD3D11_DEPTH_STENCIL_DESC();
 		depthStencilDesc.DepthEnable = true;
-		depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-		depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
 		depthStencilDesc.StencilEnable = false;
 
+		if (aPSOdesc.depthMode == DepthMode::ReadOnly)
+		{
+			depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+			depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+		}
+		else if (aPSOdesc.depthMode == DepthMode::Skybox)
+		{
+			depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+		}
+		
 		if (!myRHI->CreateDepthStencilState(aPSOdesc.name + "_DepthStencilState", depthStencilDesc, aPSO))
 		{
 			LOG(LogGraphicsEngine, Error, "Failed to create depth stencil state for PSO {}!", aPSOdesc.name);
@@ -268,7 +277,7 @@ bool ResourceVendor::CreateIndexBuffer(std::string_view aName, const std::vector
 	return myRHI->CreateIndexBuffer(aName, aIndexList, outIxBuffer, aIsDynamic);
 }
 
-Mesh ResourceVendor::CreatePlanePrimitive()
+Mesh ResourceVendor::CreatePlanePrimitive() const
 {
 	float emptyColor[4][4] = { {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f} };
 	float uv[4][4][2] = { {{1.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 1.0f}},
@@ -320,7 +329,7 @@ Mesh ResourceVendor::CreatePlanePrimitive()
 	return plane;
 }
 
-Mesh ResourceVendor::CreateCubePrimitive()
+Mesh ResourceVendor::CreateCubePrimitive() const
 {
 	float emptyColor[4][4] = { {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f} };
 	float uv[24][4][2] = { {{1.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 1.0f}},
@@ -505,7 +514,7 @@ Mesh ResourceVendor::CreateCubePrimitive()
 	return cube;
 }
 
-Mesh ResourceVendor::CreateRampPrimitive()
+Mesh ResourceVendor::CreateRampPrimitive() const
 {
 	float emptyColor[4][4] = { {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f} };
 	float uv[18][4][2] = { {{0.0f, 0.0f}, {1.0f, 1.0f}, {1.0f, 1.0f}, {1.0f, 1.0f}},

@@ -44,8 +44,8 @@ private:
     float myTimeAlive = 0;
 
     std::string myName;
-    unsigned myID;
-    unsigned myNetworkID;
+    unsigned myID = 0;
+    unsigned myNetworkID = 0;
 };
 
 template<class T, typename... Args>
