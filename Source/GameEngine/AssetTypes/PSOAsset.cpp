@@ -6,6 +6,7 @@ namespace nl = nlohmann;
 #include <fstream>
 #include "AssetManager.h"
 #include "ShaderAsset.h"
+#include "TextureAsset.h"
 
 bool PSOAsset::Load()
 {
@@ -145,6 +146,27 @@ bool PSOAsset::Load()
     {
         pso = nullptr;
         return false;
+    }
+
+    if (data.contains("Textures"))
+    {
+        unsigned textureIndex = GraphicsSettings::PSO_UTILITY_TEXTURES_START_SLOT;
+        for (auto& texturePath : data["Textures"])
+        {
+            std::filesystem::path texPath = texturePath.get<std::string>();
+            std::string texNameLower = Utilities::ToLowerCopy(texPath.filename().string());
+            std::filesystem::path texName(texNameLower);
+            if (auto texAsset = AssetManager::Get().GetAsset<TextureAsset>(texName))
+            {
+                pso->TextureResources[textureIndex] = texAsset->texture;
+            }
+            else
+            {
+                return false;
+            }
+
+            ++textureIndex;
+        }
     }
 
     return true;
