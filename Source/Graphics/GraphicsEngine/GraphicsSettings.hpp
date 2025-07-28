@@ -11,6 +11,8 @@ namespace GraphicsSettings
 	inline constexpr unsigned DIRECTIONAL_LIGHT_SHADOWS_SLOT = 100;
 	inline constexpr unsigned POINTLIGHT_SHADOWS_START_SLOT = 101;
 	inline constexpr unsigned SPOTLIGHT_SHADOWS_START_SLOT = 105;
+
+	inline constexpr unsigned PSO_UTILITY_TEXTURES_START_SLOT = 50;
 }
 
 enum class ShaderType : unsigned
@@ -253,34 +255,34 @@ namespace GraphicsSettings
 		{	BloomType::ScaledToLuminance,		"Scaled to Luminance"	},
 	};
 
-	static const std::unordered_map<const char*, BlendMode> globalBlendModeNameToEnum
+	static const std::unordered_map<std::string, BlendMode> globalBlendModeNameToEnum
 	{
 		{	"none",				BlendMode::None			},
 		{	"alpha",			BlendMode::Alpha,		},
 		{	"additive",			BlendMode::Additive,	},
 	};
 
-	static const std::unordered_map<const char*, FillMode> globalFillModeNameToEnum
+	static const std::unordered_map<std::string, FillMode> globalFillModeNameToEnum
 	{
 		{	"wireframe",		FillMode::Wireframe,	},
 		{	"solid",			FillMode::Solid			},
 	};
 
-	static const std::unordered_map<const char*, CullMode> globalCullModeNameToEnum
+	static const std::unordered_map<std::string, CullMode> globalCullModeNameToEnum
 	{
 		{	"none",				CullMode::None,		},
 		{	"front",			CullMode::Front,	},
 		{	"back",				CullMode::Back,		},
 	};
 
-	static const std::unordered_map<const char*, DepthMode> globalDepthModeNameToEnum
+	static const std::unordered_map<std::string, DepthMode> globalDepthModeNameToEnum
 	{
 		{	"none",					DepthMode::None,		},
 		{	"read only",			DepthMode::ReadOnly,	},
 		{	"skybox",				DepthMode::Skybox,		},
 	};
 
-	static const std::unordered_map<const char*, VertexType> globalVertexTypeNameToEnum
+	static const std::unordered_map<std::string, VertexType> globalVertexTypeNameToEnum
 	{
 		{	"mesh",					VertexType::MeshVertex,			},
 		{	"line",					VertexType::DebugLineVertex,	},
