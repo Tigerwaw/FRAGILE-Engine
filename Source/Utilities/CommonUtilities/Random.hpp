@@ -21,4 +21,20 @@ namespace Utilities
 		std::uniform_real_distribution<T> distribution(aMin, aMax);
 		return distribution(ranGen);
 	}
+
+	// Range is inclusive
+	template<Math::IsIntegralType T>
+	inline T RandomVariation(T aValue, T aVariation)
+	{
+		std::uniform_int_distribution<T> distribution(aValue - aVariation, aValue + aVariation);
+		return distribution(ranGen);
+	}
+
+	// Range is inclusive
+	template<Math::IsFloatingPointType T>
+	inline T RandomVariation(T aValue, T aVariation)
+	{
+		std::uniform_real_distribution<T> distribution(aValue - aVariation, aValue + aVariation);
+		return distribution(ranGen);
+	}
 }
