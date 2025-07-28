@@ -467,7 +467,7 @@
         },
         {
           "Type": "AmbientLight",
-          "Cubemap": "Skansen_Cube.dds",
+          "Cubemap": "hornkoppespring.dds",
           "Intensity": 0.1
         }
       ]
