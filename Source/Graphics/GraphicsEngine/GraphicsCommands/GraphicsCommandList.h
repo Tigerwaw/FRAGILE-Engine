@@ -5,7 +5,11 @@
 #include <stdexcept>
 #include <memory>
 
+#ifndef _RETAIL
+#define USE_PIX
+#endif
 #include "WinPixEventRuntime/pix3.h"
+
 #include "GraphicsCommandBase.h"
 #include "LambdaGraphicsCommand.h"
 #include "Render/RenderMesh.h"

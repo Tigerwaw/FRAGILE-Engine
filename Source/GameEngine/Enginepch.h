@@ -4,6 +4,12 @@
 #include <Windowsx.h>
 #include <wrl.h>
 
+#ifndef _RETAIL
+#include "Logger/Logger.h"
+#define USE_PIX
+#endif
+#include "WinPixEventRuntime/pix3.h"
+
 #include <memory>
 #include <functional>
 #include <algorithm>
@@ -24,10 +30,6 @@ namespace nl = nlohmann;
 #include <shared_mutex>
 #include <thread>
 
-#include "AssetManager.h"
-#include "Engine.h"
-#include "Audio/AudioEngine.h"
-
 #include "Imgui/imgui.h"
 #include "Imgui/backends/imgui_impl_win32.h"
 #include "Imgui/backends/imgui_impl_dx11.h"
@@ -35,12 +37,6 @@ namespace nl = nlohmann;
 #include "fmod/fmod.hpp"
 #include "fmod/fmod_studio.hpp"
 #include "fmod/fmod_common.h"
-
-#ifndef _RETAIL
-#include "Logger/Logger.h"
-#define USE_PIX
-#endif
-#include "WinPixEventRuntime/pix3.h"
 
 #ifdef _DEBUG
 DECLARE_LOG_CATEGORY_WITH_NAME(LogGameEngine, GameEngine, Verbose);

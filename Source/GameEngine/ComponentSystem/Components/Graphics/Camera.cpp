@@ -6,6 +6,8 @@
 #include "Math/Intersection3D.hpp"
 #include "SceneHandler/SceneHandler.h"
 #include <Math/MathConstants.hpp>
+#include "Engine.h"
+#include "Audio/AudioEngine.h"
 
 static Camera* sInstance = nullptr;
 

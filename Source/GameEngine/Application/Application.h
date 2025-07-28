@@ -43,9 +43,15 @@
 #define NOMCX
 #include <condition_variable>
 #include <windows.h>
+#include <Windowsx.h>
 #include <wrl.h>
 #include <shellapi.h>
 #pragma endregion
+
+#ifndef _RETAIL
+#define USE_PIX
+#endif
+#include "WinPixEventRuntime/pix3.h"
 
 #include <cstdio>
 #include <exception>
@@ -55,8 +61,6 @@
 #include <vector>
 #include <memory>
 #include <string>
-
-#include "Enginepch.h"
 
 #include "AssetManager.h"
 
@@ -69,13 +73,8 @@
 #include "Audio/AudioEngine.h"
 #include "ImGui/ImGuiHandler.h"
 
-#ifndef _RETAIL
 #include "imgui.h"
 #include "Imgui/misc/cpp/imgui_stdlib.h"
-#define USE_PIX
-#endif
-#include "WinPixEventRuntime/pix3.h"
-
 
 class Application
 {

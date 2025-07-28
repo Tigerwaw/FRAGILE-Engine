@@ -3,6 +3,7 @@
 #include "Time/Timer.h"
 #include "ComponentSystem/Components/Transform.h"
 #include "ComponentSystem/GameObject.h"
+#include "Engine.h"
 
 Rigidbody::Rigidbody(float aMass, bool aAffectedByGravity)
 {

@@ -6,6 +6,11 @@ namespace nl = nlohmann;
 #include <d3d11.h>
 #include <wrl.h>
 
+#ifndef _RETAIL
+#define USE_PIX
+#endif
+#include "WinPixEventRuntime/pix3.h"
+
 #include <memory>
 #include <mutex>
 #include <cstdint>
@@ -24,7 +29,6 @@ namespace nl = nlohmann;
 #include <future>
 #include <thread>
 #include <chrono>
-
 
 #include "Logger/Logger.h"
 

@@ -1,4 +1,9 @@
 #pragma once
+#include <memory>
+#include <unordered_map>
+#include <array>
+
+#include "GraphicsSettings.hpp"
 
 struct ID3D11BlendState;
 struct ID3D11RasterizerState;
@@ -10,8 +15,6 @@ struct ID3D11SamplerState;
 
 class Shader;
 class Texture;
-
-#include "GraphicsSettings.hpp"
 
 struct PipelineStateObject
 {

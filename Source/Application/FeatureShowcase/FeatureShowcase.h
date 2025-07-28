@@ -5,9 +5,6 @@
 class FeatureShowcase : public Application
 {
 public:
-	FeatureShowcase() {}
-	~FeatureShowcase() {}
-
 	void InitializeApplication() override;
 	void UpdateApplication() override;
 	void UpdateDebug() override;

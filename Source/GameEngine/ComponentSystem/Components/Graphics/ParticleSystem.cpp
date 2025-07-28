@@ -5,6 +5,7 @@
 #include "Engine.h"
 #include "Time/Timer.h"
 #include "CommonUtilities/SerializationUtils.hpp"
+#include "AssetManager.h"
 
 ParticleSystem::~ParticleSystem()
 {

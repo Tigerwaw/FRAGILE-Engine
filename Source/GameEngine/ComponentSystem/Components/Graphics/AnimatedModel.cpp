@@ -12,6 +12,7 @@
 #include "AssetTypes/MaterialAsset.h"
 #include "AssetTypes/MeshAsset.h"
 #include "AssetTypes/AnimationAsset.h"
+#include "AssetManager.h"
 
 AnimatedModel::~AnimatedModel()
 {

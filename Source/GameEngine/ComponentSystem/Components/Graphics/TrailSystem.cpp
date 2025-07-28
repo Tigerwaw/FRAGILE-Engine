@@ -7,6 +7,7 @@
 #include "ComponentSystem/Components/Transform.h"
 #include "Time/Timer.h"
 #include "CommonUtilities/SerializationUtils.hpp"
+#include "AssetManager.h"
 
 TrailSystem::~TrailSystem()
 {

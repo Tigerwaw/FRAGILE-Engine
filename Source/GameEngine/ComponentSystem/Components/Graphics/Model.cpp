@@ -7,6 +7,7 @@
 #include "GraphicsEngine.h"
 #include "AssetTypes/MaterialAsset.h"
 #include "AssetTypes/MeshAsset.h"
+#include "AssetManager.h"
 
 Model::~Model()
 {

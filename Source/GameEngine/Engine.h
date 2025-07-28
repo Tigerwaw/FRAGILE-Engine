@@ -1,9 +1,6 @@
 #pragma once
 #include "Math/Vector.hpp"
 
-
-
-class GlobalEventHandler;
 class SceneHandler;
 class DebugDrawer;
 class AudioEngine;

@@ -1,4 +1,8 @@
 #pragma once
+#include <filesystem>
+#include <string>
+#include "Math/Vector.hpp"
+
 class AppSettings
 {
 public:

@@ -2,7 +2,6 @@
 #include <cassert>
 #include <chrono>
 #include "Asset.h"
-#include "WinPixEventRuntime/pix3.h"
 #include "CommonUtilities/StringUtilities.hpp"
 #include <functional>
 
@@ -74,7 +73,6 @@ bool AssetManager::RegisterAsset(const std::filesystem::path& aPath)
 template<typename T> requires std::is_base_of_v<Asset, T>
 inline std::shared_ptr<T> AssetManager::GetAsset(const std::filesystem::path& aPath)
 {
-	PIXScopedEvent(PIX_COLOR_INDEX(6), "AssetManager Get Asset");
 	std::shared_ptr<T> asset = nullptr;
 	
 	if (IsAssetRegistered(aPath))

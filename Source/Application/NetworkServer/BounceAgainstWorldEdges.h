@@ -1,5 +1,6 @@
 #pragma once
 #include "GameEngine/ComponentSystem/Component.h"
+#include "Math/Vector3.hpp"
 
 class BounceAgainstWorldEdges : public Component
 {
