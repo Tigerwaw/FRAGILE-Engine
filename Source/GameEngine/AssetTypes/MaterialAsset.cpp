@@ -46,6 +46,18 @@ bool MaterialAsset::Load()
                                               data["AlbedoTint"]["A"].get<float>() };
     }
 
+    if (data.contains("UVScale"))
+    {
+        mat.MaterialSettings().uvScale = { data["UVScale"]["X"].get<float>(),
+                                           data["UVScale"]["Y"].get<float>() };
+    }
+
+    if (data.contains("UVOffset"))
+    {
+        mat.MaterialSettings().uvOffset = { data["UVOffset"]["X"].get<float>(),
+                                            data["UVOffset"]["Y"].get<float>() };
+    }
+
     if (data.contains("EmissiveStrength"))
     {
         mat.MaterialSettings().emissiveStrength = data["EmissiveStrength"].get<float>();
