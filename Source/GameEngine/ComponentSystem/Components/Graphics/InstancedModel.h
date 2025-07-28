@@ -7,8 +7,7 @@ class Model;
 class InstancedModel : public Component
 {
 public:
-    ~InstancedModel() override;
-    InstancedModel();
+    InstancedModel(unsigned aMaxInstances = 100);
 
     void Start() override;
     void Update() override;
@@ -40,6 +39,7 @@ private:
     bool myShouldViewcull = true;
     bool myCastShadows = true;
 
+    int myMaxInstances;
     DynamicVertexBuffer myMeshTransformBuffer;
     std::vector<Math::Matrix4x4f> myMeshTransforms;
 

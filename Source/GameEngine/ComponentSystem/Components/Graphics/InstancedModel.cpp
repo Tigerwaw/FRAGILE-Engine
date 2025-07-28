@@ -4,22 +4,20 @@
 #include "ComponentSystem/GameObject.h"
 #include "ComponentSystem/Components/Transform.h"
 #include "GraphicsEngine.h"
+#include "Objects/Mesh.h"
 
 #undef min
 #undef max
 
-InstancedModel::~InstancedModel()
+InstancedModel::InstancedModel(unsigned aMaxInstances)
 {
-}
-
-InstancedModel::InstancedModel()
-{
+	myMaxInstances = aMaxInstances;
 	SetMaterialOnSlot(0, GraphicsEngine::Get().GetDefaultMaterial());
 }
 
 void InstancedModel::Start()
 {
-	myMeshTransformBuffer.CreateBuffer("Instanced Model Buffer", myMeshTransforms, 1000);
+	myMeshTransformBuffer.CreateBuffer("Instanced Model Buffer", myMeshTransforms, myMaxInstances);
 }
 
 void InstancedModel::Update()
