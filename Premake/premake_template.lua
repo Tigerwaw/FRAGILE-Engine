@@ -1,6 +1,6 @@
 include "../../../Premake/common.lua"
 
-workspace "TGPGameEngine"
+workspace "FRAGILE"
   location "%{dirs.root}"
   architecture "x64"
   configurations { "Debug", "Release", "Retail" }
@@ -15,12 +15,7 @@ project "APPNAME"
   conformancemode "On"
 
   dependson { 
-    "GameEngine", 
-    "GraphicsEngine", 
-    "GraphicsEngineShaders", 
-    "AssetManager",
-    "Imgui",
-    "Logger"
+    "GameEngine"
   }
 
   debugdir "%{dirs.bin}/%{prj.name}"
@@ -93,7 +88,7 @@ project "APPNAME"
 
 	filter("files:**.hlsl")
 		flags("ExcludeFromBuild")
-		shaderobjectfileoutput(dirs.shaders.absolute .."/SH_%{file.basename}.cso")
+		shaderobjectfileoutput(dirs.shaders.absolute .."/%{file.basename}.cso")
 
 	filter("files:**VS.hlsl")
 		removeflags("ExcludeFromBuild")
