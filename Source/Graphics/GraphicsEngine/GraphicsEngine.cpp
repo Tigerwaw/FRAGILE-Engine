@@ -219,27 +219,27 @@ std::shared_ptr<PipelineStateObject> GraphicsEngine::RegisterPSO(const char* aPS
 	return aPSO;
 }
 
-bool GraphicsEngine::IsShaderCached(const std::filesystem::path& aShaderPath) const
+bool GraphicsEngine::IsShaderCached(const std::filesystem::path& aShaderFilename) const
 {
-	return myCachedShaders.contains(aShaderPath.filename().string());
+	return myCachedShaders.contains(aShaderFilename.filename().string());
 }
 
-std::shared_ptr<Shader> GraphicsEngine::GetCachedShader(const std::filesystem::path& aShaderPath)
+std::shared_ptr<Shader> GraphicsEngine::GetCachedShader(const std::filesystem::path& aShaderFilename)
 {
-	assert(IsShaderCached(aShaderPath));
-	return myCachedShaders.at(aShaderPath.filename().string());
+	assert(IsShaderCached(aShaderFilename));
+	return myCachedShaders.at(aShaderFilename.filename().string());
 }
 
-const ShaderInfo& GraphicsEngine::GetCachedShaderInfo(const std::filesystem::path& aShaderPath)
+const ShaderInfo& GraphicsEngine::GetCachedShaderInfo(const std::filesystem::path& aShaderFilename)
 {
-	assert(myCachedShaderInfo.contains(aShaderPath.filename().string()));
-	return myCachedShaderInfo.at(aShaderPath.filename().string());
+	assert(myCachedShaderInfo.contains(aShaderFilename.filename().string()));
+	return myCachedShaderInfo.at(aShaderFilename.filename().string());
 }
 
-void GraphicsEngine::CacheShader(const std::filesystem::path& aShaderPath, std::shared_ptr<Shader> aShader)
+void GraphicsEngine::CacheShader(const std::filesystem::path& aShaderFilename, std::shared_ptr<Shader> aShader)
 {
-	myCachedShaders[aShaderPath.filename().string()] = aShader;
-	myCachedShaderInfo[aShaderPath.filename().string()] = myRHI->GetShaderInfo(aShaderPath);
+	myCachedShaders[aShaderFilename.filename().string()] = aShader;
+	myCachedShaderInfo[aShaderFilename.filename().string()] = myRHI->GetShaderInfo(aShaderFilename);
 }
 
 GraphicsEngine::GraphicsEngine() = default;
@@ -1109,7 +1109,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 			return false;
 		}
 
-		pso->TextureResources[51] = GetBlueNoiseTexture();
+		pso->TextureResources[GraphicsSettings::PSO_UTILITY_TEXTURES_START_SLOT + 1] = GetBlueNoiseTexture();
 		RegisterPSO(desc.name.c_str(), pso);
 	}
 
@@ -1197,6 +1197,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = defaultMeshVSPath;
 		desc.vsShader = defaultMeshVS;
 		desc.psShader = debugForwardPS;
+		desc.cullMode = CullMode::None;
 		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
@@ -1216,6 +1217,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = defaultMeshVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = debugGBufferPS;
+		desc.cullMode = CullMode::None;
 		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
@@ -1238,6 +1240,9 @@ bool GraphicsEngine::CreateDefaultTextures(const std::filesystem::path& aContent
 
 	myBlueNoiseTexture = std::make_shared<Texture>();
 	myResourceVendor->LoadTexture(aContentRoot / "EngineAssets/Textures/Utility/BlueNoise.dds", *myBlueNoiseTexture);
+
+	myPerlinNoiseTexture = std::make_shared<Texture>();
+	myResourceVendor->LoadTexture(aContentRoot / "EngineAssets/Textures/Utility/perlin.dds", *myPerlinNoiseTexture);
 
 	myDefaultAlbedoTexture = std::make_shared<Texture>();
 	if (!GraphicsEngine::Get().GetResourceVendor().LoadTexture("default_c", BuiltIn_Default_C_ByteCode, sizeof(BuiltIn_Default_C_ByteCode), *myDefaultAlbedoTexture))

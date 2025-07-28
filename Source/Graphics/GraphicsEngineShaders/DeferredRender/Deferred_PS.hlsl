@@ -6,16 +6,18 @@ GBufferOutput main(MeshVStoPS input)
 {
     GBufferOutput output;
     
-    const float4 albedoMap = AlbedoTexture.Sample(LinearWrapSampler, input.TexCoord0.xy);
+    float2 UVs = (input.TexCoord0.xy + MB_UVOffset) * MB_UVScale;
+    
+    const float4 albedoMap = AlbedoTexture.Sample(LinearWrapSampler, UVs);
     
     if (albedoMap.a < 0.01)
     {
         discard;
     }
     
-    const float2 normalMap = NormalTexture.Sample(LinearWrapSampler, input.TexCoord0.xy).rg;
-    const float3 materialMap = MaterialTexture.Sample(LinearWrapSampler, input.TexCoord0.xy).rgb;
-    const float4 effectsMap = EffectsTexture.Sample(LinearWrapSampler, input.TexCoord0.xy);
+    const float2 normalMap = NormalTexture.Sample(LinearWrapSampler, UVs).rg;
+    const float3 materialMap = MaterialTexture.Sample(LinearWrapSampler, UVs).rgb;
+    const float4 effectsMap = EffectsTexture.Sample(LinearWrapSampler, UVs);
     
     float4 adjustedEffects = effectsMap;
     adjustedEffects.r *= MB_EmissiveStrength;

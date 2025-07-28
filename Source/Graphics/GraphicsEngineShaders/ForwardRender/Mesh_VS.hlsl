@@ -11,16 +11,18 @@ MeshVStoPS main(MeshVertex vertex)
     result.Tangent = mul((float3x3) OB_WorldInvT, normalize(vertex.Tangent));
     result.Binormal = cross(result.Tangent, result.Normal);
     
-    float4x4 skinMatrix =
-    {
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1
-    };
+    float4 localPosition = vertex.Position;
     
     if (OB_HasSkinning)
     {
+        float4x4 skinMatrix =
+        {
+            1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            0, 0, 0, 1
+        };
+        
         uint boneID = 0;
         float weight = 0;
         
@@ -44,15 +46,13 @@ MeshVStoPS main(MeshVertex vertex)
         result.Normal = mul(result.Normal, tSkinMatrix);
         result.Tangent = mul(result.Tangent, tSkinMatrix);
         result.Binormal = mul(result.Binormal, tSkinMatrix);
+        
+        localPosition = mul(skinMatrix, vertex.Position);
     }
-    
-    float4 skinnedPos = mul(skinMatrix, vertex.Position);
-    float4 localPosition = skinnedPos;
     
     if (OB_IsInstanced)
     {
         localPosition = mul(vertex.RelativeTransform, localPosition);
-
     }
     
     result.WorldPos = mul(OB_World, localPosition);

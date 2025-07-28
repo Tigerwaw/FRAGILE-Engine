@@ -625,7 +625,7 @@ void RenderHardwareInterface::ChangePipelineState(const PipelineStateObject& aCu
 
 	for (auto& [slot, texture] : aCurrentPSO.TextureResources)
 	{
-		ClearTextureResourceSlot(PIPELINE_STAGE_PIXEL_SHADER, slot);
+		ClearTextureResourceSlot(PIPELINE_STAGE_VERTEX_SHADER | PIPELINE_STAGE_PIXEL_SHADER, slot);
 	}
 
 	const std::array<float, 4> blendFactor = { 0, 0, 0, 0 };
@@ -671,7 +671,7 @@ void RenderHardwareInterface::ChangePipelineState(const PipelineStateObject& aCu
 
 	for (auto& [slot, texture] : aNewPSO.TextureResources)
 	{
-		SetTextureResource(PIPELINE_STAGE_PIXEL_SHADER, slot, *texture);
+		SetTextureResource(PIPELINE_STAGE_VERTEX_SHADER | PIPELINE_STAGE_PIXEL_SHADER, slot, *texture);
 	}
 }
 

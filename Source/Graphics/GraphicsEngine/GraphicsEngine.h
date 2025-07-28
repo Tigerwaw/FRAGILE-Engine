@@ -92,12 +92,13 @@ public:
 	std::shared_ptr<PipelineStateObject> GetPSO(PSOType aPSOType) const;
 	std::shared_ptr<PipelineStateObject> RegisterPSO(const char* aPSOName, std::shared_ptr<PipelineStateObject> aPSO);
 
-	bool IsShaderCached(const std::filesystem::path& aShaderPath) const;
-	std::shared_ptr<Shader> GetCachedShader(const std::filesystem::path& aShaderPath);
-	const ShaderInfo& GetCachedShaderInfo(const std::filesystem::path& aShaderPath);
-	void CacheShader(const std::filesystem::path& aShaderPath, std::shared_ptr<Shader> aShader);
+	bool IsShaderCached(const std::filesystem::path& aShaderFilename) const;
+	std::shared_ptr<Shader> GetCachedShader(const std::filesystem::path& aShaderFilename);
+	const ShaderInfo& GetCachedShaderInfo(const std::filesystem::path& aShaderFilename);
+	void CacheShader(const std::filesystem::path& aShaderFilename, std::shared_ptr<Shader> aShader);
 
 	std::shared_ptr<Texture> GetBlueNoiseTexture() const { return myBlueNoiseTexture; }
+	std::shared_ptr<Texture> GetPerlinNoiseTexture() const { return myPerlinNoiseTexture; }
 
 	std::shared_ptr<Texture> GetDefaultAlbedoTexture() const { return myDefaultAlbedoTexture; }
 	std::shared_ptr<Texture> GetDefaultNormalTexture() const { return myDefaultNormalTexture; }
@@ -138,6 +139,7 @@ private:
 
 	std::shared_ptr<Texture> myBRDFLUTTexture;
 	std::shared_ptr<Texture> myBlueNoiseTexture;
+	std::shared_ptr<Texture> myPerlinNoiseTexture;
 	
 	std::unique_ptr<GBuffer> myGBuffer;
 	std::unique_ptr<GraphicsCommandList> myCommandList;
