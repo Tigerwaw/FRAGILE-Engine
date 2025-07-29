@@ -625,7 +625,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		deferredDesc.vsPath = defaultMeshVSPath;
 		deferredDesc.vsShader = defaultMeshVS;
 		deferredDesc.psShader = deferredMeshPS;
-		deferredDesc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		deferredDesc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> deferred = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*deferred, deferredDesc))
@@ -646,7 +646,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = defaultMeshVSPath;
 		desc.vsShader = defaultMeshVS;
 		desc.psShader = forwardPBRMeshPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.samplerList[14] = SamplerName(SamplerType::LUT);
 		desc.samplerList[15] = SamplerName(SamplerType::Shadow);
 
@@ -667,7 +667,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = defaultMeshVSPath;
 		desc.vsShader = defaultMeshVS;
 		desc.psShader = forwardPBRMeshPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.samplerList[14] = SamplerName(SamplerType::LUT);
 		desc.samplerList[15] = SamplerName(SamplerType::Shadow);
 		desc.blendMode = BlendMode::Alpha;
@@ -726,7 +726,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsShader = spriteVS;
 		desc.gsShader = spriteGS;
 		desc.psShader = spritePS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -746,7 +746,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsShader = spriteVS;
 		desc.gsShader = spriteGS;
 		desc.psShader = spritesheetPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -765,7 +765,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = textVSPath;
 		desc.vsShader = textVS;
 		desc.psShader = textPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -785,7 +785,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsShader = particleVS;
 		desc.gsShader = particleGS;
 		desc.psShader = particlePS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.blendMode = BlendMode::Alpha;
 		desc.depthMode = DepthMode::ReadOnly;
 
@@ -807,7 +807,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsShader = trailVS;
 		desc.gsShader = trailGS;
 		desc.psShader = trailPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.fillMode = FillMode::Solid;
 		desc.cullMode = CullMode::None;
 		desc.blendMode = BlendMode::Alpha;
@@ -831,7 +831,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsShader = particleVS;
 		desc.gsShader = particleGS;
 		desc.psShader = particleSpritesheetPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.blendMode = BlendMode::Alpha;
 		desc.depthMode = DepthMode::ReadOnly;
 
@@ -852,7 +852,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = defaultMeshVSPath;
 		desc.vsShader = defaultMeshVS;
 		desc.psShader = vfxSpritesheetPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.samplerList[14] = SamplerName(SamplerType::LUT);
 		desc.samplerList[15] = SamplerName(SamplerType::Shadow);
 		desc.blendMode = BlendMode::Alpha;
@@ -917,7 +917,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = quadVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = deferredDirectionalLightPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.samplerList[14] = SamplerName(SamplerType::LUT);
 		desc.samplerList[15] = SamplerName(SamplerType::Shadow);
 		desc.blendMode = BlendMode::Additive;
@@ -939,7 +939,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = quadVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = deferredPointlightPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.samplerList[14] = SamplerName(SamplerType::LUT);
 		desc.samplerList[15] = SamplerName(SamplerType::Shadow);
 		desc.blendMode = BlendMode::Additive;
@@ -961,7 +961,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = quadVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = deferredSpotlightPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.samplerList[14] = SamplerName(SamplerType::LUT);
 		desc.samplerList[15] = SamplerName(SamplerType::Shadow);
 		desc.blendMode = BlendMode::Additive;
@@ -983,7 +983,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = quadVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = bloomPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.blendMode = BlendMode::Alpha;
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
@@ -1041,7 +1041,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = quadVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = luminancePS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -1120,7 +1120,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = quadVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = tonemapACESPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -1139,7 +1139,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = quadVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = tonemapLottesPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -1158,7 +1158,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = quadVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = tonemapUEPS;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -1198,7 +1198,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsShader = defaultMeshVS;
 		desc.psShader = debugForwardPS;
 		desc.cullMode = CullMode::None;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -1218,7 +1218,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsShader = quadVS;
 		desc.psShader = debugGBufferPS;
 		desc.cullMode = CullMode::None;
-		desc.samplerList[0] = SamplerName(SamplerType::LinearWrap);
+		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))

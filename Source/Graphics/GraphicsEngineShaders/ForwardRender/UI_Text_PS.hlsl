@@ -25,7 +25,7 @@ float ScreenPxRange(float2 uvs)
 
 float4 main(Text_VSout input) : SV_TARGET
 {    
-    const float3 fontPx = FontTexture.Sample(LinearWrapSampler, input.TexCoord).rgb;
+    const float3 fontPx = FontTexture.Sample(AnisoWrapSampler, input.TexCoord).rgb;
     float sd = median(fontPx);
     float screenPxDist = ScreenPxRange(input.TexCoord) * (sd - 0.5);
     float opacity = clamp(screenPxDist + 0.5, 0, 1.0);

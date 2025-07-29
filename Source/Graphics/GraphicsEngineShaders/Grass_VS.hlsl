@@ -21,7 +21,7 @@ MeshVStoPS main(MeshVertex vertex)
     result.WorldPos = mul(OB_World, localPosition);
     float speed = -0.1;
     float magnitude = 50.0;
-    float3 noise = PerlinNoise.SampleLevel(LinearWrapSampler, result.WorldPos.xz + FB_Time.xx * speed, 0).rgb * vertex.VertexColor0.rgb * magnitude;
+    float3 noise = PerlinNoise.SampleLevel(AnisoWrapSampler, result.WorldPos.xz + FB_Time.xx * speed, 0).rgb * vertex.VertexColor0.rgb * magnitude;
     
     result.WorldPos.rgb += noise;
     

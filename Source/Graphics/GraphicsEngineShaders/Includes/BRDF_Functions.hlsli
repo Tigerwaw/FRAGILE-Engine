@@ -78,7 +78,7 @@ int GetNumMips(TextureCube aCube)
 float3 Diffuse_IBL(float3 aPixelNormal, TextureCube envCubemap)
 {
     const int numMips = GetNumMips(envCubemap) - 1;
-    const float3 iblDiffuse = envCubemap.SampleLevel(LinearWrapSampler, aPixelNormal, numMips).rgb;
+    const float3 iblDiffuse = envCubemap.SampleLevel(AnisoWrapSampler, aPixelNormal, numMips).rgb;
     return iblDiffuse;
 }
 
@@ -87,7 +87,7 @@ float3 Specular_IBL(float3 aPixelNormal, float3 toViewDir, float aRoughness, flo
     const int numMips = GetNumMips(envCubemap) - 1;
     const float3 R = reflect(-toViewDir, aPixelNormal);
     
-    float3 envColor = envCubemap.SampleLevel(LinearWrapSampler, R, aRoughness * numMips).rgb;
+    float3 envColor = envCubemap.SampleLevel(AnisoWrapSampler, R, aRoughness * numMips).rgb;
     
     const float NdotV = saturate(dot(aPixelNormal, toViewDir));
     const float2 brdfLUT = BRDF_LUT_Texture.Sample(BRDF_LUT_Sampler, float2(NdotV, aRoughness)).rg;

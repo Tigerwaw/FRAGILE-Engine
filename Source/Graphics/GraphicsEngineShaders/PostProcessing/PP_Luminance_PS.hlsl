@@ -6,7 +6,7 @@ Texture2D IntermediateLDRBuffer : register(t30);
 
 float4 main(Quad_VS_to_PS input) : SV_TARGET
 {
-    const float4 color = IntermediateLDRBuffer.Sample(LinearWrapSampler, input.UV);
+    const float4 color = IntermediateLDRBuffer.Sample(AnisoWrapSampler, input.UV);
     
     if (color.a < 0.05f)
     {

@@ -12,6 +12,8 @@ SamplerState LinearWrapSampler : register(s0);
 SamplerState LinearClampSampler : register(s1);
 SamplerState PointWrapSampler : register(s2);
 SamplerState PointClampSampler : register(s3);
+SamplerState AnisoWrapSampler : register(s4);
+SamplerState AnisoClampSampler : register(s5);
 SamplerComparisonState ShadowCmpSampler : register(s15);
 
 Texture2D PerlinNoise : register(t50);

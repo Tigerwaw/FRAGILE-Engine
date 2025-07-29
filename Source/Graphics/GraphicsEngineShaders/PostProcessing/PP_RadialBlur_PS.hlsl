@@ -13,7 +13,7 @@ float4 main(Quad_VS_to_PS input) : SV_TARGET
         for (int y = -2; y < 2; ++y)
         {
             float2 offset = float2(float(x), float(y)) * texel;
-            v += InputTexture.Sample(LinearClampSampler, input.UV + offset).r;
+            v += InputTexture.Sample(AnisoWrapSampler, input.UV + offset).r;
         }
     }
     

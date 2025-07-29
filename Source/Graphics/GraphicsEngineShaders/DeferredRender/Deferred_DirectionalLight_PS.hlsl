@@ -10,11 +10,11 @@ Texture2D SSAOTexture : register(t30);
 
 float4 main(Quad_VS_to_PS input) : SV_TARGET
 {
-    float3 albedoColor = GBuffer_Albedo.Sample(LinearWrapSampler, input.UV).rgb;
-    float3 material = GBuffer_Material.Sample(LinearWrapSampler, input.UV).rgb;
-    float4 effects = GBuffer_Effects.Sample(LinearWrapSampler, input.UV);
-    float3 worldNormal = GBuffer_WorldNormal.Sample(LinearWrapSampler, input.UV).rgb;
-    float4 worldPos = GBuffer_WorldPos.Sample(LinearWrapSampler, input.UV);
+    float3 albedoColor = GBuffer_Albedo.Sample(AnisoWrapSampler, input.UV).rgb;
+    float3 material = GBuffer_Material.Sample(AnisoWrapSampler, input.UV).rgb;
+    float4 effects = GBuffer_Effects.Sample(AnisoWrapSampler, input.UV);
+    float3 worldNormal = GBuffer_WorldNormal.Sample(AnisoWrapSampler, input.UV).rgb;
+    float4 worldPos = GBuffer_WorldPos.Sample(AnisoWrapSampler, input.UV);
     
     float ambientOcclusion = material.r;
     

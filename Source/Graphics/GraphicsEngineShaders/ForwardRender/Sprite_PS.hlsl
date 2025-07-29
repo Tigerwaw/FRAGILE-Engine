@@ -3,5 +3,5 @@
 
 float4 main(Sprite_GSout input) : SV_TARGET
 {
-	return AlbedoTexture.Sample(LinearWrapSampler, input.TexCoord0.xy);
+    return AlbedoTexture.Sample(AnisoWrapSampler, input.TexCoord0.xy);
 }

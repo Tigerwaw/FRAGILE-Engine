@@ -11,7 +11,7 @@ float4 main(Particle_GSOut input) : SV_TARGET
         return 0;
     }
     
-    float4 textureColor = ParticleTexture.Sample(LinearWrapSampler, input.UV);
+    float4 textureColor = ParticleTexture.Sample(AnisoWrapSampler, input.UV);
     
     if (input.ChannelMask.r + input.ChannelMask.g + input.ChannelMask.b + input.ChannelMask.a > 1.0)
     {

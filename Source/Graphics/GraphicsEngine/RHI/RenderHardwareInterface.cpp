@@ -715,7 +715,7 @@ void RenderHardwareInterface::CreateDefaultSamplerStates()
 	anisoWrapDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 	anisoWrapDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 	anisoWrapDesc.MipLODBias = 0.0f;
-	anisoWrapDesc.MaxAnisotropy = 1;
+	anisoWrapDesc.MaxAnisotropy = 8;
 	anisoWrapDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	anisoWrapDesc.BorderColor[0] = 1.0f;
 	anisoWrapDesc.BorderColor[1] = 1.0f;
@@ -763,7 +763,7 @@ void RenderHardwareInterface::CreateDefaultSamplerStates()
 	anisoClampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 	anisoClampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 	anisoClampDesc.MipLODBias = 0.0f;
-	anisoClampDesc.MaxAnisotropy = 1;
+	anisoClampDesc.MaxAnisotropy = 8;
 	anisoClampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
 	anisoClampDesc.BorderColor[0] = 1.0f;
 	anisoClampDesc.BorderColor[1] = 1.0f;

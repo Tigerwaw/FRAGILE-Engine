@@ -9,7 +9,7 @@ GBufferOutput main(MeshVStoPS input, bool isFrontFace : SV_IsFrontFace)
     
     float2 UVs = (input.TexCoord0.xy + MB_UVOffset) * MB_UVScale;
     
-    float4 albedoMap = AlbedoTexture.Sample(LinearWrapSampler, UVs);
+    float4 albedoMap = AlbedoTexture.Sample(AnisoWrapSampler, UVs);
     
     if (albedoMap.a < 0.01)
     {
@@ -18,14 +18,14 @@ GBufferOutput main(MeshVStoPS input, bool isFrontFace : SV_IsFrontFace)
     
     float2 worldUV = input.WorldPos.xz / 5000.0f;
     
-    float3 variationColor = lerp(0.5f, 2.0f, PerlinNoise.Sample(LinearWrapSampler, worldUV).r);
+    float3 variationColor = lerp(0.5f, 2.0f, PerlinNoise.Sample(AnisoWrapSampler, worldUV).r);
     albedoMap.rgb *= variationColor;
     
-    float3 windColor = lerp(0.5f, 2.0f, PerlinNoise.Sample(LinearWrapSampler, worldUV + FB_Time.xx * -0.1f).r);
+    float3 windColor = lerp(0.5f, 2.0f, PerlinNoise.Sample(AnisoWrapSampler, worldUV + FB_Time.xx * -0.1f).r);
     albedoMap.rgb *= windColor;
     
-    const float2 normalMap = NormalTexture.Sample(LinearWrapSampler, UVs).rg;
-    const float3 materialMap = MaterialTexture.Sample(LinearWrapSampler, UVs).rgb;
+    const float2 normalMap = NormalTexture.Sample(AnisoWrapSampler, UVs).rg;
+    const float3 materialMap = MaterialTexture.Sample(AnisoWrapSampler, UVs).rgb;
    
     // NORMALS
     float3 calculatedNormals;
@@ -34,12 +34,12 @@ GBufferOutput main(MeshVStoPS input, bool isFrontFace : SV_IsFrontFace)
     calculatedNormals = normalize(calculatedNormals);
     
     // Calculate normal based on whether we are rendering a frontface or backface.
-    //int ffMult = ((int) isFrontFace * 2) - 1;
+    int ffMult = ((int)isFrontFace * 2) - 1;
     
     const float3x3 TBN = float3x3(
         normalize(input.Tangent),
         normalize(input.Binormal),
-        normalize(input.Normal)
+        normalize(input.Normal * ffMult)
     );
     
     float3 pixelNormal = normalize(mul(calculatedNormals, TBN));

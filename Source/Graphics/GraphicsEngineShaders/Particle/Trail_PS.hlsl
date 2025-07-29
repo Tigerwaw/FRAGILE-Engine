@@ -11,7 +11,7 @@ float4 main(Trail_GSOut input) : SV_TARGET
         return 0;
     }
     
-    float4 textureColor = TrailTexture.Sample(LinearWrapSampler, input.UV);
+    float4 textureColor = TrailTexture.Sample(AnisoWrapSampler, input.UV);
     
     if (input.ChannelMask.r + input.ChannelMask.g + input.ChannelMask.b + input.ChannelMask.a > 1.0)
     {

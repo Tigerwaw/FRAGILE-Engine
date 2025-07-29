@@ -7,8 +7,8 @@ Texture2D IntermediateLDR : register(t31);
 
 float4 main(Quad_VS_to_PS input) : SV_TARGET
 {
-    const float3 sceneColor = IntermediateLDR.Sample(LinearWrapSampler, input.UV).rgb;
-    const float3 bloomColor = InputTexture.Sample(LinearWrapSampler, input.UV).rgb * PPB_BloomStrength;
+    const float3 sceneColor = IntermediateLDR.Sample(AnisoWrapSampler, input.UV).rgb;
+    const float3 bloomColor = InputTexture.Sample(AnisoWrapSampler, input.UV).rgb * PPB_BloomStrength;
     
     switch (PPB_BloomFunction)
     {

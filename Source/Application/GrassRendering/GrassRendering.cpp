@@ -37,9 +37,9 @@ void GrassRendering::InitializeApplication()
 	float minSize = 0.5f;
 	float maxSize = 2.0f;
 
-	for (int outer = 0; outer < 200; outer++)
+	for (int outer = 0; outer < 1; outer++)
 	{
-		for (int inner = 0; inner < 200; inner++)
+		for (int inner = 0; inner < 1; inner++)
 		{
 			Math::Matrix4x4f instanceMatrix = Math::Matrix4x4f::CreateRollPitchYawMatrix({ 0.0f, Utilities::RandomInRange(-180.0f, 180.0f), 0.0f });
 			instanceMatrix(4, 1) = Utilities::RandomVariation(inner * defaultOffset, offsetVariation);

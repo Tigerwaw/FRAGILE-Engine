@@ -11,7 +11,7 @@ float4 main(Quad_VS_to_PS input) : SV_TARGET
     for (uint s = 0; s < kernelSize; ++s)
     {
         float2 uv = input.UV + float2(0.0f, texelSize * (step + (float) s));
-        float3 color = InputTexture.Sample(LinearClampSampler, uv).rgb;
+        float3 color = InputTexture.Sample(AnisoWrapSampler, uv).rgb;
         result += color * GaussianKernel[s];
     }
     

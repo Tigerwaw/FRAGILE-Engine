@@ -10,7 +10,7 @@ float4 main(MeshVStoPS input) : SV_TARGET
             return float4((input.Normal + 1.0f) * 0.5f, 1.0f);
         case 10: // Texture Normals
         {
-            const float2 normalMap = NormalTexture.Sample(LinearWrapSampler, input.TexCoord0.xy).rg;
+            const float2 normalMap = NormalTexture.Sample(AnisoWrapSampler, input.TexCoord0.xy).rg;
             float3 calculatedNormals;
             calculatedNormals.xy = (normalMap.xy - 0.5f) * 2;
             calculatedNormals.z = sqrt(1 - saturate(calculatedNormals.x * calculatedNormals.x + calculatedNormals.y * calculatedNormals.y));

@@ -15,6 +15,6 @@ float4 main(Particle_GSOut input) : SV_TARGET
     }
     
     float2 uv = Flipbook(input.UV, float2(8, 4), input.Lifetime * (8 * 4));
-    const float4 textureColor = ParticleTexture.Sample(LinearWrapSampler, uv);
+    const float4 textureColor = ParticleTexture.Sample(AnisoWrapSampler, uv);
     return textureColor * input.Color;
 }
