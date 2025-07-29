@@ -4,14 +4,13 @@
 #include "Math/AABB3D.hpp"
 #include "Math/Sphere.hpp"
 
-
 #include "Objects/Vertices/DebugLineVertex.h"
 #include "DebugDrawer/DebugLine.hpp"
 
 class Camera;
 class Model;
 class AnimatedModel;
-class DebugModel;
+class InstancedModel;
 
 class DynamicVertexBuffer;
 
@@ -27,7 +26,7 @@ public:
     void DrawBoundingBox(Math::AABB3D<float> aAABB, Math::Matrix4x4f aWorldMatrix = Math::Matrix4x4f(), Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
     void DrawBoundingBox(std::shared_ptr<Model> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
     void DrawBoundingBox(std::shared_ptr<AnimatedModel> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
-    void DrawBoundingBox(std::shared_ptr<DebugModel> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
+    void DrawBoundingBox(std::shared_ptr<InstancedModel> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
     void DrawBoundingSphere(Math::Sphere<float> aSphere, Math::Matrix4x4f aWorldMatrix = Math::Matrix4x4f(), Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
 private:
 

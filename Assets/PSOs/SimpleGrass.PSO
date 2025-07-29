@@ -1,0 +1,14 @@
+{
+  "VertexType": "Mesh",
+  "VertexShader": "SimpleGrass_VS.cso",
+  "PixelShader": "SimpleGrass_PS.cso",
+  "RasterizerDesc": {
+    "CullMode": "None"
+  },
+  "Samplers": {
+    "AnisotropicWrap": 4
+  },
+  "Textures": [
+    "perlin.dds"
+  ]
+}

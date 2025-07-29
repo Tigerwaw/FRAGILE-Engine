@@ -1276,8 +1276,8 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 
 	if (Engine::Get().DrawBoundingBoxes)
 	{
-		Engine::Get().GetDebugDrawer().DrawBoundingBox(aRenderData.sceneBoundingBox);
-		Engine::Get().GetDebugDrawer().DrawBoundingBox(myVisibleObjectsBB);
+		Engine::Get().GetDebugDrawer().DrawBoundingBox(aRenderData.sceneBoundingBox, Math::Matrix4x4f(), Math::Vector4f(1.0f, 1.0f, 0.0f, 1.0f));
+		Engine::Get().GetDebugDrawer().DrawBoundingBox(myVisibleObjectsBB, Math::Matrix4x4f(), Math::Vector4f(1.0f, 0.0f, 1.0f, 1.0f));
 
 		for (auto& gameObject : aRenderData.drawBoundingBoxesObjects)
 		{
@@ -1296,7 +1296,7 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 			std::shared_ptr<InstancedModel> instancedModel = gameObject->GetComponent<InstancedModel>();
 			if (instancedModel && instancedModel->GetActive())
 			{
-				Engine::Get().GetDebugDrawer().DrawBoundingBox(instancedModel->GetBoundingBox());
+				Engine::Get().GetDebugDrawer().DrawBoundingBox(instancedModel);
 			}
 		}
 	}

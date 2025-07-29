@@ -33,14 +33,19 @@ void InstancedModel::SetMesh(std::shared_ptr<Mesh> aMesh)
 	}
 }
 
-void InstancedModel::AddInstance(Math::Matrix4x4f aTransform)
+void InstancedModel::AddInstance(const Math::Matrix4x4f& aTransform)
+{
+	AddInstanceNoBufferUpdate(aTransform);
+	UpdateInstanceBuffer();
+}
+
+void InstancedModel::AddInstanceNoBufferUpdate(const Math::Matrix4x4f& aTransform)
 {
 	myMeshTransforms.emplace_back(aTransform);
 
-	myMeshTransformBuffer.UpdateVertexBuffer(myMeshTransforms);
+	auto transform = gameObject->GetComponent<Transform>();
+	Math::AABB3D<float> meshAABB = myMesh->GetBoundingBox().GetAABBinNewSpace(aTransform);
 
-	Math::AABB3D<float> meshAABB = myMesh->GetBoundingBox().GetAABBinNewSpace(gameObject->GetComponent<Transform>()->GetWorldMatrix());
-	meshAABB = meshAABB.GetAABBinNewSpace(myMeshTransforms.back());
 	Math::Vector3f aabbMin = myBoundingBox.GetMin();
 	Math::Vector3f aabbMax = myBoundingBox.GetMax();
 	aabbMin.x = std::min(aabbMin.x, meshAABB.GetMin().x);
@@ -51,6 +56,11 @@ void InstancedModel::AddInstance(Math::Matrix4x4f aTransform)
 	aabbMax.z = std::max(aabbMax.z, meshAABB.GetMax().z);
 
 	myBoundingBox.InitWithMinAndMax(aabbMin, aabbMax);
+}
+
+void InstancedModel::UpdateInstanceBuffer()
+{
+	myMeshTransformBuffer.UpdateVertexBuffer(myMeshTransforms);
 }
 
 void InstancedModel::SetMaterialOnSlot(unsigned aSlot, std::shared_ptr<Material> aMaterial)

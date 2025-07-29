@@ -17,7 +17,9 @@ public:
     unsigned GetMeshCount() { return static_cast<unsigned>(myMeshTransforms.size()); }
     DynamicVertexBuffer& GetInstanceBuffer() { return myMeshTransformBuffer; }
 
-    void AddInstance(Math::Matrix4x4f aTransform);
+    void AddInstance(const Math::Matrix4x4f& aTransform);
+    void AddInstanceNoBufferUpdate(const Math::Matrix4x4f& aTransform);
+    void UpdateInstanceBuffer();
 
     void SetMaterialOnSlot(unsigned aSlot, std::shared_ptr<Material> aMaterial);
     std::shared_ptr<Material>& GetMaterialOnSlot(unsigned aSlot) { return myMaterials[mySlotToIndex[aSlot]]; }
