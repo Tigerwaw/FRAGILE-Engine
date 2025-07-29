@@ -6,7 +6,7 @@
     "CullMode": "None"
   },
   "Samplers": {
-    "LinearWrap": 0
+    "AnisotropicWrap": 4
   },
   "Textures": [
     "perlin.dds"

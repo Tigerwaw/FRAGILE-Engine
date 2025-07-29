@@ -26,7 +26,7 @@ void GrassRendering::InitializeApplication()
 	sh.LoadScene("Scenes/GrassRendering.SCENE");
 
 	std::shared_ptr<GameObject> instancedModelObj = std::make_shared<GameObject>();
-	instancedModelObj->AddComponent<Transform>(Math::Vector3f(-3000.0f, -10.0f, -3000.0f));
+	instancedModelObj->AddComponent<Transform>(Math::Vector3f(-3000.0f, 0.0f, -3000.0f));
 	std::shared_ptr<InstancedModel> instancedModel = instancedModelObj->AddComponent<InstancedModel>(40000);
 	instancedModel->SetMesh(AssetManager::Get().GetAsset<MeshAsset>("SM_Grass.fbx")->mesh);
 	instancedModel->SetMaterialOnSlot(0, AssetManager::Get().GetAsset<MaterialAsset>("Grass.mat")->material);
@@ -37,18 +37,20 @@ void GrassRendering::InitializeApplication()
 	float minSize = 0.5f;
 	float maxSize = 2.0f;
 
-	for (int outer = 0; outer < 1; outer++)
+	for (int outer = 0; outer < 200; outer++)
 	{
-		for (int inner = 0; inner < 1; inner++)
+		for (int inner = 0; inner < 200; inner++)
 		{
 			Math::Matrix4x4f instanceMatrix = Math::Matrix4x4f::CreateRollPitchYawMatrix({ 0.0f, Utilities::RandomInRange(-180.0f, 180.0f), 0.0f });
-			instanceMatrix(4, 1) = Utilities::RandomVariation(inner * defaultOffset, offsetVariation);
-			instanceMatrix(4, 3) = Utilities::RandomVariation(outer * defaultOffset, offsetVariation);
 
 			float scale = Utilities::RandomInRange(minSize, maxSize);
 			instanceMatrix(1, 1) = scale;
 			instanceMatrix(2, 2) = scale;
 			instanceMatrix(3, 3) = scale;
+
+			instanceMatrix(4, 1) = Utilities::RandomVariation(inner * defaultOffset, offsetVariation);
+			instanceMatrix(4, 3) = Utilities::RandomVariation(outer * defaultOffset, offsetVariation);
+
 			instancedModel->AddInstance(instanceMatrix);
 		}
 	}

@@ -121,7 +121,6 @@ bool ResourceVendor::CreatePSO(PipelineStateObject& aPSO, PSODescription& aPSOde
 		rastDesc.FillMode = static_cast<D3D11_FILL_MODE>(aPSOdesc.fillMode);
 		rastDesc.CullMode = static_cast<D3D11_CULL_MODE>(aPSOdesc.cullMode);
 		rastDesc.AntialiasedLineEnable = aPSOdesc.antiAliasedLine;
-		rastDesc.MultisampleEnable = TRUE;
 
 		if (!myRHI->CreateRasterizerState(aPSOdesc.name + "_Rasterizer", rastDesc, aPSO))
 		{

@@ -919,6 +919,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = quadVSPath;
 		desc.vsShader = quadVS;
 		desc.psShader = deferredDirectionalLightPS;
+		desc.samplerList[1] = SamplerName(SamplerType::LinearClamp);
 		desc.samplerList[4] = SamplerName(SamplerType::AnisotropicWrap);
 		desc.samplerList[14] = SamplerName(SamplerType::LUT);
 		desc.samplerList[15] = SamplerName(SamplerType::Shadow);

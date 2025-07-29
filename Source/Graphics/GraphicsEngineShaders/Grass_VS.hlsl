@@ -8,24 +8,22 @@ MeshVStoPS main(MeshVertex vertex)
     MeshVStoPS result;
     
     float4 localPosition = vertex.Position;
+    float3 localNormal = normalize(vertex.Normal);
+    float3 localTangent = normalize(vertex.Tangent);
     
     if (OB_IsInstanced)
     {
         localPosition = mul(vertex.RelativeTransform, localPosition);
-        result.Normal = mul((float3x3) vertex.RelativeTransform, normalize(vertex.Normal));
-        result.Tangent = mul((float3x3) vertex.RelativeTransform, normalize(vertex.Tangent));
-        result.Binormal = cross(result.Normal, result.Tangent);
-    }
-    else
-    {
-        result.Normal = mul((float3x3) OB_World, normalize(vertex.Normal));
-        result.Tangent = mul((float3x3) OB_World, normalize(vertex.Tangent));
-        result.Binormal = cross(result.Normal, result.Tangent);
+        localNormal = mul((float3x3) vertex.RelativeTransform, localNormal);
+        localTangent = mul((float3x3) vertex.RelativeTransform, localTangent);
     }
     
+    result.Normal = mul((float3x3) OB_World, localNormal);
+    result.Tangent = mul((float3x3) OB_World, localTangent);
+    result.Binormal = cross(result.Normal, result.Tangent);
     result.WorldPos = mul(OB_World, localPosition);
     float speed = -0.1;
-    float magnitude = 50.0;
+    float magnitude = 30.0;
     float3 noise = PerlinNoise.SampleLevel(AnisoWrapSampler, result.WorldPos.xz + FB_Time.xx * speed, 0).rgb * vertex.VertexColor0.rgb * magnitude;
     
     result.WorldPos.rgb += noise;
