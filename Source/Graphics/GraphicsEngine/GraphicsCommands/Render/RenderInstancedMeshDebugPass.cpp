@@ -25,7 +25,6 @@ void RenderInstancedMeshDebugPass::Execute()
 
     ObjectBuffer objBufferData;
     objBufferData.World = myData.transform;
-    objBufferData.WorldInvT = myData.transform.GetFastInverse().GetTranspose();
     objBufferData.hasSkinning = false;
     objBufferData.isInstanced = true;
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, objBufferData);

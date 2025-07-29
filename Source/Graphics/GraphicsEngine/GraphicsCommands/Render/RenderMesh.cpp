@@ -25,7 +25,6 @@ void RenderMesh::Execute()
 
     ObjectBuffer objBufferData;
     objBufferData.World = myData.transform;
-    objBufferData.WorldInvT = myData.transform.GetFastInverse().GetTranspose();
     objBufferData.hasSkinning = false;
     objBufferData.customData_1 = myData.customShaderParams_1;
     objBufferData.customData_2 = myData.customShaderParams_2;

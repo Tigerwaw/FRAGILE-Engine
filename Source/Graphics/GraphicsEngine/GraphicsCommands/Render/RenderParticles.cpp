@@ -22,7 +22,6 @@ void RenderParticles::Execute()
 
     ObjectBuffer objBufferData;
     objBufferData.World = myData.transform;
-    objBufferData.WorldInvT = myData.transform.GetFastInverse().GetTranspose();
     gfx.UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, objBufferData);
 
     for (auto& emitter : myData.emitters)

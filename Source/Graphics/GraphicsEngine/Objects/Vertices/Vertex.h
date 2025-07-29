@@ -3,8 +3,6 @@
 
 #include "RHI/RHIStructs.h"
 
-
-
 struct Vertex
 {
 	Math::Vector4f Position = { 0, 0, 0, 1 };

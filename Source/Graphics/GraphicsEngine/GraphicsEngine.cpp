@@ -689,6 +689,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vertexType = VertexType::MeshVertex;
 		desc.vsPath = defaultMeshVSPath;
 		desc.vsShader = defaultMeshVS;
+		desc.cullMode = CullMode::None;
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))
@@ -707,6 +708,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 		desc.vsPath = shadowCubeVSPath;
 		desc.vsShader = shadowCubeVS;
 		desc.gsShader = shadowCubeGS;
+		desc.cullMode = CullMode::None;
 
 		std::shared_ptr<PipelineStateObject> pso = std::make_shared<PipelineStateObject>();
 		if (!rv.CreatePSO(*pso, desc))

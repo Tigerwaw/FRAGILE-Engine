@@ -7,11 +7,21 @@ MeshVStoPS main(MeshVertex vertex)
 {
     MeshVStoPS result;
     
-    result.Normal = mul((float3x3) OB_WorldInvT, normalize(vertex.Normal));
-    result.Tangent = mul((float3x3) OB_WorldInvT, normalize(vertex.Tangent));
-    result.Binormal = cross(result.Tangent, result.Normal);
-    
     float4 localPosition = vertex.Position;
+    
+    if (OB_IsInstanced)
+    {
+        localPosition = mul(vertex.RelativeTransform, localPosition);
+        result.Normal = mul((float3x3) vertex.RelativeTransform, normalize(vertex.Normal));
+        result.Tangent = mul((float3x3) vertex.RelativeTransform, normalize(vertex.Tangent));
+        result.Binormal = cross(result.Normal, result.Tangent);
+    }
+    else
+    {
+        result.Normal = mul((float3x3) OB_World, normalize(vertex.Normal));
+        result.Tangent = mul((float3x3) OB_World, normalize(vertex.Tangent));
+        result.Binormal = cross(result.Normal, result.Tangent);
+    }
     
     if (OB_HasSkinning)
     {
@@ -48,11 +58,6 @@ MeshVStoPS main(MeshVertex vertex)
         result.Binormal = mul(result.Binormal, tSkinMatrix);
         
         localPosition = mul(skinMatrix, vertex.Position);
-    }
-    
-    if (OB_IsInstanced)
-    {
-        localPosition = mul(vertex.RelativeTransform, localPosition);
     }
     
     result.WorldPos = mul(OB_World, localPosition);
