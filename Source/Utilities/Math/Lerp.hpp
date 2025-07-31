@@ -25,6 +25,18 @@ namespace Math
 	template<typename T>
 	T Lerp(T aStartValue, T aEndValue, const float aDeltaValue)
 	{
-		return (aStartValue + aDeltaValue * (aEndValue - aStartValue));;
+		return (aStartValue + aDeltaValue * (aEndValue - aStartValue));
+	}
+
+	template<typename T>
+	T LerpAngle(T aStartValue, T aEndValue, const float aDeltaValue)
+	{
+		float dTheta = aEndValue - aStartValue;
+		if (dTheta > 180.0f)
+			aStartValue += 360.0f;
+		else if (dTheta < -180.0f)
+			aStartValue -= 360.0f;
+
+		return Lerp(aStartValue, aEndValue, aDeltaValue);
 	}
 }

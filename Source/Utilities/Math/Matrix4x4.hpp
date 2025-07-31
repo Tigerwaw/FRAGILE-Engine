@@ -400,19 +400,19 @@ namespace Math
 	template<class T>
 	inline const Vector3<T> Matrix4x4<T>::GetRightVector() const
 	{
-		return { this->operator()(1, 1), this->operator()(1, 2), this->operator()(1, 3) };
+		return Vector3<T>(this->operator()(1, 1), this->operator()(1, 2), this->operator()(1, 3)).GetNormalized();
 	}
 
 	template<class T>
 	inline const Vector3<T> Matrix4x4<T>::GetUpVector() const
 	{
-		return { this->operator()(2, 1), this->operator()(2, 2), this->operator()(2, 3) };
+		return Vector3<T>(this->operator()(2, 1), this->operator()(2, 2), this->operator()(2, 3)).GetNormalized();
 	}
 
 	template<class T>
 	inline const Vector3<T> Matrix4x4<T>::GetForwardVector() const
 	{
-		return { this->operator()(3, 1), this->operator()(3, 2), this->operator()(3, 3) };
+		return Vector3<T>(this->operator()(3, 1), this->operator()(3, 2), this->operator()(3, 3)).GetNormalized();
 	}
 
 	template <class T>

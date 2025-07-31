@@ -1027,6 +1027,9 @@ void RenderAssembler::QueueDirectionalLightShadows(SceneRenderData& aRenderData)
 	GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<BeginEvent>("Directional Light Shadows");
 
 	std::shared_ptr<DirectionalLight> dLight = aRenderData.directionalLight;
+
+	if (!dLight->CastsShadows()) return;
+
 	std::shared_ptr<Camera> lightCam = dLight->gameObject->GetComponent<Camera>();
 	std::shared_ptr<Transform> lightTransform = dLight->gameObject->GetComponent<Transform>();
 

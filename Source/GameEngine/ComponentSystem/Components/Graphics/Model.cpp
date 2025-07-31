@@ -33,7 +33,10 @@ Model::Model(std::shared_ptr<Mesh> aMesh)
 Model::Model(std::shared_ptr<Mesh> aMesh, std::shared_ptr<Material> aMaterial)
 {
     myMesh = aMesh;
-    SetMaterialOnSlot(0, aMaterial);
+    for (auto& element : myMesh->GetElements())
+    {
+        SetMaterialOnSlot(element.MaterialIndex, aMaterial);
+    }
 }
 
 void Model::Start()
