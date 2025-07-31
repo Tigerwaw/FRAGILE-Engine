@@ -1,0 +1,99 @@
+{
+  "GameObjects": [
+    {
+      "Name": "MainCamera",
+      "Active": true,
+      "Static": false,
+      "Components": [
+        {
+          "Type": "Transform",
+          "Position": [ 0.0, 0.0, -1000.0 ],
+          "Rotation": [ 0.0, 0.0, 0.0 ],
+          "Scale": [ 1.0, 1.0, 1.0 ]
+        },
+        {
+          "Type": "Camera",
+          "Perspective": false,
+          "LeftPlane": -3640.0,
+          "RightPlane": 3640.0,
+          "TopPlane": 2048.0,
+          "BottomPlane": -2048.0,
+          "NearPlane": 1.0,
+          "FarPlane": 6000.0
+        }
+      ]
+    },
+    {
+      "Name": "A_Light",
+      "Active": true,
+      "Static": true,
+      "Components": [
+        {
+          "Type": "Transform",
+          "Position": [ 0.0, 0.0, 0.0 ],
+          "Rotation": [ 0.0, 0.0, 0.0 ],
+          "Scale": [ 1.0, 1.0, 1.0 ]
+        },
+        {
+          "Type": "AmbientLight",
+          "Cubemap": "hornkoppespring.dds",
+          "Intensity": 0.1
+        }
+      ]
+    },
+    {
+      "Name": "D_Light",
+      "Active": true,
+      "Static": true,
+      "Components": [
+        {
+          "Type": "Transform",
+          "Position": [ -500.0, 500.0, -500.0 ],
+          "Rotation": [ 45.0, 25.0, 0.0 ],
+          "Scale": [ 1.0, 1.0, 1.0 ]
+        },
+        {
+          "Type": "DirectionalLight",
+          "Intensity": 0.5,
+          "Color": [ 1.0, 1.0, 1.0 ],
+          "CastShadows": true,
+          "ShadowTextureSize": 4096,
+          "MinShadowBias": 0.00068,
+          "MaxShadowBias": 0.001,
+          "LightSize": 1000.0
+        },
+        {
+          "Type": "Camera",
+          "Perspective": false,
+          "LeftPlane": -1024.0,
+          "RightPlane": 1024.0,
+          "TopPlane": 1024.0,
+          "BottomPlane": -1024.0,
+          "NearPlane": 1.0,
+          "FarPlane": 6000.0
+        }
+      ]
+    },
+    {
+      "Name": "Plane",
+      "Active": true,
+      "Static": false,
+      "Components": [
+        {
+          "Type": "Transform",
+          "Position": [ 0.0, 0.0, 1000.0 ],
+          "Rotation": [ -90.0, 0.0, 0.0 ],
+          "Scale": [ 5000.0, 5000.0, 5000.0 ]
+        },
+        {
+          "Type": "Model",
+          "ShouldViewcull": false,
+          "Model": "SM_PlanePrimitive",
+          "Materials": [
+            "Background.MAT"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "PSO": "Deferred",
+  "AlbedoTint": {
+    "R": 1.0,
+    "G": 1.0,
+    "B": 1.0,
+    "A": 1.0
+  },
+  "Textures": [
+    "WormHead_Mat_C.dds",
+    "WormHead_Mat_N.dds",
+    "WormHead_Mat_M.dds"
+  ]
+}
