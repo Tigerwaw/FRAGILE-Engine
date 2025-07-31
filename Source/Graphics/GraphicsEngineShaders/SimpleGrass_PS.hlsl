@@ -7,7 +7,7 @@ GBufferOutput main(MeshVStoPS input, bool isFrontFace : SV_IsFrontFace)
 {
     GBufferOutput output;
     
-    float2 worldUV = input.WorldPos.xz / 1000.0f;
+    float2 worldUV = input.WorldPos.xz / 5000.0f;
     
     float3 color;
     float3 darkColor = float3(0.243, 0.529, 0.235);

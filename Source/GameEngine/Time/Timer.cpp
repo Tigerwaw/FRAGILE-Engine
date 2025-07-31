@@ -17,12 +17,15 @@ void Timer::Update()
 
 	myCurrentFPSCountFrame++;
 	myTotalFPS += 1 / GetDeltaTime();
+	myTotalFrametime += GetFrameTimeMS();
 
 	if (myCurrentFPSCountFrame >= myMaxFPSCountFrame)
 	{
 		myAverageFPS = static_cast<int>(myTotalFPS / myCurrentFPSCountFrame);
+		myAverageFrametime = myTotalFrametime / static_cast<float>(myCurrentFPSCountFrame);
 		myCurrentFPSCountFrame = 0;
 		myTotalFPS = 0;
+		myTotalFrametime = 0.0f;
 	}
 
 }
@@ -48,10 +51,15 @@ double Timer::GetTimeSinceProgramStart() const
 float Timer::GetFrameTimeMS() const
 {
 	const std::chrono::duration<float, std::ratio<1, 1000>> frameTime = myCurrentFrameTime - myLastFrameTime;
-	return frameTime.count() * GetTimeScale();
+	return frameTime.count();
 }
 
-int Timer::GetFPS() const
+int Timer::GetAverageFPS() const
 {
 	return myAverageFPS;
+}
+
+float Timer::GetAverageFrameTimeMS() const
+{
+	return myAverageFrametime;
 }

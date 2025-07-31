@@ -14,7 +14,8 @@ public:
 	float GetUnscaledDeltaTime() const;
 	double GetTimeSinceProgramStart() const;
 	float GetFrameTimeMS() const;
-	int GetFPS() const;
+	int GetAverageFPS() const;
+	float GetAverageFrameTimeMS() const;
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> myStartTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> myLastFrameTime;
@@ -24,5 +25,7 @@ private:
 	int myMaxFPSCountFrame = 100;
 	float myTotalFPS = 0;
 	int myAverageFPS = 0;
+	float myTotalFrametime = 0;
+	float myAverageFrametime = 0.0f;
 	float myTimeScale = 1.0f;
 };

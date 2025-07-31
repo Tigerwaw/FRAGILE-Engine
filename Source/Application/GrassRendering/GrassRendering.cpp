@@ -98,7 +98,7 @@ void GrassRendering::UpdateDebug()
 			// FPS
 			{
 				Math::Vector4f color = { 1.0f, 1.0f, 1.0f, 1.0f };
-				int fps = Engine::Get().GetTimer().GetFPS();
+				int fps = Engine::Get().GetTimer().GetAverageFPS();
 				if (fps < 60) color = { 1.0f, 1.0f, 0.0f, 1.0f };
 				if (fps < 30) color = { 1.0f, 0.0f, 0.0f, 1.0f };
 
@@ -110,7 +110,7 @@ void GrassRendering::UpdateDebug()
 
 				ImGui::Text("Frametime (ms):");
 				ImGui::TableNextColumn();
-				ImGui::Text("%.2f", Engine::Get().GetTimer().GetFrameTimeMS());
+				ImGui::Text("%.2f", Engine::Get().GetTimer().GetAverageFrameTimeMS());
 				ImGui::TableNextColumn();
 			}
 
