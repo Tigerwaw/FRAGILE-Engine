@@ -48,3 +48,4 @@ Lib/**
 !Dependencies/**
 !ProjectCreator.exe
 !premake5.exe
+!Tools/**
