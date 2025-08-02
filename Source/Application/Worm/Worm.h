@@ -7,6 +7,7 @@
 
 class GameObject;
 class Transform;
+class TextComponent;
 
 constexpr int max_pieces = 10;
 constexpr int max_obstacles = 30;
@@ -19,6 +20,7 @@ public:
     void UpdateDebug() override;
 
 private:
+    void CreateUI();
     void StartGame();
     void GameOver();
     void UpdateReticle();
@@ -55,6 +57,7 @@ private:
 
     float myMaxTurnRate = 0.25f;
 
+    float myScore = 0.0f;
     float myHighestYPoint = 0.0f;
     float myDistanceTravelled = 0.0f;
 
@@ -76,4 +79,9 @@ private:
     float myTimeSinceLastObstacleSpawned = 0.0f;
     int myActiveObstacles = 0;
     float myMinObstacleXDiff = 600.0f;
+
+    std::shared_ptr<TextComponent> myTitleText;
+    std::shared_ptr<TextComponent> myTutorialText;
+    std::shared_ptr<TextComponent> myPressSpaceText;
+    std::shared_ptr<TextComponent> myScoreText;
 };

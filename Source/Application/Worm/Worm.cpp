@@ -9,11 +9,13 @@
 #include <GameEngine/ComponentSystem/Components/Lights/AmbientLight.h>
 #include <GameEngine/ComponentSystem/Components/Lights/DirectionalLight.h>
 #include <GameEngine/ComponentSystem/Components/Physics/Colliders/BoxCollider.h>
+#include <GameEngine/ComponentSystem/Components/Graphics/TextComponent.h>
 
 #include <AssetManager/AssetManager.h>
 #include <GameEngine/AssetTypes/TextureAsset.h>
 #include <GameEngine/AssetTypes/MaterialAsset.h>
 #include <GameEngine/AssetTypes/MeshAsset.h>
+#include <GameEngine/AssetTypes/FontAsset.h>
 
 #include <GameEngine/Time/Timer.h>
 #include "CommonUtilities/Random.hpp"
@@ -56,6 +58,7 @@ void Worm::InitializeApplication()
 	myReticle->SetUniformScale(50.0f);
 	reticle->AddComponent<Model>(AssetManager::Get().GetAsset<MeshAsset>("SM_sphere.fbx")->mesh);
 
+	CreateUI();
 	CreateWorm();
 	CreateObstacles();
 }
@@ -110,6 +113,7 @@ void Worm::UpdateDebug()
 
 		ImGui::Text("History updated %i times", historyUpdated);
 		ImGui::Text("Highest Point: %f", myHighestYPoint);
+		ImGui::Text("Score: %f", myScore);
 		ImGui::Text("T: %f", myDistanceTravelled / myBodyOffset);
 
 		ImGui::Spacing();
@@ -123,8 +127,66 @@ void Worm::UpdateDebug()
 	ImGui::End();
 }
 
+void Worm::CreateUI()
+{
+	auto& sceneHandler = Engine::Get().GetSceneHandler();
+
+	auto font = AssetManager::Get().GetAsset<FontAsset>("Super Vanilla.FONT");
+
+	{
+		std::shared_ptr<GameObject> titleTextGO = std::make_shared<GameObject>();
+		sceneHandler.Instantiate(titleTextGO);
+		Math::Vector3f pos(-myCameraViewportDimensions.x * 0.5f, myCameraViewportDimensions.y * 0.3f, -500.0f);
+		Math::Vector3f scale(5.0f, 5.0f, 5.0f);
+		titleTextGO->AddComponent<Transform>(pos, Math::Vector3f(), scale);
+		myTitleText = titleTextGO->AddComponent<TextComponent>();
+		myTitleText->GetText()->SetFont(font->font);
+		myTitleText->GetText()->SetTextContent("WORM");
+	}
+
+	{
+		std::shared_ptr<GameObject> tutorialTextGO = std::make_shared<GameObject>();
+		sceneHandler.Instantiate(tutorialTextGO);
+		Math::Vector3f pos(-myCameraViewportDimensions.x * 0.68f, 0.0f, -500.0f);
+		Math::Vector3f scale(1.0f, 1.0f, 1.0f);
+		tutorialTextGO->AddComponent<Transform>(pos, Math::Vector3f(), scale);
+		myTutorialText = tutorialTextGO->AddComponent<TextComponent>();
+		myTutorialText->GetText()->SetFont(font->font);
+		myTutorialText->GetText()->SetTextContent("Use your mouse to move the worm!");
+	}
+
+	{
+		std::shared_ptr<GameObject> pressSpaceTextGO = std::make_shared<GameObject>();
+		sceneHandler.Instantiate(pressSpaceTextGO);
+		Math::Vector3f pos(-myCameraViewportDimensions.x * 0.5f, -myCameraViewportDimensions.y * 0.1f, -500.0f);
+		Math::Vector3f scale(1.0f, 1.0f, 1.0f);
+		pressSpaceTextGO->AddComponent<Transform>(pos, Math::Vector3f(), scale);
+		myPressSpaceText = pressSpaceTextGO->AddComponent<TextComponent>();
+		myPressSpaceText->GetText()->SetFont(font->font);
+		myPressSpaceText->GetText()->SetTextContent("Press Space to start!");
+	}
+
+	{
+		std::shared_ptr<GameObject> scoreTextGO = std::make_shared<GameObject>();
+		sceneHandler.Instantiate(scoreTextGO);
+		Math::Vector3f pos(-myCameraViewportDimensions.x * 0.9f, -myCameraViewportDimensions.y * 0.9f, -500.0f);
+		Math::Vector3f scale(1.0f, 1.0f, 1.0f);
+		scoreTextGO->AddComponent<Transform>(pos, Math::Vector3f(), scale);
+		myScoreText = scoreTextGO->AddComponent<TextComponent>();
+		myScoreText->GetText()->SetFont(font->font);
+		myScoreText->GetText()->SetTextContent("Distance Ascended: 0");
+	}
+}
+
 void Worm::StartGame()
 {
+	myTitleText->gameObject->SetActive(false);
+	myTutorialText->gameObject->SetActive(false);
+	myPressSpaceText->gameObject->SetActive(false);
+	myScoreText->GetText()->SetTextContent("Distance Ascended: 0m");
+
+	myScore = 0.0f;
+	myHighestYPoint = 0.0f;
 	myEnvironmentSpeedIncreaseMultiplier = myEnvironmentSpeedIncreaseStartMultiplier;
 	myObstacleSpawnTimer = myObstacleStartSpawnTimer;
 	myEnvironmentScrollSpeed = myEnvironmentStartingSpeed;
@@ -153,8 +215,11 @@ void Worm::StartGame()
 
 void Worm::GameOver()
 {
-	printf("Game Over\n");
 	myIsGameRunning = false;
+
+	myTitleText->gameObject->SetActive(true);
+	myTutorialText->gameObject->SetActive(true);
+	myPressSpaceText->gameObject->SetActive(true);
 }
 
 void Worm::UpdateReticle()
@@ -272,10 +337,13 @@ void Worm::MovePlayerHead()
 	moveVector.y -= myEnvironmentScrollSpeed * Engine::Get().GetTimer().GetDeltaTime();
 	myPlayerPieces[0]->AddTranslation(moveVector);
 	myDistanceTravelled += moveVectorLength;
+	myHighestYPoint -= myEnvironmentScrollSpeed * Engine::Get().GetTimer().GetDeltaTime();
 
 	if (myPlayerPieces[0]->GetTranslation().y > myHighestYPoint)
 	{
+		myScore += myPlayerPieces[0]->GetTranslation().y - myHighestYPoint;
 		myHighestYPoint = myPlayerPieces[0]->GetTranslation().y;
+		myScoreText->GetText()->SetTextContent(std::format("Distance Ascended: {}m", static_cast<int>(std::roundf(myScore / 100.0f))));
 	}
 
 	if (myPlayerPieces[0]->GetTranslation().y < -myCameraViewportDimensions.y)
