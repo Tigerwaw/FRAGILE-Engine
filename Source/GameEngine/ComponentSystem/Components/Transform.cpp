@@ -233,7 +233,7 @@ const Math::Vector3f Transform::GetRotation(bool aInWorldSpace) const
 {
 	if (aInWorldSpace)
 	{
-		return Math::ToVector3(Math::ToVector4(myRotation) * myToWorldMatrix);
+		return Math::ToVector3(Math::ToVector4(myRotation * Math::DEGREES_TO_RADIANS) * myToWorldMatrix) * Math::RADIANS_TO_DEGREES;
 	}
 	else
 	{
@@ -346,7 +346,7 @@ const bool Transform::IsScaled() const
 	float tolerance = 0.001f;
 	float scaleLength = myScale.LengthSqr();
 
-	return (scaleLength < (3.0f - tolerance) || scaleLength > (3.0f + tolerance));
+	return !Math::Equal(scaleLength, 3.0f, tolerance);
 }
 
 bool Transform::Serialize(nl::json& outJsonObject)
@@ -383,27 +383,12 @@ const Math::Matrix4x4f& Transform::GetMatrixInternal(bool aNoScale)
 {
 	if (myIsDirty)
 	{
-		myCachedMatrix = Math::Matrix4x4f();
-		myCachedMatrixNoScale = Math::Matrix4x4f();
-
-		Math::Matrix4x4f scaleMatrix;
-		scaleMatrix(1, 1) = myScale.x;
-		scaleMatrix(2, 2) = myScale.y;
-		scaleMatrix(3, 3) = myScale.z;
-
-		myCachedMatrix *= scaleMatrix;
-
+		Math::Matrix4x4f scaleMatrix = Math::Matrix4x4f::CreateScaleMatrix(myScale);
 		Math::Matrix4x4f rotationMatrix = Math::Matrix4x4f::CreateRollPitchYawMatrix(myRotation);
-		myCachedMatrix *= rotationMatrix;
-		myCachedMatrixNoScale *= rotationMatrix;
+		Math::Matrix4x4f translationMatrix = Math::Matrix4x4f::CreateTranslationMatrix(myPosition);
 
-		Math::Matrix4x4f translationMatrix;
-		translationMatrix(4, 1) = myPosition.x;
-		translationMatrix(4, 2) = myPosition.y;
-		translationMatrix(4, 3) = myPosition.z;
-
-		myCachedMatrix *= translationMatrix;
-		myCachedMatrixNoScale *= translationMatrix;
+		myCachedMatrix = scaleMatrix * rotationMatrix * translationMatrix;
+		myCachedMatrixNoScale = rotationMatrix * translationMatrix;
 
 		myIsDirty = false;
 	}

@@ -735,7 +735,7 @@ void FeatureShowcase::PhysicsPlayground()
 			transform->SetUniformScale(50.0f);
 			physicsObject->AddComponent<Rigidbody>(1.0f);
 			physicsObject->AddComponent<Model>(GraphicsEngine::Get().GetCubePrimitive());
-			physicsObject->AddComponent<BoxCollider>(Math::Vector3f(2.0f, 2.0f, 2.0f));
+			physicsObject->AddComponent<BoxCollider>(false, Math::Vector3f(2.0f, 2.0f, 2.0f));
 			Engine::Get().GetSceneHandler().Instantiate(physicsObject);
 		}
 
@@ -747,7 +747,7 @@ void FeatureShowcase::PhysicsPlayground()
 			transform->SetUniformScale(50.0f);
 			physicsObject->AddComponent<Rigidbody>(1.0f);
 			physicsObject->AddComponent<Model>(AssetManager::Get().GetAsset<MeshAsset>("sm_sphere.fbx")->mesh);
-			physicsObject->AddComponent<SphereCollider>(1.0f);
+			physicsObject->AddComponent<SphereCollider>(false, 1.0f);
 			Engine::Get().GetSceneHandler().Instantiate(physicsObject);
 		}
 
@@ -762,7 +762,7 @@ void FeatureShowcase::PhysicsPlayground()
 				transform->SetUniformScale(50.0f);
 				myControllablePhysicsObject->AddComponent<Rigidbody>(1.0f);
 				myControllablePhysicsObject->AddComponent<Model>(GraphicsEngine::Get().GetCubePrimitive());
-				myControllablePhysicsObject->AddComponent<BoxCollider>(Math::Vector3f(2.0f, 2.0f, 2.0f));
+				myControllablePhysicsObject->AddComponent<BoxCollider>(false, Math::Vector3f(2.0f, 2.0f, 2.0f));
 				myControllablePhysicsObject->AddComponent<PhysicsController>(1000.0f, 1.0f);
 				Engine::Get().GetSceneHandler().Instantiate(myControllablePhysicsObject);
 			}

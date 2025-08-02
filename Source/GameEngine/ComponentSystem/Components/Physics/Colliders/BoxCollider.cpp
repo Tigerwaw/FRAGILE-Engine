@@ -7,8 +7,9 @@
 #include "ComponentSystem/Components/Transform.h"
 #include "CommonUtilities/SerializationUtils.hpp"
 
-BoxCollider::BoxCollider(Math::Vector3f aExtents, Math::Vector3f aCenterOffset)
+BoxCollider::BoxCollider(bool aIsTrigger, Math::Vector3f aExtents, Math::Vector3f aCenterOffset)
 {
+    SetIsTrigger(aIsTrigger);
     myAABB.InitWithCenterAndExtents(aCenterOffset, aExtents);
 }
 

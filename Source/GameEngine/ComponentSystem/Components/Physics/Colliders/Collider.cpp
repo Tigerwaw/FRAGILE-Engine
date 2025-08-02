@@ -76,8 +76,6 @@ void Collider::OnCollisionExit()
 
 void Collider::OnTriggerEnter()
 {
-	myIsOverlappingDebug = true;
-
 	if (myOnTriggerEnterResponse)
 	{
 		myOnTriggerEnterResponse();
@@ -86,6 +84,8 @@ void Collider::OnTriggerEnter()
 
 void Collider::OnTriggerStay()
 {
+	myIsOverlappingDebug = true;
+
 	if (myOnTriggerStayResponse)
 	{
 		myOnTriggerStayResponse();

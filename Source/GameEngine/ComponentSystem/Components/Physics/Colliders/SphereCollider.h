@@ -7,7 +7,7 @@ class BoxCollider;
 class SphereCollider : public Collider
 {
 public:
-    SphereCollider(float aRadius = 100.0f, Math::Vector3f aCenterOffset = Math::Vector3f());
+    SphereCollider(bool aIsTrigger = false, float aRadius = 100.0f, Math::Vector3f aCenterOffset = Math::Vector3f());
 
     CollisionInfo CheckOverlap(const Collider* aCollider) const override;
     CollisionInfo CheckOverlap(const BoxCollider* aCollider) const override;

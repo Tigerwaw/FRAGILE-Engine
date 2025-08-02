@@ -4,6 +4,9 @@
 
 namespace Math
 {
+#undef min
+#undef max
+
 	template <class T>
 	class Sphere
 	{
@@ -68,7 +71,7 @@ namespace Math
 	{
 		Vector3<T> newCenter = ToVector3(ToVector4(myPoint) * aMatrix);
 		newCenter += { aMatrix(4, 1), aMatrix(4, 2), aMatrix(4, 3) };
-		Vector3<T> scale = Matrix4x4<T>::CreateScaleVector(aMatrix);
+		Vector3<T> scale = Vector3<T>::Abs(Matrix4x4<T>::CreateScaleVector(aMatrix));
 		T maxScale = static_cast<T>(std::max(scale.x, std::max(scale.y, scale.z)));
 		T newRadius = GetRadius() * maxScale;
 		Sphere<T> newSphere(newCenter, newRadius);

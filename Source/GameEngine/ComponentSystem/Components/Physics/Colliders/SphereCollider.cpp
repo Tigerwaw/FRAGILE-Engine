@@ -6,8 +6,9 @@
 #include "ComponentSystem/Components/Transform.h"
 #include "CommonUtilities/SerializationUtils.hpp"
 
-SphereCollider::SphereCollider(float aRadius, Math::Vector3f aCenterOffset)
+SphereCollider::SphereCollider(bool aIsTrigger, float aRadius, Math::Vector3f aCenterOffset)
 {
+    SetIsTrigger(aIsTrigger);
     mySphere.InitWithCenterAndRadius(aCenterOffset, aRadius);
 }
 

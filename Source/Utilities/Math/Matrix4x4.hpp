@@ -459,9 +459,7 @@ namespace Math
 	{
 		//pitch * roll * yaw
 
-		aPitchYawRollVector.x *= static_cast<T>(DEGREES_TO_RADIANS);
-		aPitchYawRollVector.y *= static_cast<T>(DEGREES_TO_RADIANS);
-		aPitchYawRollVector.z *= static_cast<T>(DEGREES_TO_RADIANS);
+		aPitchYawRollVector *= static_cast<T>(DEGREES_TO_RADIANS);
 
 		Quaternion<T> rotation = Quaternion<T>(aPitchYawRollVector);
 		Vector4<T> values = { rotation.x, rotation.y, rotation.z, rotation.w };

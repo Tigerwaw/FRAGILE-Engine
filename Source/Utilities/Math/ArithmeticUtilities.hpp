@@ -34,4 +34,10 @@ namespace Math
 	{
 		return static_cast<T>((aValue < T{}) ? -1 : 1);
 	}
+
+	template<IsArithmeticType T>
+	T IsInRange(T aValue, T aMinValue, T aMaxValue)
+	{
+		return aValue > aMinValue && aValue < aMaxValue;
+	}
 }
