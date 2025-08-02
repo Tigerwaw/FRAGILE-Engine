@@ -7,8 +7,8 @@
     "A": 1.0
   },
   "Textures": [
-    "WormHead_Mat_C.dds",
-    "WormHead_Mat_N.dds",
-    "WormHead_Mat_M.dds"
+    "Button_Mat_C.dds",
+    "Button_Mat_N.dds",
+    "Button_Mat_M.dds"
   ]
 }

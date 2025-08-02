@@ -7,8 +7,8 @@
     "A": 1.0
   },
   "Textures": [
-    "WormTail_Mat_C.dds",
-    "WormTail_Mat_N.dds",
-    "WormTail_Mat_M.dds"
+    "Stone_Mat_C.dds",
+    "Stone_Mat_N.dds",
+    "Stone_Mat_M.dds"
   ]
 }
