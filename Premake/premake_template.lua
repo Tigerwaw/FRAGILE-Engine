@@ -82,6 +82,7 @@ project "APPNAME"
 	  defines "_RETAIL"
 	  runtime "Release"
 	  optimize "on"
+	  targetname("%{prj.name}")
     links { "fmod_vc", "fmodstudio_vc" }
 
   shadermodel("5.0")
