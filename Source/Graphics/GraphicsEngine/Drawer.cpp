@@ -347,7 +347,7 @@ void Drawer::RenderText(const Text& aText)
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Text");
 	GraphicsEngine& ge = GraphicsEngine::Get();
 
-	ge.SetTextureResource_PS(10, *aText.GetTexture());
+	ge.SetTextureResource_PS(0, *aText.GetTexture());
 
 	const Text::TextData& textData = aText.GetTextData();
 	ge.myRHI->SetVertexBuffer(textData.vertexBuffer->GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
@@ -357,7 +357,7 @@ void Drawer::RenderText(const Text& aText)
 	ge.myRHI->DrawIndexed(0, textData.numIndices);
 	ge.myDrawcallAmount++;
 
-	ge.ClearTextureResource_PS(10);
+	ge.ClearTextureResource_PS(0);
 }
 
 void Drawer::RenderDebugLines(DynamicVertexBuffer& aDynamicBuffer, unsigned aLineAmount)

@@ -24,14 +24,13 @@ bool FontAsset::Load()
 
     Font newFont;
 
-    std::filesystem::path texturePath = GetPath();
-    texturePath = texturePath.replace_extension(".dds");
-    if (!AssetManager::Get().IsAssetRegistered(texturePath))
+    std::filesystem::path textureName = GetName().stem().concat("_F.dds");
+    if (!AssetManager::Get().IsAssetRegistered(textureName))
     {
         return false;
     }
 
-    newFont.Texture = AssetManager::Get().GetAsset<TextureAsset>(texturePath.filename())->texture;
+    newFont.Texture = AssetManager::Get().GetAsset<TextureAsset>(textureName.filename())->texture;
 
     newFont.Atlas.Size = data["atlas"]["size"];
     newFont.Atlas.Width = data["atlas"]["width"];

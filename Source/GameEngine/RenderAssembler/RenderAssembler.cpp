@@ -31,6 +31,7 @@
 
 #include "AssetTypes/TextureAsset.h"
 #include "AssetTypes/PSOAsset.h"
+#include "AssetTypes/FontAsset.h"
 
 
 RenderAssembler::RenderAssembler() = default;
@@ -51,8 +52,6 @@ void RenderAssembler::RenderScene(Scene& aScene)
 	{
 		RenderDebug(sceneRenderData);
 	}
-
-	DrawTestUI();
 }
 
 RenderAssembler::SceneRenderData RenderAssembler::AssembleLists(Scene& aScene)
@@ -520,6 +519,8 @@ void RenderAssembler::RenderDeferred(SceneRenderData& aRenderData)
 			GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderTrail>(std::move(data));
 		}
 	}
+
+	DrawTestUI();
 
 	QueueDebugLines(aRenderData);
 	Engine::Get().GetDebugDrawer().DrawObjects();
@@ -1386,25 +1387,33 @@ void RenderAssembler::UpdateBoundingBox(std::shared_ptr<Transform> aTransform, c
 // TEMP
 void RenderAssembler::Init()
 {
-	//myTestSprite = std::make_shared<Sprite>();
-	//myTestText = std::make_shared<Text>();
+	myTestSprite = std::make_shared<Sprite>();
+	myTestSprite->SetTexture(GraphicsEngine::Get().GetPerlinNoiseTexture());
+	myTestSprite->SetPosition(Math::Vector2f(500.0f, 500.0f));
+	myTestSprite->SetSize(Math::Vector2f(600.0f, 600.0f));
 
-	//myTestText->SetFont(AssetManager::Get().GetAsset<FontAsset>("Fonts/F_RobotoRegular.json")->font);
-	//myTestText->SetPosition(Math::Vector2f(-500.0f, 700.0f));
-	//myTestText->SetSize(5);
-	//myTestText->SetTextContent("Test");
+	myTestText = std::make_shared<Text>();
+	myTestText->SetFont(AssetManager::Get().GetAsset<FontAsset>("RobotoRegular.FONT")->font);
+	myTestText->SetPosition(Math::Vector2f(-500.0f, 700.0f));
+	myTestText->SetSize(5);
+	myTestText->SetTextContent("Test");
 }
 
 void RenderAssembler::DrawTestUI()
 {
-	//myTestSprite->SetTexture(AssetManager::Get().GetAsset<TextureAsset>("EngineAssets/Textures/CommonUtilitiesT_perlin_C.dds")->texture);
-	//myTestSprite->SetPosition(Math::Vector2f(500.0f, 500.0f));
-	//myTestSprite->SetSize(Math::Vector2f(600.0f, 600.0f));
-	//GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<SetRenderTarget>(GraphicsEngine::Get().GetBackBuffer(), nullptr, false, false);
-	// //GraphicsEngine::Get().ChangePipelineState(GraphicsEngine::Get().GetPSO(PSOType::Sprite));
-	// //GraphicsEngine::Get().ChangePipelineState(GraphicsEngine::Get().GetPSO(PSOType::Spritesheet));
-	//GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderSprite>(myTestSprite);
+	{
+		GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<ChangePipelineState>(GraphicsEngine::Get().GetPSO(PSOType::Sprite));
+		//GraphicsEngine::Get().ChangePipelineState(GraphicsEngine::Get().GetPSO(PSOType::Spritesheet));
+		RenderSprite::SpriteData data;
+		data.matrix = myTestSprite->GetMatrix();
+		data.texture = myTestSprite->GetTexture();
+		GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderSprite>(std::move(data));
+	}
 
-	//GraphicsEngine::Get().ChangePipelineState(GraphicsEngine::Get().GetPSO(PSOType::Text));
-	//GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderText>(myTestText);
+	{
+		GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<ChangePipelineState>(GraphicsEngine::Get().GetPSO(PSOType::Text));
+		RenderText::TextData data;
+		data.text = myTestText;
+		GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderText>(std::move(data));
+	}
 }
