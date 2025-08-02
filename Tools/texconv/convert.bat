@@ -15,4 +15,6 @@ start /b %executing_directory%texconv %common_args%*_M.png -f BC7_UNORM
 start /b %executing_directory%texconv %common_args%*_FX.png -f BC7_UNORM
 start /b %executing_directory%texconv %common_args%*_N.png -f BC5_UNORM
 
+start /b %executing_directory%texconv %common_args%*_F.png -f BC7_UNORM
+
 exit
