@@ -11,7 +11,7 @@ struct TextVertex
 
 	TextVertex(float positionX, float positionY, float uvX, float uvY)
 	{
-		Position = { positionX, positionY, 0, 1 };
+		Position = { positionX, positionY, 0, 1.0f };
 		TexCoords = { uvX, uvY };
 	}
 

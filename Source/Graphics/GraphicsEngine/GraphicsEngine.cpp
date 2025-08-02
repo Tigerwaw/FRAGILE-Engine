@@ -339,7 +339,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 	}
 	CacheShader(spritesheetPSPath, spritesheetPS);
 
-	std::filesystem::path textVSPath = aContentRoot / "EngineAssets/Shaders/UI_Text_VS.cso";
+	std::filesystem::path textVSPath = aContentRoot / "EngineAssets/Shaders/Text_VS.cso";
 	std::shared_ptr<Shader> textVS = std::make_shared<Shader>();
 	if (!rv.LoadShader(textVSPath, *textVS))
 	{
@@ -348,7 +348,7 @@ bool GraphicsEngine::CreateDefaultPSOs(const std::filesystem::path& aContentRoot
 	}
 	CacheShader(textVSPath, textVS);
 
-	std::filesystem::path textPSPath = aContentRoot / "EngineAssets/Shaders/UI_Text_PS.cso";
+	std::filesystem::path textPSPath = aContentRoot / "EngineAssets/Shaders/Text_PS.cso";
 	std::shared_ptr<Shader> textPS = std::make_shared<Shader>();
 	if (!rv.LoadShader(textPSPath, *textPS))
 	{

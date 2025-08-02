@@ -3,8 +3,6 @@
 #include "Math/Random.hpp"
 #include "Objects/DynamicVertexBuffer.h"
 
-#define MAX_PARTICLES 20000
-
 ParticleEmitter::ParticleEmitter()
 {
 }
@@ -77,5 +75,5 @@ void ParticleEmitter::InitInternal()
 	}
 
 	myVertexBuffer = std::make_shared<DynamicVertexBuffer>();
-	myVertexBuffer->CreateBuffer("Particle_VertexBuffer", myParticles, MAX_PARTICLES);
+	myVertexBuffer->CreateBuffer("Particle_VertexBuffer", myParticles, GraphicsSettings::PARTICLE_BUFFER_VERTEX_COUNT);
 }

@@ -27,6 +27,7 @@ public:
         unsigned currentFrame = 0;
         float frameTime = 0;
         float currentTime = 0;
+        float speedMultiplier = 1.0f;
         bool isLooping = false;
 
         std::vector<AnimationEvent> events;

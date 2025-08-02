@@ -1,10 +1,13 @@
 #include "../Includes/DefaultShaderIncludes.hlsli"
 #include "../Includes/Sprite_Includes.hlsli"
+#include "../Includes/ConstantBuffers/ObjectBuffer.hlsli"
 
 Text_VSout main(TextVertex input)
 {
     Text_VSout result;
-    result.Position = input.Position / float4(FB_Resolution, 1, 1);
+    float4 worldPos = mul(OB_World, input.Position);
+    float4 viewPos = mul(FB_InvView, worldPos);
+    result.Position = mul(FB_Projection, viewPos);
     result.TexCoord = input.TexCoord;
 	return result;
 }

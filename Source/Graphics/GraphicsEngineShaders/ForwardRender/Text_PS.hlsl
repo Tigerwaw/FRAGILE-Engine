@@ -17,7 +17,7 @@ float ScreenPxRange(float2 uvs, float pixelRange, float2 textureSize)
 
 float4 main(Text_VSout input) : SV_TARGET
 {    
-    float4 msd = FontTexture.Sample(AnisoWrapSampler, input.TexCoord);
+    float4 msd = FontTexture.SampleLevel(AnisoWrapSampler, input.TexCoord, 0);
     float sd = median(msd.rgb);
     
     float2 dim;

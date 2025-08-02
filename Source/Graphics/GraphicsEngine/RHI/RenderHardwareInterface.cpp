@@ -339,6 +339,8 @@ void RenderHardwareInterface::MaximizeWindowSize()
 
 bool RenderHardwareInterface::CreateIndexBuffer(std::string_view aName, const std::vector<unsigned>& aIndexList, Microsoft::WRL::ComPtr<ID3D11Buffer>& outIxBuffer, bool aIsDynamic)
 {
+	assert(!aIndexList.empty() && "DX11 does not allow creation of an empty index buffer!");
+
 	D3D11_BUFFER_DESC indexBufferDesc = {};
 	indexBufferDesc.ByteWidth = static_cast<unsigned>(aIndexList.size() * sizeof(unsigned));
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -363,6 +365,7 @@ bool RenderHardwareInterface::CreateIndexBuffer(std::string_view aName, const st
 		return false;
 	}
 
+	LOG(LogRHI, Log, "Created Index Buffer {}!", aName);
 	SetObjectName(outIxBuffer, aName);
 	return true;
 }
@@ -1329,13 +1332,8 @@ bool RenderHardwareInterface::CreateVertexBufferInternal(std::string_view aName,
 		}
 	}
 
+	LOG(LogRHI, Log, "Created Vertex Buffer {}!", aName);
 	SetObjectName(outVxBuffer, aName);
-
-	if (aIsDynamic)
-	{
-		LOG(LogRHI, Log, "Created Vertex Buffer {}!", aName);
-	}
-
 	return true;
 }
 

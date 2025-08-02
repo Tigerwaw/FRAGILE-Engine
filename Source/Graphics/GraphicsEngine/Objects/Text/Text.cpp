@@ -2,36 +2,38 @@
 #include "Text.h"
 #include "Objects/DynamicVertexBuffer.h"
 
-Text::Text() = default;
-Text::~Text() = default;
-
-Text::Text(const std::string& aTextContent, std::shared_ptr<Font> aFont, const int aSize)
+Text::Text()
 {
-	SetTextContent(aTextContent);
-	SetFont(aFont);
-	SetSize(aSize);
+	InitializeBuffers();
 }
 
-void Text::Initialize()
+Text::Text(const std::string& aTextContent, std::shared_ptr<Font> aFont)
 {
+	InitializeBuffers();
+	SetTextContent(aTextContent);
+	SetFont(aFont);
+}
+
+void Text::InitializeBuffers()
+{
+	myTextData.indices.resize(GraphicsSettings::TEXT_BUFFER_INDEX_COUNT);
+
 	myTextData.vertexBuffer = std::make_shared<DynamicVertexBuffer>();
-	myTextData.vertexBuffer->CreateBuffer("Text Vertex Buffer", myTextData.vertices, myTextData.vertices.size());
+	myTextData.vertexBuffer->CreateBuffer("Text Vertex Buffer", myTextData.vertices, GraphicsSettings::TEXT_BUFFER_VERTEX_COUNT);
 	GraphicsEngine::Get().GetResourceVendor().CreateIndexBuffer("Text Index Buffer", myTextData.indices, myTextData.indexBuffer, true);
 }
 
 void Text::UpdateBuffers()
 {
-	if (!myTextData.vertexBuffer)
-	{
-		Initialize();
-	}
-
 	myTextData.vertexBuffer->UpdateVertexBuffer(myTextData.vertices);
 	GraphicsEngine::Get().UpdateDynamicIndexBuffer(myTextData.indices, myTextData.indexBuffer);
 }
 
 void Text::SetTextContent(const std::string& aTextContent)
 {
+	myTextData.vertices.clear();
+	myTextData.indices.clear();
+
 	myTextContent = aTextContent;
 	float X = 0;
 	float scalarOffset = 0.65f;
@@ -40,7 +42,7 @@ void Text::SetTextContent(const std::string& aTextContent)
 	{
 		Font::Glyph& glyph = myFont->operator[](c);
 
-		const int fontSize = myFont->Atlas.Size * mySize;
+		const float fontSize = static_cast<float>(myFont->Atlas.Size);
 		const float charAdvance = glyph.Advance * fontSize;
 		const unsigned currentVertexCount = static_cast<unsigned>(myTextData.vertices.size());
 		Math::Vector4f bounds = glyph.UVBounds;
@@ -56,10 +58,10 @@ void Text::SetTextContent(const std::string& aTextContent)
 			offsets.w += myFont->Atlas.Descender * fontSize;
 		}
 
-		myTextData.vertices.emplace_back(myMatrix(4, 1) + X + offsets.x, myMatrix(4, 2) + offsets.y, bounds.x, 1 - bounds.y);
-		myTextData.vertices.emplace_back(myMatrix(4, 1) + X + offsets.x, myMatrix(4, 2) + offsets.w, bounds.x, 1 - bounds.w);
-		myTextData.vertices.emplace_back(myMatrix(4, 1) + X + offsets.z, myMatrix(4, 2) + offsets.y, bounds.z, 1 - bounds.y);
-		myTextData.vertices.emplace_back(myMatrix(4, 1) + X + offsets.z, myMatrix(4, 2) + offsets.w, bounds.z, 1 - bounds.w);
+		myTextData.vertices.emplace_back(X + offsets.x, offsets.y, bounds.x, 1 - bounds.y);
+		myTextData.vertices.emplace_back(X + offsets.x, offsets.w, bounds.x, 1 - bounds.w);
+		myTextData.vertices.emplace_back(X + offsets.z, offsets.y, bounds.z, 1 - bounds.y);
+		myTextData.vertices.emplace_back(X + offsets.z, offsets.w, bounds.z, 1 - bounds.w);
 
 		X += charAdvance + scalarOffset;
 
@@ -80,15 +82,5 @@ void Text::SetTextContent(const std::string& aTextContent)
 void Text::SetFont(std::shared_ptr<Font> aFont)
 {
 	myFont = aFont;
-}
-
-void Text::SetSize(const int aSize)
-{
-	mySize = aSize;
-}
-
-void Text::SetPosition(Math::Vector2f aPosition)
-{
-	myMatrix(4, 1) = aPosition.x;
-	myMatrix(4, 2) = aPosition.y;
+	UpdateBuffers();
 }

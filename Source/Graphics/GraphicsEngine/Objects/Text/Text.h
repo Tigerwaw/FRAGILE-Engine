@@ -3,7 +3,6 @@
 #include "Math/Matrix.hpp"
 #include "Math/Vector.hpp"
 
-
 #include "Objects/Vertices/TextVertex.h"
 
 struct ID3D11Buffer;
@@ -13,8 +12,7 @@ class Text
 {
 public:
     Text();
-    ~Text();
-    Text(const std::string& aTextContent, std::shared_ptr<Font> aFont, const int aSize);
+    Text(const std::string& aTextContent, std::shared_ptr<Font> aFont);
 
     struct TextData
     {
@@ -26,22 +24,17 @@ public:
         Microsoft::WRL::ComPtr<ID3D11Buffer> indexBuffer;
     };
 
-    void Initialize();
-    void UpdateBuffers();
 
     void SetTextContent(const std::string& aTextContent);
     void SetFont(std::shared_ptr<Font> aFont);
-    void SetSize(const int aSize);
-    void SetPosition(Math::Vector2f aPosition);
 
     const std::shared_ptr<Texture> GetTexture() const { return myFont->Texture; }
     const TextData& GetTextData() const { return myTextData; }
 private:
+    void InitializeBuffers();
+    void UpdateBuffers();
 
-    std::shared_ptr<Font> myFont;
     TextData myTextData;
-
+    std::shared_ptr<Font> myFont;
     std::string myTextContent;
-    Math::Matrix4x4f myMatrix;
-    int mySize = 0;
 };

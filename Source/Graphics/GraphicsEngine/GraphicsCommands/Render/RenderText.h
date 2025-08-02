@@ -10,6 +10,7 @@ public:
 	struct TextData
 	{
 		std::shared_ptr<Text> text;
+		Math::Matrix4x4f transform;
 	};
 
 	RenderText(const TextData& aTextData);

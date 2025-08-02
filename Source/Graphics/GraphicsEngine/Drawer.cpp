@@ -340,6 +340,7 @@ void Drawer::RenderSprite()
 
 	ge.myRHI->SetPrimitiveTopology(Topology::POINTLIST);
 	ge.myRHI->Draw(1);
+	ge.myDrawcallAmount++;
 }
 
 void Drawer::RenderText(const Text& aText)
@@ -410,6 +411,7 @@ void Drawer::RenderParticleEmitter(ParticleEmitter& aParticleEmitter)
 	ge.myRHI->SetPrimitiveTopology(Topology::POINTLIST);
 	ge.myRHI->SetVertexBuffer(aParticleEmitter.myVertexBuffer->GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
 	ge.myRHI->Draw(static_cast<unsigned>(aParticleEmitter.myParticles.size()));
+	ge.myDrawcallAmount++;
 
 	for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)
 	{
@@ -458,6 +460,7 @@ void Drawer::RenderTrailEmitter(TrailEmitter& aTrailEmitter)
 	ge.myRHI->SetVertexBuffer(aTrailEmitter.myVertexBuffer->GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
 	unsigned count = aTrailEmitter.GetCurrentLength();
 	ge.myRHI->Draw(count);
+	ge.myDrawcallAmount++;
 
 	for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)
 	{

@@ -18,6 +18,12 @@ RenderText::RenderText(TextData&& aTextData)
 void RenderText::Execute()
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderText Execute");
+	assert(myData.text->GetTexture() && "Text object has no texture!");
+
+	ObjectBuffer ob;
+	ob.World = myData.transform;
+
+	GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, ob);
 	GraphicsEngine::Get().GetDrawer().RenderText(*myData.text);
 }
 

@@ -28,6 +28,7 @@
 #include "ComponentSystem/Components/Lights/SpotLight.h"
 #include "ComponentSystem/Components/Physics/Colliders/BoxCollider.h"
 #include "ComponentSystem/Components/Physics/Colliders/SphereCollider.h"
+#include "ComponentSystem/Components/Graphics/TextComponent.h"
 
 #include "AssetTypes/TextureAsset.h"
 #include "AssetTypes/PSOAsset.h"
@@ -192,6 +193,14 @@ RenderAssembler::SceneRenderData RenderAssembler::AssembleLists(Scene& aScene)
 			if (trailSystem && trailSystem->GetActive())
 			{
 				sceneRenderData.drawParticleSystems.emplace_back(gameObject);
+			}
+		}
+
+		{
+			std::shared_ptr<TextComponent> text = gameObject->GetComponent<TextComponent>();
+			if (text && text->GetActive())
+			{
+				sceneRenderData.drawText.emplace_back(gameObject);
 			}
 		}
 
@@ -499,28 +508,53 @@ void RenderAssembler::RenderDeferred(SceneRenderData& aRenderData)
 		gfxList.Enqueue<EndEvent>();
 	}
 
-	for (auto& gameObject : aRenderData.drawParticleSystems)
+	// Draw Text
 	{
-		std::shared_ptr<ParticleSystem> particleSystem = gameObject->GetComponent<ParticleSystem>();
-		if (particleSystem && particleSystem->GetActive())
+		PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Draw Text");
+		gfxList.Enqueue<BeginEvent>("Draw Text");
+		gfx.GetGraphicsCommandList().Enqueue<ChangePipelineState>(gfx.GetPSO(PSOType::Text));
+		for (auto& gameObject : aRenderData.drawText)
 		{
-			RenderParticles::RenderParticlesData data;
-			data.emitters = particleSystem->GetEmitters();
-			data.transform = gameObject->GetComponent<Transform>()->GetWorldMatrix();
-			GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderParticles>(std::move(data));
+			std::shared_ptr<TextComponent> text = gameObject->GetComponent<TextComponent>();
+			if (text)
+			{
+				RenderText::TextData data;
+				data.text = text->GetText();
+				data.transform = text->gameObject->GetComponent<Transform>()->GetWorldMatrix();
+				gfx.GetGraphicsCommandList().Enqueue<RenderText>(std::move(data));
+			}
 		}
 
-		std::shared_ptr<TrailSystem> trailSystem = gameObject->GetComponent<TrailSystem>();
-		if (trailSystem && trailSystem->GetActive())
-		{
-			RenderTrail::TrailData data;
-			data.emitters = trailSystem->GetEmitters();
-			data.transform = gameObject->GetComponent<Transform>()->GetWorldMatrix();
-			GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderTrail>(std::move(data));
-		}
+		gfxList.Enqueue<EndEvent>();
 	}
 
-	DrawTestUI();
+	{
+		PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Draw Particle & Trail Systems");
+		gfxList.Enqueue<BeginEvent>("Draw Particle & Trail Systems");
+
+		for (auto& gameObject : aRenderData.drawParticleSystems)
+		{
+			std::shared_ptr<ParticleSystem> particleSystem = gameObject->GetComponent<ParticleSystem>();
+			if (particleSystem && particleSystem->GetActive())
+			{
+				RenderParticles::RenderParticlesData data;
+				data.emitters = particleSystem->GetEmitters();
+				data.transform = gameObject->GetComponent<Transform>()->GetWorldMatrix();
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderParticles>(std::move(data));
+			}
+
+			std::shared_ptr<TrailSystem> trailSystem = gameObject->GetComponent<TrailSystem>();
+			if (trailSystem && trailSystem->GetActive())
+			{
+				RenderTrail::TrailData data;
+				data.emitters = trailSystem->GetEmitters();
+				data.transform = gameObject->GetComponent<Transform>()->GetWorldMatrix();
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderTrail>(std::move(data));
+			}
+		}
+
+		gfxList.Enqueue<EndEvent>();
+	}
 
 	QueueDebugLines(aRenderData);
 	Engine::Get().GetDebugDrawer().DrawObjects();
@@ -679,11 +713,9 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 
 	for (auto& gameObject : aRenderData.drawDeferred)
 	{
-		if (!gameObject->GetActive()) continue;
 		auto transform = gameObject->GetComponent<Transform>();
 
-		std::shared_ptr<Model> model = gameObject->GetComponent<Model>();
-		if (model && model->GetActive())
+		if (auto model = gameObject->GetComponent<Model>())
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
@@ -701,8 +733,7 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 			}
 		}
 
-		std::shared_ptr<AnimatedModel> animModel = gameObject->GetComponent<AnimatedModel>();
-		if (animModel && animModel->GetActive())
+		if (auto animModel = gameObject->GetComponent<AnimatedModel>())
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
@@ -719,8 +750,7 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 			}
 		}
 
-		std::shared_ptr<InstancedModel> instancedModel = gameObject->GetComponent<InstancedModel>();
-		if (instancedModel && instancedModel->GetActive())
+		if (auto instancedModel = gameObject->GetComponent<InstancedModel>())
 		{
 			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, instancedModel->GetBoundingBox()))
 			{
@@ -746,11 +776,9 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 
 	for (auto& gameObject : aRenderData.drawForward)
 	{
-		if (!gameObject->GetActive()) continue;
 		auto transform = gameObject->GetComponent<Transform>();
 
-		std::shared_ptr<Model> model = gameObject->GetComponent<Model>();
-		if (model && model->GetActive())
+		if (auto model = gameObject->GetComponent<Model>())
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
@@ -766,8 +794,7 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 			}
 		}
 
-		std::shared_ptr<AnimatedModel> animModel = gameObject->GetComponent<AnimatedModel>();
-		if (animModel && animModel->GetActive())
+		if (auto animModel = gameObject->GetComponent<AnimatedModel>())
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
@@ -782,8 +809,7 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 			}
 		}
 
-		std::shared_ptr<InstancedModel> instancedModel = gameObject->GetComponent<InstancedModel>();
-		if (instancedModel && instancedModel->GetActive())
+		if (auto instancedModel = gameObject->GetComponent<InstancedModel>())
 		{
 			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, instancedModel->GetBoundingBox()))
 			{
@@ -1169,11 +1195,9 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 {
 	for (auto& gameObject : aRenderData.drawForward)
 	{
-		if (!gameObject->GetActive()) continue;
 		auto transform = gameObject->GetComponent<Transform>();
 
-		std::shared_ptr<Model> model = gameObject->GetComponent<Model>();
-		if (model && model->GetActive())
+		if (auto model = gameObject->GetComponent<Model>())
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
@@ -1188,8 +1212,7 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 			}
 		}
 
-		std::shared_ptr<AnimatedModel> animModel = gameObject->GetComponent<AnimatedModel>();
-		if (animModel && animModel->GetActive())
+		if (auto animModel = gameObject->GetComponent<AnimatedModel>())
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
@@ -1203,8 +1226,7 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 			}
 		}
 
-		std::shared_ptr<InstancedModel> instancedModel = gameObject->GetComponent<InstancedModel>();
-		if (instancedModel && instancedModel->GetActive())
+		if (auto instancedModel = gameObject->GetComponent<InstancedModel>())
 		{
 			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, instancedModel->GetBoundingBox()))
 			{
@@ -1222,11 +1244,9 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 
 	for (auto& gameObject : aRenderData.drawDeferred)
 	{
-		if (!gameObject->GetActive()) continue;
 		auto transform = gameObject->GetComponent<Transform>();
 
-		std::shared_ptr<Model> model = gameObject->GetComponent<Model>();
-		if (model && model->GetActive())
+		if (auto model = gameObject->GetComponent<Model>())
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
@@ -1241,8 +1261,7 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 			}
 		}
 
-		std::shared_ptr<AnimatedModel> animModel = gameObject->GetComponent<AnimatedModel>();
-		if (animModel && animModel->GetActive())
+		if (auto animModel = gameObject->GetComponent<AnimatedModel>())
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
@@ -1256,8 +1275,7 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 			}
 		}
 
-		std::shared_ptr<InstancedModel> instancedModel = gameObject->GetComponent<InstancedModel>();
-		if (instancedModel && instancedModel->GetActive())
+		if (auto instancedModel = gameObject->GetComponent<InstancedModel>())
 		{
 			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, instancedModel->GetBoundingBox()))
 			{
@@ -1285,20 +1303,17 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 
 		for (auto& gameObject : aRenderData.drawBoundingBoxesObjects)
 		{
-			std::shared_ptr<Model> model = gameObject->GetComponent<Model>();
-			if (model && model->GetActive())
+			if (auto model = gameObject->GetComponent<Model>())
 			{
 				Engine::Get().GetDebugDrawer().DrawBoundingBox(model);
 			}
 			
-			std::shared_ptr<AnimatedModel> animModel = gameObject->GetComponent<AnimatedModel>();
-			if (animModel && animModel->GetActive())
+			if (auto animModel = gameObject->GetComponent<AnimatedModel>())
 			{
 				Engine::Get().GetDebugDrawer().DrawBoundingBox(animModel);
 			}
 			
-			std::shared_ptr<InstancedModel> instancedModel = gameObject->GetComponent<InstancedModel>();
-			if (instancedModel && instancedModel->GetActive())
+			if (auto instancedModel = gameObject->GetComponent<InstancedModel>())
 			{
 				Engine::Get().GetDebugDrawer().DrawBoundingBox(instancedModel);
 			}
@@ -1312,14 +1327,12 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 
 		for (auto& gameObject : aRenderData.drawCollidersObjects)
 		{
-			std::shared_ptr<BoxCollider> boxCollider = gameObject->GetComponent<BoxCollider>();
-			if (boxCollider && boxCollider->GetActive())
+			if (auto boxCollider = gameObject->GetComponent<BoxCollider>())
 			{
 				Engine::Get().GetDebugDrawer().DrawBoundingBox(boxCollider->GetAABB(), gameObject->GetComponent<Transform>()->GetWorldMatrix(), boxCollider->IsOverlapping() ? colorRed : colorGreen);
 			}
 
-			std::shared_ptr<SphereCollider> sphereCollider = gameObject->GetComponent<SphereCollider>();
-			if (sphereCollider && sphereCollider->GetActive())
+			if (auto sphereCollider = gameObject->GetComponent<SphereCollider>())
 			{
 				Engine::Get().GetDebugDrawer().DrawBoundingSphere(sphereCollider->GetSphere(), gameObject->GetComponent<Transform>()->GetWorldMatrix(), sphereCollider->IsOverlapping() ? colorRed : colorGreen);
 			}
@@ -1330,8 +1343,7 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 	{
 		for (auto& gameObject : aRenderData.drawCameraFrustumsObjects)
 		{
-			std::shared_ptr<Camera> cam = gameObject->GetComponent<Camera>();
-			if (cam && cam->GetActive() && cam != aRenderData.mainCamera)
+			if (auto cam = gameObject->GetComponent<Camera>())
 			{
 				Engine::Get().GetDebugDrawer().DrawCameraFrustum(cam);
 			}
@@ -1387,33 +1399,18 @@ void RenderAssembler::UpdateBoundingBox(std::shared_ptr<Transform> aTransform, c
 // TEMP
 void RenderAssembler::Init()
 {
-	myTestSprite = std::make_shared<Sprite>();
-	myTestSprite->SetTexture(GraphicsEngine::Get().GetPerlinNoiseTexture());
-	myTestSprite->SetPosition(Math::Vector2f(500.0f, 500.0f));
-	myTestSprite->SetSize(Math::Vector2f(600.0f, 600.0f));
-
-	myTestText = std::make_shared<Text>();
-	myTestText->SetFont(AssetManager::Get().GetAsset<FontAsset>("RobotoRegular.FONT")->font);
-	myTestText->SetPosition(Math::Vector2f(-500.0f, 700.0f));
-	myTestText->SetSize(5);
-	myTestText->SetTextContent("Test");
+	//myTestSprite = std::make_shared<Sprite>();
+	//myTestSprite->SetTexture(GraphicsEngine::Get().GetPerlinNoiseTexture());
+	//myTestSprite->SetPosition(Math::Vector2f(500.0f, 500.0f));
+	//myTestSprite->SetSize(Math::Vector2f(600.0f, 600.0f));
 }
 
 void RenderAssembler::DrawTestUI()
 {
-	{
-		GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<ChangePipelineState>(GraphicsEngine::Get().GetPSO(PSOType::Sprite));
-		//GraphicsEngine::Get().ChangePipelineState(GraphicsEngine::Get().GetPSO(PSOType::Spritesheet));
-		RenderSprite::SpriteData data;
-		data.matrix = myTestSprite->GetMatrix();
-		data.texture = myTestSprite->GetTexture();
-		GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderSprite>(std::move(data));
-	}
-
-	{
-		GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<ChangePipelineState>(GraphicsEngine::Get().GetPSO(PSOType::Text));
-		RenderText::TextData data;
-		data.text = myTestText;
-		GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderText>(std::move(data));
-	}
+	GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<ChangePipelineState>(GraphicsEngine::Get().GetPSO(PSOType::Sprite));
+	//GraphicsEngine::Get().ChangePipelineState(GraphicsEngine::Get().GetPSO(PSOType::Spritesheet));
+	RenderSprite::SpriteData data;
+	data.matrix = myTestSprite->GetMatrix();
+	data.texture = myTestSprite->GetTexture();
+	GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderSprite>(std::move(data));
 }

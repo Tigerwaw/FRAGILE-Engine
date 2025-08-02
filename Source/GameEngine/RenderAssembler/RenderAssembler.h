@@ -9,11 +9,6 @@ class AmbientLight;
 class DirectionalLight;
 class PointLight;
 class SpotLight;
-class Model;
-class AnimatedModel;
-class InstancedModel;
-class ParticleSystem;
-class TrailSystem;
 
 // TEMP
 class Sprite;
@@ -43,6 +38,7 @@ private:
         std::vector<std::shared_ptr<GameObject>> drawDeferred;
         std::vector<std::shared_ptr<GameObject>> drawForward;
         std::vector<std::shared_ptr<GameObject>> drawParticleSystems;
+        std::vector<std::shared_ptr<GameObject>> drawText;
 
         std::vector<std::shared_ptr<GameObject>> drawCollidersObjects;
         std::vector<std::shared_ptr<GameObject>> drawBoundingBoxesObjects;
@@ -81,6 +77,5 @@ private:
     // TEMP
     void DrawTestUI();
     std::shared_ptr<Sprite> myTestSprite;
-    std::shared_ptr<Text> myTestText;
 };
 

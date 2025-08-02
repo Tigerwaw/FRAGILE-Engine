@@ -421,7 +421,7 @@ void AnimatedModel::UpdateAnimationState(AnimationState& aAnimationState)
 {
     PIXScopedEvent(PIX_COLOR_INDEX(2), "AnimatedModel Update Animation State");
 
-    aAnimationState.currentTime += Engine::Get().GetTimer().GetDeltaTime();
+    aAnimationState.currentTime += Engine::Get().GetTimer().GetDeltaTime() * aAnimationState.speedMultiplier;
     if (aAnimationState.currentTime < aAnimationState.frameTime) return;
 
     aAnimationState.currentTime = 0;

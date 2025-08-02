@@ -13,6 +13,10 @@ namespace GraphicsSettings
 	inline constexpr unsigned SPOTLIGHT_SHADOWS_START_SLOT = 105;
 
 	inline constexpr unsigned PSO_UTILITY_TEXTURES_START_SLOT = 50;
+
+	inline constexpr unsigned TEXT_BUFFER_VERTEX_COUNT = 1024;
+	inline constexpr unsigned TEXT_BUFFER_INDEX_COUNT = 1024;
+	inline constexpr unsigned PARTICLE_BUFFER_VERTEX_COUNT = 4096;
 }
 
 enum class ShaderType : unsigned
