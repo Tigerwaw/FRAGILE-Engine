@@ -77,6 +77,8 @@ void CollisionHandler::AddActiveCollisions(Scene& aScene)
 				newCollision.colliderTwo = colliderB;
 				newCollision.isTrigger = colliderA->IsTrigger() || colliderB->IsTrigger();
 				newCollision.info = info;
+				newCollision.info.collA = colliderA.get();
+				newCollision.info.collB = colliderB.get();
 			}
 		}
 	}
@@ -93,31 +95,31 @@ void CollisionHandler::CompareCollisions()
 			if (isNewCollision)
 			{
 				if (activeCollisionThisFrame.colliderOne->IsTrigger())
-					activeCollisionThisFrame.colliderOne->OnTriggerEnter();
+					activeCollisionThisFrame.colliderOne->OnTriggerEnter(activeCollisionThisFrame.info);
 
 				if (activeCollisionThisFrame.colliderTwo->IsTrigger())
-					activeCollisionThisFrame.colliderTwo->OnTriggerEnter();
+					activeCollisionThisFrame.colliderTwo->OnTriggerEnter(activeCollisionThisFrame.info);
 			}
 			else
 			{
 				if (activeCollisionThisFrame.colliderOne->IsTrigger())
-					activeCollisionThisFrame.colliderOne->OnTriggerStay();
+					activeCollisionThisFrame.colliderOne->OnTriggerStay(activeCollisionThisFrame.info);
 
 				if (activeCollisionThisFrame.colliderTwo->IsTrigger())
-					activeCollisionThisFrame.colliderTwo->OnTriggerStay();
+					activeCollisionThisFrame.colliderTwo->OnTriggerStay(activeCollisionThisFrame.info);
 			}
 		}
 		else
 		{
 			if (isNewCollision)
 			{
-				activeCollisionThisFrame.colliderOne->OnCollisionEnter();
-				activeCollisionThisFrame.colliderTwo->OnCollisionEnter();
+				activeCollisionThisFrame.colliderOne->OnCollisionEnter(activeCollisionThisFrame.info);
+				activeCollisionThisFrame.colliderTwo->OnCollisionEnter(activeCollisionThisFrame.info);
 			}
 			else
 			{
-				activeCollisionThisFrame.colliderOne->OnCollisionStay();
-				activeCollisionThisFrame.colliderTwo->OnCollisionStay();
+				activeCollisionThisFrame.colliderOne->OnCollisionStay(activeCollisionThisFrame.info);
+				activeCollisionThisFrame.colliderTwo->OnCollisionStay(activeCollisionThisFrame.info);
 			}
 
 			ResolveCollision(activeCollisionThisFrame);
@@ -133,15 +135,15 @@ void CollisionHandler::CompareCollisions()
 			if (activeCollisionLastFrame.isTrigger)
 			{
 				if (activeCollisionLastFrame.colliderOne->IsTrigger())
-					activeCollisionLastFrame.colliderOne->OnTriggerExit();
+					activeCollisionLastFrame.colliderOne->OnTriggerExit(activeCollisionLastFrame.info);
 
 				if (activeCollisionLastFrame.colliderTwo->IsTrigger())
-					activeCollisionLastFrame.colliderTwo->OnTriggerExit();
+					activeCollisionLastFrame.colliderTwo->OnTriggerExit(activeCollisionLastFrame.info);
 			}
 			else
 			{
-				activeCollisionLastFrame.colliderOne->OnCollisionExit();
-				activeCollisionLastFrame.colliderTwo->OnCollisionExit();
+				activeCollisionLastFrame.colliderOne->OnCollisionExit(activeCollisionLastFrame.info);
+				activeCollisionLastFrame.colliderTwo->OnCollisionExit(activeCollisionLastFrame.info);
 			}
 		}
 	}

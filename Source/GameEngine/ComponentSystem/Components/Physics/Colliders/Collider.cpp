@@ -1,32 +1,32 @@
 #include "Enginepch.h"
 #include "Collider.h"
 
-void Collider::SetOnCollisionEnterResponse(const std::function<void()>& aCallback)
+void Collider::SetOnCollisionEnterResponse(const std::function<void(CollisionInfo)>& aCallback)
 {
 	myOnCollisionEnterResponse = aCallback;
 }
 
-void Collider::SetOnCollisionStayResponse(const std::function<void()>& aCallback)
+void Collider::SetOnCollisionStayResponse(const std::function<void(CollisionInfo)>& aCallback)
 {
 	myOnCollisionStayResponse = aCallback;
 }
 
-void Collider::SetOnCollisionExitResponse(const std::function<void()>& aCallback)
+void Collider::SetOnCollisionExitResponse(const std::function<void(CollisionInfo)>& aCallback)
 {
 	myOnCollisionExitResponse = aCallback;
 }
 
-void Collider::SetOnTriggerEnterResponse(const std::function<void()>& aCallback)
+void Collider::SetOnTriggerEnterResponse(const std::function<void(CollisionInfo)>& aCallback)
 {
 	myOnTriggerEnterResponse = aCallback;
 }
 
-void Collider::SetOnTriggerStayResponse(const std::function<void()>& aCallback)
+void Collider::SetOnTriggerStayResponse(const std::function<void(CollisionInfo)>& aCallback)
 {
 	myOnTriggerStayResponse = aCallback;
 }
 
-void Collider::SetOnTriggerExitResponse(const std::function<void()>& aCallback)
+void Collider::SetOnTriggerExitResponse(const std::function<void(CollisionInfo)>& aCallback)
 {
 	myOnTriggerExitResponse = aCallback;
 }
@@ -46,58 +46,58 @@ bool Collider::Deserialize(nl::json& aJsonObject)
 	return true;
 }
 
-void Collider::OnCollisionEnter()
+void Collider::OnCollisionEnter(CollisionInfo aCollision)
 {
 	if (myOnCollisionEnterResponse)
 	{
-		myOnCollisionEnterResponse();
+		myOnCollisionEnterResponse(aCollision);
 	}
 }
 
-void Collider::OnCollisionStay()
+void Collider::OnCollisionStay(CollisionInfo aCollision)
 {
 	myIsOverlappingDebug = true;
 
 	if (myOnCollisionStayResponse)
 	{
-		myOnCollisionStayResponse();
+		myOnCollisionStayResponse(aCollision);
 	}
 }
 
-void Collider::OnCollisionExit()
+void Collider::OnCollisionExit(CollisionInfo aCollision)
 {
 	myIsOverlappingDebug = false;
 
 	if (myOnCollisionExitResponse)
 	{
-		myOnCollisionExitResponse();
+		myOnCollisionExitResponse(aCollision);
 	}
 }
 
-void Collider::OnTriggerEnter()
+void Collider::OnTriggerEnter(CollisionInfo aCollision)
 {
 	if (myOnTriggerEnterResponse)
 	{
-		myOnTriggerEnterResponse();
+		myOnTriggerEnterResponse(aCollision);
 	}
 }
 
-void Collider::OnTriggerStay()
+void Collider::OnTriggerStay(CollisionInfo aCollision)
 {
 	myIsOverlappingDebug = true;
 
 	if (myOnTriggerStayResponse)
 	{
-		myOnTriggerStayResponse();
+		myOnTriggerStayResponse(aCollision);
 	}
 }
 
-void Collider::OnTriggerExit()
+void Collider::OnTriggerExit(CollisionInfo aCollision)
 {
 	myIsOverlappingDebug = false;
 
 	if (myOnTriggerExitResponse)
 	{
-		myOnTriggerExitResponse();
+		myOnTriggerExitResponse(aCollision);
 	}
 }

@@ -5,6 +5,7 @@
 
 class BoxCollider;
 class SphereCollider;
+class CollisionInfo;
 
 class Collider : public Component
 {
@@ -46,13 +47,13 @@ public:
     virtual CollisionInfo CheckOverlap(const SphereCollider* aCollider) const = 0;
     virtual CollisionInfo CheckOverlap(const Math::Ray<float> aRay) const = 0;
 
-    void SetOnCollisionEnterResponse(const std::function<void()>& aCallback);
-    void SetOnCollisionStayResponse(const std::function<void()>& aCallback);
-    void SetOnCollisionExitResponse(const std::function<void()>& aCallback);
+    void SetOnCollisionEnterResponse(const std::function<void(CollisionInfo)>& aCallback);
+    void SetOnCollisionStayResponse(const std::function<void(CollisionInfo)>& aCallback);
+    void SetOnCollisionExitResponse(const std::function<void(CollisionInfo)>& aCallback);
 
-    void SetOnTriggerEnterResponse(const std::function<void()>& aCallback);
-    void SetOnTriggerStayResponse(const std::function<void()>& aCallback);
-    void SetOnTriggerExitResponse(const std::function<void()>& aCallback);
+    void SetOnTriggerEnterResponse(const std::function<void(CollisionInfo)>& aCallback);
+    void SetOnTriggerStayResponse(const std::function<void(CollisionInfo)>& aCallback);
+    void SetOnTriggerExitResponse(const std::function<void(CollisionInfo)>& aCallback);
 
     bool Serialize(nl::json& outJsonObject) override;
     bool Deserialize(nl::json& aJsonObject) override;
@@ -61,18 +62,18 @@ private:
     bool myIsTrigger = false;
     bool myIsOverlappingDebug = false;
 
-    void OnCollisionEnter();
-    void OnCollisionStay();
-    void OnCollisionExit();
+    void OnCollisionEnter(CollisionInfo aCollision);
+    void OnCollisionStay(CollisionInfo aCollision);
+    void OnCollisionExit(CollisionInfo aCollision);
 
-    void OnTriggerEnter();
-    void OnTriggerStay();
-    void OnTriggerExit();
-    std::function<void()> myOnCollisionEnterResponse;
-    std::function<void()> myOnCollisionStayResponse;
-    std::function<void()> myOnCollisionExitResponse;
-    std::function<void()> myOnTriggerEnterResponse;
-    std::function<void()> myOnTriggerStayResponse;
-    std::function<void()> myOnTriggerExitResponse;
+    void OnTriggerEnter(CollisionInfo aCollision);
+    void OnTriggerStay(CollisionInfo aCollision);
+    void OnTriggerExit(CollisionInfo aCollision);
+    std::function<void(CollisionInfo)> myOnCollisionEnterResponse;
+    std::function<void(CollisionInfo)> myOnCollisionStayResponse;
+    std::function<void(CollisionInfo)> myOnCollisionExitResponse;
+    std::function<void(CollisionInfo)> myOnTriggerEnterResponse;
+    std::function<void(CollisionInfo)> myOnTriggerStayResponse;
+    std::function<void(CollisionInfo)> myOnTriggerExitResponse;
 };
 
