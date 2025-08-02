@@ -21,6 +21,8 @@
 #undef min
 #undef max
 
+int currentDebugMode = 0;
+
 Application* CreateApplication()
 {
 	AppSettings::LoadSettings(std::filesystem::current_path() / APP_SETTINGS_PATH);
@@ -29,10 +31,16 @@ Application* CreateApplication()
 
 void Worm::InitializeApplication()
 {
-	Engine::Get().DrawColliders = true;
-
 	InputHandler& inputHandler = Engine::Get().GetInputHandler();
+	inputHandler.SetCursorVisibility(false);
+
 	inputHandler.RegisterAnalog2DAction("MousePosNDC", MouseMovement2D::MousePosNDC);
+	inputHandler.RegisterBinaryAction("Space", Keys::SPACE, GenericInput::ActionType::Clicked);
+#ifdef _DEBUG
+	inputHandler.RegisterBinaryAction("F6", Keys::F6, GenericInput::ActionType::Clicked);
+	inputHandler.RegisterBinaryAction("F5", Keys::F5, GenericInput::ActionType::Clicked);
+	inputHandler.RegisterBinaryAction("F4", Keys::F4, GenericInput::ActionType::Clicked);
+#endif
 
 	auto& sceneHandler = Engine::Get().GetSceneHandler();
 	sceneHandler.LoadScene("WormGame/WormGame.SCENE");
@@ -42,41 +50,64 @@ void Worm::InitializeApplication()
 
 	myCameraViewportDimensions = Camera::GetMainCamera()->GetViewportDimensions();
 
+	std::shared_ptr<GameObject> reticle = std::make_shared<GameObject>();
+	sceneHandler.Instantiate(reticle);
+	myReticle = reticle->AddComponent<Transform>();
+	myReticle->SetUniformScale(50.0f);
+	reticle->AddComponent<Model>(AssetManager::Get().GetAsset<MeshAsset>("SM_sphere.fbx")->mesh);
+
 	CreateWorm();
 	CreateObstacles();
 }
 
 void Worm::UpdateApplication()
 {
-	ScrollBackgroundPlane();
-	MoveObstacles();
-
-	myTimeSinceLastObstacleSpawned += Engine::Get().GetTimer().GetDeltaTime();
-	if (myTimeSinceLastObstacleSpawned > myObstacleSpawnTimer)
+	if (!myIsGameRunning)
 	{
-		SpawnObstacle();
-		myTimeSinceLastObstacleSpawned = 0.0f;
+		if (Engine::Get().GetInputHandler().GetBinaryAction("Space"))
+			StartGame();
+		else
+			return;
 	}
 
-
-	UpdatePlayerHeadRotation();
-	MovePlayerHead();
-	
-	float t = myDistanceTravelled / myBodyOffset;
-	UpdatePlayerBodyPosition(t);
-	if (t >= 1.0f)
-	{
-		myDistanceTravelled = 0.0f;
-		++historyUpdated;
-		UpdateRotationHistory(myPlayerPieces[0]->GetRotation().z);
-		UpdatePositionHistory(myPlayerPieces[0]->GetTranslation());
-	}
+	UpdateReticle();
+	IncreaseDifficulty();
+	MoveEverything();
 }
 
 void Worm::UpdateDebug()
 {
+	if (Engine::Get().GetInputHandler().GetBinaryAction("F4"))
+	{
+		SpawnObstacle();
+	}
+
+	if (Engine::Get().GetInputHandler().GetBinaryAction("F5"))
+	{
+		Engine::Get().DrawColliders = !Engine::Get().DrawColliders;
+	}
+
+	if (Engine::Get().GetInputHandler().GetBinaryAction("F6"))
+	{
+		currentDebugMode += 1;
+		if (currentDebugMode >= static_cast<unsigned>(DebugRenderMode::COUNT))
+		{
+			currentDebugMode = 0;
+		}
+
+		GraphicsEngine::Get().CurrentDebugRenderMode = static_cast<DebugRenderMode>(currentDebugMode);
+	}
+
 	if (ImGui::Begin("Position history"))
 	{
+		ImGui::Text("FPS: %i", Engine::Get().GetTimer().GetAverageFPS());
+		ImGui::Text("Frametime: %.2fms", Engine::Get().GetTimer().GetAverageFrameTimeMS());
+		ImGui::Text("Drawcalls: %i", GraphicsEngine::Get().GetDrawcallAmount());
+
+		ImGui::Text("Scroll Speed: %.2f", myEnvironmentScrollSpeed);
+		ImGui::Text("Scroll Speed Increase: %.2f", myEnvironmentSpeedIncreaseMultiplier);
+		ImGui::Text("Obstacle Spawn Timer: %.2f", myObstacleSpawnTimer);
+
 		ImGui::Text("History updated %i times", historyUpdated);
 		ImGui::Text("Highest Point: %f", myHighestYPoint);
 		ImGui::Text("T: %f", myDistanceTravelled / myBodyOffset);
@@ -92,6 +123,90 @@ void Worm::UpdateDebug()
 	ImGui::End();
 }
 
+void Worm::StartGame()
+{
+	myEnvironmentSpeedIncreaseMultiplier = myEnvironmentSpeedIncreaseStartMultiplier;
+	myObstacleSpawnTimer = myObstacleStartSpawnTimer;
+	myEnvironmentScrollSpeed = myEnvironmentStartingSpeed;
+	myTimeSinceLastObstacleSpawned = 0.0f;
+	myTimeSinceSpawnrateIncrease = 0.0f;
+
+	for (auto& obstacle : myObstacles)
+	{
+		if (obstacle->gameObject->GetActive())
+		{
+			obstacle->gameObject->SetActive(false);
+			--myActiveObstacles;
+		}
+	}
+
+	for (int i = 0; i < static_cast<int>(myPlayerPieces.size()); i++)
+	{
+		myPlayerPieces[i]->SetTranslation(0.0f, i * -myBodyOffset, 0.0f);
+		myPlayerPieces[i]->SetRotation(-90.0f, 0.0f, 0.0f);
+		myRotationHistory[i] = myPlayerPieces[i]->GetRotation().z;
+		myPositionHistory[i] = myPlayerPieces[i]->GetTranslation();
+	}
+
+	myIsGameRunning = true;
+}
+
+void Worm::GameOver()
+{
+	printf("Game Over\n");
+	myIsGameRunning = false;
+}
+
+void Worm::UpdateReticle()
+{
+	InputHandler& input = Engine::Get().GetInputHandler();
+	Math::Vector2f mousePosNDC = input.GetAnalogAction2D("MousePosNDC");
+	Math::Vector2f mouseInWorldPos = mousePosNDC * myCameraViewportDimensions + Math::ToVector2(Camera::GetMainCamera()->gameObject->GetComponent<Transform>()->GetTranslation());
+	myReticle->SetTranslation(mouseInWorldPos.x, mouseInWorldPos.y, -500.0f);
+}
+
+void Worm::MoveEverything()
+{
+	ScrollBackgroundPlane();
+	MoveObstacles();
+
+	myTimeSinceLastObstacleSpawned += Engine::Get().GetTimer().GetDeltaTime();
+	if (myTimeSinceLastObstacleSpawned > myObstacleSpawnTimer)
+	{
+		SpawnObstacle();
+		myTimeSinceLastObstacleSpawned = 0.0f;
+	}
+
+
+	UpdatePlayerHeadRotation();
+	MovePlayerHead();
+
+	float t = myDistanceTravelled / myBodyOffset;
+	UpdatePlayerBodyPosition(t);
+	if (t >= 1.0f)
+	{
+		myDistanceTravelled = 0.0f;
+		++historyUpdated;
+		UpdateRotationHistory(myPlayerPieces[0]->GetRotation().z);
+		UpdatePositionHistory(myPlayerPieces[0]->GetTranslation());
+	}
+}
+
+void Worm::IncreaseDifficulty()
+{
+	float dt = Engine::Get().GetTimer().GetDeltaTime();
+
+	myEnvironmentSpeedIncreaseMultiplier += dt * myEnvironmentSpeedIncreaseMultiplierIncrease;
+	myEnvironmentScrollSpeed += dt * myEnvironmentSpeedIncreaseMultiplier;
+
+	myTimeSinceSpawnrateIncrease += dt;
+	if (myTimeSinceSpawnrateIncrease > mySpawnrateIncreaseTimer)
+	{
+		myObstacleSpawnTimer = std::clamp(myObstacleSpawnTimer - myObstacleSpawnTimerReduction, myObstacleMinSpawnTimer, myObstacleStartSpawnTimer);
+		myTimeSinceSpawnrateIncrease = 0.0f;
+	}
+}
+
 void Worm::CreateWorm()
 {
 	auto& sceneHandler = Engine::Get().GetSceneHandler();
@@ -104,22 +219,37 @@ void Worm::CreateWorm()
 		myRotationHistory[i] = myPlayerPieces[i]->GetRotation().z;
 		myPositionHistory[i] = myPlayerPieces[i]->GetTranslation();
 
+		std::shared_ptr<BoxCollider> collider;
+
 		if (i == 0)
 		{
 			newPiece->AddComponent<Model>(AssetManager::Get().GetAsset<MeshAsset>("SM_WormHead.fbx")->mesh, AssetManager::Get().GetAsset<MaterialAsset>("Worm.MAT")->material);
 			myPlayerPieces[i]->AddTranslation(0.0f, 0.0f, -100.0f);
-			newPiece->AddComponent<BoxCollider>(true, Math::Vector3(150.0f, 200.0f, 200.0f), Math::Vector3f(0.0f, 0.0f, 50.0f));
+			collider = newPiece->AddComponent<BoxCollider>(true, Math::Vector3(120.0f, 100.0f, 120.0f), Math::Vector3f(0.0f, 0.0f, 0.0f));
 		}
 		else if (i == max_pieces - 1)
 		{
 			newPiece->AddComponent<Model>(AssetManager::Get().GetAsset<MeshAsset>("SM_WormTail.fbx")->mesh, AssetManager::Get().GetAsset<MaterialAsset>("Worm.MAT")->material);
-			newPiece->AddComponent<BoxCollider>(true, Math::Vector3(150.0f, 200.0f, 200.0f), Math::Vector3f(0.0f, 0.0f, 50.0f));
+			collider = newPiece->AddComponent<BoxCollider>(true, Math::Vector3(120.0f, 100.0f, 120.0f), Math::Vector3f(0.0f, 0.0f, 50.0f));
 		}
 		else
 		{
 			newPiece->AddComponent<Model>(AssetManager::Get().GetAsset<MeshAsset>("SM_WormBody.fbx")->mesh, AssetManager::Get().GetAsset<MaterialAsset>("Worm.MAT")->material);
-			newPiece->AddComponent<BoxCollider>(true, Math::Vector3(150.0f, 200.0f, 200.0f), Math::Vector3f(0.0f, 0.0f, 50.0f));
+			collider = newPiece->AddComponent<BoxCollider>(true, Math::Vector3(120.0f, 100.0f, 150.0f), Math::Vector3f(0.0f, 0.0f, 100.0f));
 		}
+
+		collider->SetOnTriggerEnterResponse([this, collider](Collider::CollisionInfo aCollisionInfo)
+			{
+				Collider* otherCollider = aCollisionInfo.collA;
+
+				if (otherCollider == collider.get())
+					otherCollider = aCollisionInfo.collB;
+
+				if (otherCollider->gameObject->GetName() == "Obstacle")
+				{
+					GameOver();
+				}
+			});
 	}
 }
 
@@ -129,10 +259,10 @@ void Worm::ScrollBackgroundPlane()
 	myBackgroundPlane2->AddTranslation(0.0f, -myEnvironmentScrollSpeed * Engine::Get().GetTimer().GetDeltaTime(), 0.0f);
 
 	if (myBackgroundPlane1->GetTranslation().y < -myCameraViewportDimensions.y - 5000.0f)
-		myBackgroundPlane1->SetTranslation(myBackgroundPlane1->GetTranslation().x, 10000.0f, myBackgroundPlane1->GetTranslation().z);
+		myBackgroundPlane1->SetTranslation(myBackgroundPlane1->GetTranslation().x, 9000.0f, myBackgroundPlane1->GetTranslation().z);
 
 	if (myBackgroundPlane2->GetTranslation().y < -myCameraViewportDimensions.y - 5000.0f)
-		myBackgroundPlane2->SetTranslation(myBackgroundPlane2->GetTranslation().x, 10000.0f, myBackgroundPlane2->GetTranslation().z);
+		myBackgroundPlane2->SetTranslation(myBackgroundPlane2->GetTranslation().x, 9000.0f, myBackgroundPlane2->GetTranslation().z);
 }
 
 void Worm::MovePlayerHead()
@@ -147,6 +277,11 @@ void Worm::MovePlayerHead()
 	{
 		myHighestYPoint = myPlayerPieces[0]->GetTranslation().y;
 	}
+
+	if (myPlayerPieces[0]->GetTranslation().y < -myCameraViewportDimensions.y)
+	{
+		GameOver();
+	}
 }
 
 void Worm::UpdatePlayerHeadRotation()
@@ -156,8 +291,9 @@ void Worm::UpdatePlayerHeadRotation()
 	Math::Vector2f adjustedPos = mousePosNDC * myCameraViewportDimensions + Math::ToVector2(Camera::GetMainCamera()->gameObject->GetComponent<Transform>()->GetTranslation());
 
 	Math::Vector2f diff = adjustedPos - Math::ToVector2(myPlayerPieces[0]->GetTranslation());
-	float dir = Math::Sign(Math::ToVector3(diff).GetNormalized().Dot(myPlayerPieces[0]->GetRightVector(true)));
-	float newZRot = -dir * myMaxTurnRate;
+	float dot = Math::ToVector3(diff).GetNormalized().Dot(myPlayerPieces[0]->GetRightVector(true));
+	float turnRate = myEnvironmentScrollSpeed * 2.0f * myMaxTurnRate;
+	float newZRot = -dot * turnRate * Engine::Get().GetTimer().GetDeltaTime();
 	myPlayerPieces[0]->AddRotation({ 0.0f, 0.0f, newZRot });
 }
 
@@ -205,41 +341,37 @@ void Worm::CreateObstacles()
 {
 	auto& sceneHandler = Engine::Get().GetSceneHandler();
 
-	std::array<const char*, 7> myObstaclePaths = {
+	std::array<const char*, 6> myObstaclePaths = {
 		"SM_BranchLarge.fbx",
 		"SM_BranchMedium.fbx",
 		"SM_BranchSmall.fbx",
-		"SM_StoneLarge.fbx",
-		"SM_StoneMedium.fbx",
-		"SM_StoneSmall.fbx",
-		"SM_Button.fbx"
+		"SM_LargeStone.fbx",
+		"SM_MediumStone.fbx",
+		"SM_SmallStone.fbx"
 	};
 
-	std::array<const char*, 7> myObstacleMatPaths = {
+	std::array<const char*, 6> myObstacleMatPaths = {
 		"Branches.MAT",
 		"Branches.MAT",
 		"Branches.MAT",
 		"Stones.MAT",
 		"Stones.MAT",
 		"Stones.MAT",
-		"Button.MAT"
 	};
 
-	std::array<Math::Vector3f, 7> myColliderExtents = {
-		Math::Vector3f(200.0f, 200.0f, 1700.0f),
-		Math::Vector3f(150.0f, 200.0f, 1200.0f),
-		Math::Vector3f(100.0f, 100.0f, 800.0f),
-		Math::Vector3f(900.0f, 900.0f, 900.0f),
-		Math::Vector3f(550.0f, 550.0f, 550.0f),
-		Math::Vector3f(250.0f, 250.0f, 250.0f),
-		Math::Vector3f(150.0f, 150.0f, 150.0f)
+	std::array<Math::Vector3f, 6> myColliderExtents = {
+		Math::Vector3f(120.0f, 200.0f, 1500.0f),
+		Math::Vector3f(100.0f, 200.0f, 1000.0f),
+		Math::Vector3f(60.0f, 100.0f, 700.0f),
+		Math::Vector3f(800.0f, 900.0f, 900.0f),
+		Math::Vector3f(200.0f, 550.0f, 600.0f),
+		Math::Vector3f(250.0f, 250.0f, 150.0f)
 	};
 
-	std::array<Math::Vector3f, 7> myColliderOffsets = {
-		Math::Vector3f(0.0f, 0.0f, 350.0f),
+	std::array<Math::Vector3f, 6> myColliderOffsets = {
+		Math::Vector3f(-20.0f, 0.0f, 350.0f),
 		Math::Vector3f(0.0f, 0.0f, 170.0f),
 		Math::Vector3f(0.0f, 0.0f, 70.0f),
-		Math::Vector3f(0.0f, 0.0f, 0.0f),
 		Math::Vector3f(0.0f, 0.0f, 0.0f),
 		Math::Vector3f(0.0f, 0.0f, 0.0f),
 		Math::Vector3f(0.0f, 0.0f, 0.0f)
@@ -248,6 +380,7 @@ void Worm::CreateObstacles()
 	for (int i = 0; i < max_obstacles; i++)
 	{
 		std::shared_ptr<GameObject> newObstacle = std::make_shared<GameObject>();
+		newObstacle->SetName("Obstacle");
 		sceneHandler.Instantiate(newObstacle);
 
 		int obstacleType = Utilities::RandomInRange(0, static_cast<int>(myObstaclePaths.size()) - 1);
@@ -285,23 +418,15 @@ std::shared_ptr<Transform> Worm::GetUnusedObstacle()
 
 Math::Vector3f Worm::GetRandomSpawnPoint()
 {
-	Math::Vector3f spawnPoint;
-	spawnPoint.x = Utilities::RandomInRange(-myCameraViewportDimensions.x, myCameraViewportDimensions.x);
-	float min = myLastObstacleSpawnPoint.x - myMinObstacleXDiff;
-	float max = myLastObstacleSpawnPoint.x + myMinObstacleXDiff;
-	if (Math::IsInRange(spawnPoint.x, min, max))
-	{
-		if (spawnPoint.x - min < max - spawnPoint.x)
-			spawnPoint.x = min;
-		else
-			spawnPoint.x = max;
-	}
+	float playerMovingRight = Math::Sign(myPlayerPieces[0]->GetForwardVector(true).Dot({ 1.0f, 0.0f, 0.0f }));
+	Math::Vector3f initialPos = myPlayerPieces[0]->GetTranslation();
+	Math::Vector3f predictedPos = myPlayerPieces[0]->GetTranslation() + Math::Vector3f(1.0f, 0.0f, 0.0f) * myMinObstacleXDiff * playerMovingRight;
 
+	Math::Vector3f spawnPoint;
+	spawnPoint.x = Utilities::RandomInRange(std::min(initialPos.x, predictedPos.x), std::max(initialPos.x, predictedPos.x));
 	spawnPoint.y = myCameraViewportDimensions.y + myObstacleSpawnYOffset;
 	spawnPoint.z = 0.0f;
-
-	myLastObstacleSpawnPoint = spawnPoint;
-	return myLastObstacleSpawnPoint;
+	return spawnPoint;
 }
 
 void Worm::MoveObstacles()

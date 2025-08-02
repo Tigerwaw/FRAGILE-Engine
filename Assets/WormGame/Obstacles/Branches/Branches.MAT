@@ -7,8 +7,8 @@
     "A": 1.0
   },
   "Textures": [
-    "Branch_C.dds",
-    "Branch_N.dds",
-    "Branch_M.dds"
+    "Branch_Mat_C.dds",
+    "Branch_Mat_N.dds",
+    "Branch_Mat_M.dds"
   ]
 }

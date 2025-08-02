@@ -19,6 +19,11 @@ public:
     void UpdateDebug() override;
 
 private:
+    void StartGame();
+    void GameOver();
+    void UpdateReticle();
+    void MoveEverything();
+    void IncreaseDifficulty();
     void CreateWorm();
     void ScrollBackgroundPlane();
     void MovePlayerHead();
@@ -26,6 +31,10 @@ private:
     void UpdatePlayerBodyPosition(const float aT);
     void UpdateRotationHistory(const float aNewRotation);
     void UpdatePositionHistory(const Math::Vector3f& aNewPosition);
+
+    bool myIsGameRunning = false;
+
+    std::shared_ptr<Transform> myReticle;
 
     std::shared_ptr<Transform> myBackgroundPlane1;
     std::shared_ptr<Transform> myBackgroundPlane2;
@@ -35,9 +44,16 @@ private:
 
     float myBodyOffset = 180.0f;
     
+    float myEnvironmentStartingSpeed = 300.0f;
     float myEnvironmentScrollSpeed = 300.0f;
+    float myEnvironmentSpeedIncreaseStartMultiplier = 1.0f;
+    float myEnvironmentSpeedIncreaseMultiplier = 1.0f;
+    float myEnvironmentSpeedIncreaseMultiplierIncrease = 0.1f;
 
-    float myMaxTurnRate = 3.0f;
+    float mySpawnrateIncreaseTimer = 10.0f;
+    float myTimeSinceSpawnrateIncrease = 0.0f;
+
+    float myMaxTurnRate = 0.25f;
 
     float myHighestYPoint = 0.0f;
     float myDistanceTravelled = 0.0f;
@@ -53,9 +69,11 @@ private:
     void MoveObstacles();
     std::array<std::shared_ptr<Transform>, max_obstacles> myObstacles;
     float myObstacleSpawnYOffset = 2000.0f;
-    float myObstacleSpawnTimer = 1.0f;
+    float myObstacleStartSpawnTimer = 3.0f;
+    float myObstacleMinSpawnTimer = 1.0f;
+    float myObstacleSpawnTimerReduction = 0.2f;
+    float myObstacleSpawnTimer = 3.0f;
     float myTimeSinceLastObstacleSpawned = 0.0f;
     int myActiveObstacles = 0;
-    Math::Vector3f myLastObstacleSpawnPoint;
     float myMinObstacleXDiff = 600.0f;
 };

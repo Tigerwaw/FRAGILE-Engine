@@ -36,8 +36,8 @@
         },
         {
           "Type": "AmbientLight",
-          "Cubemap": "hornkoppespring.dds",
-          "Intensity": 0.5
+          "Cubemap": "DirtCubemap.dds",
+          "Intensity": 5.0
         }
       ]
     },
@@ -54,7 +54,7 @@
         },
         {
           "Type": "DirectionalLight",
-          "Intensity": 0.5,
+          "Intensity": 0.1,
           "Color": [ 1.0, 1.0, 1.0 ],
           "CastShadows": true,
           "ShadowTextureSize": 4096,
@@ -102,7 +102,7 @@
       "Components": [
         {
           "Type": "Transform",
-          "Position": [ 0.0, 10000.0, 1000.0 ],
+          "Position": [ 0.0, 9000.0, 1000.0 ],
           "Rotation": [ -90.0, 0.0, 0.0 ],
           "Scale": [ 5000.0, 5000.0, 5000.0 ]
         },
