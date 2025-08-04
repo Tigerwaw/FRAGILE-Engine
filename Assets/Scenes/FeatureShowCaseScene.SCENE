@@ -467,7 +467,7 @@
         },
         {
           "Type": "AmbientLight",
-          "Cubemap": "hornkoppespring.dds",
+          "Cubemap": "hilly_terrain.dds",
           "Intensity": 0.1
         }
       ]

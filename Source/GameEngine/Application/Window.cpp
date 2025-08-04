@@ -37,10 +37,10 @@ bool Window::InitializeWindow(const std::string& aWindowTitle, Math::Vector2f aW
 	HCURSOR hCursor = nullptr;
 	HICON hIcon = nullptr;
 
-	hIcon = (HICON)LoadImageA(NULL, "OhWorm_Icon.ico",
+	hIcon = (HICON)LoadImageA(NULL, "GameIcon.ico",
 		IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE | LR_SHARED);
 
-	//hCursor = LoadCursorFromFileA(("EngineAssets/" + aCursorName).c_str());
+	hCursor = LoadCursorFromFileA("GameCursor.cur");
 
 	if (hCursor == nullptr)
 		hCursor = LoadCursor(nullptr, IDC_ARROW);

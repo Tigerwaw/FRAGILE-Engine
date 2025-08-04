@@ -52,6 +52,7 @@ void FeatureShowcase::InitializeApplication()
 	Engine::Get().GetSceneHandler().LoadScene("Scenes/FeatureShowCaseScene.SCENE");
 
 	InputHandler& inputHandler = Engine::Get().GetInputHandler();
+	inputHandler.RegisterBinaryAction("QUIT", Keys::ESCAPE, GenericInput::ActionType::Clicked);
 	inputHandler.RegisterBinaryAction("W", Keys::W, GenericInput::ActionType::Held);
 	inputHandler.RegisterBinaryAction("A", Keys::A, GenericInput::ActionType::Held);
 	inputHandler.RegisterBinaryAction("S", Keys::S, GenericInput::ActionType::Held);
@@ -111,6 +112,9 @@ void FeatureShowcase::InitializeApplication()
 
 void FeatureShowcase::UpdateApplication()
 {
+	if (Engine::Get().GetInputHandler().GetBinaryAction("QUIT"))
+		QuitApplication();
+
 	if (Engine::Get().GetInputHandler().GetBinaryAction("SPACE") && !Engine::Get().GetInputHandler().GetBinaryAction("RMB"))
 	{
 		currentAnimation += 1;
