@@ -15,8 +15,8 @@ void main(
         { 1.0f, 1.0f }
     };
     
-    const TrailVertex startVertex = input[0];
-    const TrailVertex endVertex = input[1];
+    const Trail_VSOut startVertex = input[0];
+    const Trail_VSOut endVertex = input[1];
     
     // Topleft vertex
     {

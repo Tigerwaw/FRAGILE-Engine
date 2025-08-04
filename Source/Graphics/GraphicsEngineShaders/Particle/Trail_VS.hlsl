@@ -7,7 +7,6 @@ Trail_VSOut main(TrailVertex input)
 {
     Trail_VSOut output;
     
-    float4 worldPos = mul(OB_World, input.Position);
     float4 viewPos = mul(FB_InvView, input.Position);
     output.Position = viewPos;
     output.Color = input.Color;
