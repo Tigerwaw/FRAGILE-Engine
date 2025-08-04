@@ -81,6 +81,7 @@ public:
     const std::string GetCurrentAnimationNameOnLayer(unsigned aLayerIndex = 0) const;
     const std::string GetCurrentAnimationNameOnLayer(const std::string& aStartJoint = "") const;
 
+    std::shared_ptr<AnimatedModel::AnimationState> GetCurrentAnimationStateOnLayer(unsigned aLayerIndex);
     std::vector<std::shared_ptr<AnimatedModel::AnimationState>> GetAnimationStatesOnLayer(unsigned aLayerIndex = 0);
 
     const bool IsLayerCurrentlyBlending(unsigned aLayerIndex = 0) const;

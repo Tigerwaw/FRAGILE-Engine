@@ -27,10 +27,19 @@ void TrailSystem::Update()
 	}
 }
 
+void TrailSystem::ResetEmitters()
+{
+	for (auto& emitter : myEmitters)
+	{
+		emitter.ResetTrail();
+	}
+}
+
 TrailEmitter& TrailSystem::AddEmitter(const TrailEmitterSettings& aSettings)
 {
 	TrailEmitter& emitter = myEmitters.emplace_back(TrailEmitter());
 	emitter.mySettings = aSettings;
+	emitter.InitInternal();
 	return emitter;
 }
 

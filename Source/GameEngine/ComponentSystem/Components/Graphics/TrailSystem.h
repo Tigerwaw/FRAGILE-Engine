@@ -11,6 +11,8 @@ public:
 	void Start() override;
 	void Update() override;
 
+	void ResetEmitters();
+
 	TrailEmitter& AddEmitter(const TrailEmitterSettings& aSettings);
 
 	std::vector<TrailEmitter>& GetEmitters() { return myEmitters; }

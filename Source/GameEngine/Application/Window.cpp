@@ -34,11 +34,23 @@ bool Window::InitializeWindow(const std::string& aWindowTitle, Math::Vector2f aW
 			posY = 0;
 	}
 
+	HCURSOR hCursor = nullptr;
+	HICON hIcon = nullptr;
+
+	hIcon = (HICON)LoadImageA(NULL, "OhWorm_Icon.ico",
+		IMAGE_ICON, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE | LR_SHARED);
+
+	//hCursor = LoadCursorFromFileA(("EngineAssets/" + aCursorName).c_str());
+
+	if (hCursor == nullptr)
+		hCursor = LoadCursor(nullptr, IDC_ARROW);
+
 	// First we create our Window Class
 	WNDCLASS windowClass = {};
 	windowClass.style = CS_VREDRAW | CS_HREDRAW | CS_OWNDC;
 	windowClass.lpfnWndProc = WinProc;
-	windowClass.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	windowClass.hCursor = hCursor;
+	windowClass.hIcon = hIcon;
 	windowClass.lpszClassName = windowClassName;
 	RegisterClass(&windowClass);
 

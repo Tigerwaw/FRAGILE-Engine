@@ -220,6 +220,11 @@ const std::string AnimatedModel::GetCurrentAnimationNameOnLayer(const std::strin
     return GetCurrentAnimationNameOnLayer(myJointNameToLayerIndex.at(aStartJoint));
 }
 
+std::shared_ptr<AnimatedModel::AnimationState> AnimatedModel::GetCurrentAnimationStateOnLayer(unsigned aLayerIndex)
+{
+    return myAnimationLayers[aLayerIndex].currentState;
+}
+
 std::vector<std::shared_ptr<AnimatedModel::AnimationState>> AnimatedModel::GetAnimationStatesOnLayer(unsigned aLayerIndex)
 {
     std::vector<std::shared_ptr<AnimatedModel::AnimationState>> animationStates;

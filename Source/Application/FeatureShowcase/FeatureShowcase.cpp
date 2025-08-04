@@ -41,9 +41,9 @@ Application* CreateApplication()
 void FeatureShowcase::InitializeApplication()
 {
 	Engine::Get().GetInputHandler().SetControllerDeadZone(0.1f, 0.06f);
-	Engine::Get().GetAudioEngine().LoadBank("Master");
-	Engine::Get().GetAudioEngine().LoadBank("Master.strings");
-	Engine::Get().GetAudioEngine().LoadBank("Test");
+	Engine::Get().GetAudioEngine().LoadBank("AudioBanks/Master.bank");
+	Engine::Get().GetAudioEngine().LoadBank("AudioBanks/Master.strings.bank");
+	Engine::Get().GetAudioEngine().LoadBank("AudioBanks/Test.bank");
 
 	Engine::Get().GetAudioEngine().AddBus(BusType::Music, "Music");
 	Engine::Get().GetAudioEngine().AddBus(BusType::Ambience, "Ambience");

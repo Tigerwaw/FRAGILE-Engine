@@ -10,4 +10,5 @@ struct TrailEmitterSettings
 	Math::Curve<float> Width;
 	unsigned Length = 10;
 	Math::Vector4f ChannelMask = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Math::Vector3f ConstantVelocity;
 };

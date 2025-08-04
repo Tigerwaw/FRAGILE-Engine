@@ -17,8 +17,10 @@ public:
 	void SetMaterial(std::shared_ptr<Material> aMaterial) { myMaterial = aMaterial; }
 	std::shared_ptr<Material> GetMaterial() { return myMaterial; }
 
-	const TrailEmitterSettings& GetEmitterSettings() const { return mySettings; }
+	TrailEmitterSettings& GetEmitterSettings() { return mySettings; }
 	const unsigned GetCurrentLength() const { return myCurrentLength; }
+
+	void ResetTrail();
 
 protected:
 	virtual void InitTrailVertex(TrailVertex& aTrailVertex);

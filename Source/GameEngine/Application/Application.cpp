@@ -78,3 +78,13 @@ void Application::Run()
 
 	engine.Shutdown();
 }
+
+void Application::QuitApplication()
+{
+	myIsRunning = false;
+}
+
+void Application::SetPaused(bool aToggle)
+{
+	myIsPaused = aToggle;
+}

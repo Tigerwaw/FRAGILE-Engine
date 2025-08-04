@@ -104,7 +104,7 @@ bool AudioEngine::LoadBank(const std::string& aBankName)
     }
 
     FMOD::Studio::Bank* newBank = nullptr;
-    std::string name = Engine::Get().GetContentRootPath().string() + "/AudioBanks/" + aBankName + ".bank";
+    std::string name = Engine::Get().GetContentRootPath().string() + aBankName;
     FMOD_RESULT result = mySystem->loadBankFile((name).c_str(), FMOD_STUDIO_LOAD_BANK_NORMAL, &newBank);
     if (result != FMOD_OK)
     {

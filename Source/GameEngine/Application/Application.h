@@ -86,8 +86,9 @@ public:
     virtual void UpdateApplication() {};
     virtual void UpdateDebug() {};
     void Run();
+    void QuitApplication();
+    void SetPaused(bool aToggle);
 private:
-
     bool myIsRunning = true;
     bool myIsPaused = false;
 };
