@@ -1,0 +1,14 @@
+{
+  "PSO": "Deferred",
+  "AlbedoTint": {
+    "R": 1.0,
+    "G": 1.0,
+    "B": 1.0,
+    "A": 1.0
+  },
+  "Textures": [
+    "Castle_Wall2_C.dds",
+    "Castle_Wall2_N.dds",
+    "Castle_Wall2_M.dds"
+  ]
+}

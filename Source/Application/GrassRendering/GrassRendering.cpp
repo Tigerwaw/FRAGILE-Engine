@@ -21,6 +21,7 @@ Application* CreateApplication()
 void GrassRendering::InitializeApplication()
 {
 	Engine::Get().GetInputHandler().RegisterBinaryAction("F6", Keys::F6, GenericInput::ActionType::Clicked);
+	Engine::Get().GetInputHandler().RegisterBinaryAction("QUIT", Keys::ESCAPE, GenericInput::ActionType::Clicked);
 
 	auto& sh = Engine::Get().GetSceneHandler();
 	sh.LoadScene("Scenes/GrassRendering.SCENE");
@@ -42,8 +43,8 @@ void GrassRendering::InitializeApplication()
 			float defaultOffset = 10.0f;
 			float offsetVariation = 10.0f;
 
-			float minSize = 0.5f;
-			float maxSize = 2.0f;
+			float minSize = 0.3f;
+			float maxSize = 1.5f;
 
 			for (int outer = 0; outer < instanceRows; outer++)
 			{
@@ -71,6 +72,9 @@ void GrassRendering::InitializeApplication()
 
 void GrassRendering::UpdateApplication()
 {
+	if (Engine::Get().GetInputHandler().GetBinaryAction("QUIT"))
+		QuitApplication();
+
 	if (Engine::Get().GetInputHandler().GetBinaryAction("F6"))
 	{
 		currentDebugMode += 1;
