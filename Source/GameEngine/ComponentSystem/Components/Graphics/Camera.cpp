@@ -68,24 +68,20 @@ void Camera::InitPerspectiveProjection(float aFOV, float aNearPlane, float aFarP
 	myProjectionMatrix(4, 3) = -aNearPlane * myProjectionMatrix(3, 3);
 	myProjectionMatrix(4, 4) = 0;
 
-	//Math::Vector3f topLeft = Math::Vector3f(-cos(horizontalFOV), sin(verticalFOV), 1.0f).GetNormalized();
-	//Math::Vector3f topRight = Math::Vector3f(cos(horizontalFOV), sin(verticalFOV), 1.0f).GetNormalized();
-	//Math::Vector3f bottomRight = Math::Vector3f(cos(horizontalFOV), -sin(verticalFOV), 1.0f).GetNormalized();
-	//Math::Vector3f bottomLeft = Math::Vector3f(-cos(horizontalFOV), -sin(verticalFOV), 1.0f).GetNormalized();
-	
-	Math::Vector3f topLeft = Math::Vector3f(-1.0f, 1.0f, 1.0f).GetNormalized();
-	Math::Vector3f topRight = Math::Vector3f(1.0f, 1.0f, 1.0f).GetNormalized();
-	Math::Vector3f bottomRight = Math::Vector3f(1.0f, -1.0f, 1.0f).GetNormalized();
-	Math::Vector3f bottomLeft = Math::Vector3f(-1.0f, -1.0f, 1.0f).GetNormalized();
+	float nearHalfWidth = tan(fov / 2) * aNearPlane;
+	float nearHalfHeight = nearHalfWidth * aspectRatio;
 
-	myFrustumCorners[0] = bottomLeft * aNearPlane;
-	myFrustumCorners[1] = topLeft * aNearPlane;
-	myFrustumCorners[2] = topRight * aNearPlane;
-	myFrustumCorners[3] = bottomRight * aNearPlane;
-	myFrustumCorners[4] = bottomLeft * aFarPlane;
-	myFrustumCorners[5] = topLeft * aFarPlane;
-	myFrustumCorners[6] = topRight * aFarPlane;
-	myFrustumCorners[7] = bottomRight * aFarPlane;
+	float farHalfWidth = tan(fov / 2) * aFarPlane;
+	float farHalfHeight = farHalfWidth * aspectRatio;
+
+	myFrustumCorners[0] = { -nearHalfWidth, -nearHalfHeight, aNearPlane };
+	myFrustumCorners[1] = { -nearHalfWidth, nearHalfHeight, aNearPlane };
+	myFrustumCorners[2] = { nearHalfWidth, nearHalfHeight, aNearPlane };
+	myFrustumCorners[3] = { nearHalfWidth, -nearHalfHeight, aNearPlane };
+	myFrustumCorners[4] = { -farHalfWidth, -farHalfHeight, aFarPlane };
+	myFrustumCorners[5] = { -farHalfWidth, farHalfHeight, aFarPlane };
+	myFrustumCorners[6] = { farHalfWidth, farHalfHeight, aFarPlane };
+	myFrustumCorners[7] = { farHalfWidth, -farHalfHeight, aFarPlane };
 }
 
 void Camera::InitOrtographicProjection(float aLeft, float aRight, float aTop, float aBottom, float aNearPlane, float aFarPlane)

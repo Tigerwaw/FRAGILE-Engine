@@ -76,16 +76,19 @@ void DebugDrawer::DrawCameraFrustum(std::shared_ptr<Camera> aCamera, Math::Vecto
         pos = Math::ToVector3(Math::ToVector4(pos, 1.0f) * camMatrix);
     }
 
+    // Near plane
     DrawLine(frustumVolume[0], frustumVolume[1], aColor);
     DrawLine(frustumVolume[1], frustumVolume[2], aColor);
     DrawLine(frustumVolume[2], frustumVolume[3], aColor);
     DrawLine(frustumVolume[3], frustumVolume[0], aColor);
 
+    // Far Plane
     DrawLine(frustumVolume[4], frustumVolume[5], aColor);
     DrawLine(frustumVolume[5], frustumVolume[6], aColor);
     DrawLine(frustumVolume[6], frustumVolume[7], aColor);
     DrawLine(frustumVolume[7], frustumVolume[4], aColor);
 
+    // Connecting Lines
     DrawLine(frustumVolume[0], frustumVolume[4], aColor);
     DrawLine(frustumVolume[1], frustumVolume[5], aColor);
     DrawLine(frustumVolume[2], frustumVolume[6], aColor);
