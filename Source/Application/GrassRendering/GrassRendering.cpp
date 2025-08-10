@@ -20,6 +20,8 @@ Application* CreateApplication()
 
 void GrassRendering::InitializeApplication()
 {
+	Engine::Get().DrawColliders = true;
+
 	Engine::Get().GetInputHandler().RegisterBinaryAction("F6", Keys::F6, GenericInput::ActionType::Clicked);
 	Engine::Get().GetInputHandler().RegisterBinaryAction("QUIT", Keys::ESCAPE, GenericInput::ActionType::Clicked);
 
@@ -33,12 +35,15 @@ void GrassRendering::InitializeApplication()
 			int instanceRows = 100;
 
 			std::shared_ptr<GameObject> instancedModelObj = std::make_shared<GameObject>();
-			instancedModelObj->AddComponent<Transform>(Math::Vector3f(i * 1000.0f, 0.0f, j * 1000.0f));
+			Math::Vector3f instPosOffset(i * 1000.0f, 0.0f, j * 1000.0f);
+			instancedModelObj->AddComponent<Transform>(instPosOffset);
 			std::shared_ptr<InstancedModel> instancedModel = instancedModelObj->AddComponent<InstancedModel>(instanceRows * instanceRows);
 			instancedModel->SetMesh(AssetManager::Get().GetAsset<MeshAsset>("SM_GrassBlade.fbx")->mesh);
 			instancedModel->SetMaterialOnSlot(0, AssetManager::Get().GetAsset<MaterialAsset>("SimpleGrass.mat")->material);
 			//instancedModel->SetMesh(AssetManager::Get().GetAsset<MeshAsset>("SM_Grass.fbx")->mesh);
 			//instancedModel->SetMaterialOnSlot(0, AssetManager::Get().GetAsset<MaterialAsset>("Grass.mat")->material);
+			
+			float yRayOrigin = 1500.0f;
 
 			float defaultOffset = 10.0f;
 			float offsetVariation = 10.0f;
@@ -60,7 +65,12 @@ void GrassRendering::InitializeApplication()
 					instanceMatrix(4, 1) = Utilities::RandomVariation(inner * defaultOffset, offsetVariation);
 					instanceMatrix(4, 3) = Utilities::RandomVariation(outer * defaultOffset, offsetVariation);
 
-					instancedModel->AddInstanceNoBufferUpdate(instanceMatrix);
+					Math::Vector3f hitPoint;
+					sh.Raycast({ instPosOffset.x + instanceMatrix(4, 1), instPosOffset.y + yRayOrigin, instPosOffset.z + instanceMatrix(4, 3) }, { 0.0f, -1.0f, 0.0f }, hitPoint);
+					instanceMatrix(4, 2) = hitPoint.y;
+
+					if (instanceMatrix(4, 2) < 1.0f)
+						instancedModel->AddInstanceNoBufferUpdate(instanceMatrix);
 				}
 			}
 

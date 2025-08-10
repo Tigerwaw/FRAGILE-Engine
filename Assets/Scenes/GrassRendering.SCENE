@@ -18,6 +18,16 @@
           "Materials": [
             "ForestFloor.MAT"
           ]
+        },
+        {
+          "Type": "BoxCollider",
+          "IsTrigger": false,
+          "CenterOffset": [ 0.0, 0.0, 0.0 ],
+          "Extents": {
+            "Width": 2.0,
+            "Height": 0.001,
+            "Depth": 2.0
+          }
         }
       ]
     },
@@ -114,6 +124,16 @@
           "Materials": [
             "Castle_Wall1.MAT"
           ]
+        },
+        {
+          "Type": "BoxCollider",
+          "IsTrigger": false,
+          "CenterOffset": [ 0.0, 35.0, 0.0 ],
+          "Extents": {
+            "Width": 230.0,
+            "Height": 70.0,
+            "Depth": 42.0
+          }
         }
       ]
     },
@@ -134,6 +154,16 @@
           "Materials": [
             "Castle_Wall2.MAT"
           ]
+        },
+        {
+          "Type": "BoxCollider",
+          "IsTrigger": false,
+          "CenterOffset": [ 0.0, 35.0, 0.0 ],
+          "Extents": {
+            "Width": 62.0,
+            "Height": 70.0,
+            "Depth": 214.0
+          }
         }
       ]
     },
@@ -154,6 +184,16 @@
           "Materials": [
             "Castle_Stairs.MAT"
           ]
+        },
+        {
+          "Type": "BoxCollider",
+          "IsTrigger": false,
+          "CenterOffset": [ 0.0, 83.0, 0.0 ],
+          "Extents": {
+            "Width": 332.0,
+            "Height": 166.0,
+            "Depth": 455.0
+          }
         }
       ]
     },
@@ -174,6 +214,16 @@
           "Materials": [
             "Castle_Structure.MAT"
           ]
+        },
+        {
+          "Type": "BoxCollider",
+          "IsTrigger": false,
+          "CenterOffset": [ 0.0, 45.0, 0.0 ],
+          "Extents": {
+            "Width": 217.0,
+            "Height": 91.0,
+            "Depth": 132.0
+          }
         }
       ]
     }

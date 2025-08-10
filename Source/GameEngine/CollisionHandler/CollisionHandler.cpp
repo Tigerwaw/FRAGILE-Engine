@@ -28,6 +28,8 @@ void CollisionHandler::UpdateCollisions(Scene& aScene)
 
 bool CollisionHandler::Raycast(Scene& aScene, Math::Vector3f aOrigin, Math::Vector3f aDirection, Math::Vector3f& aHitPoint)
 {
+	Collider::CollisionInfo info;
+
 	for (auto& goA : aScene.myGameObjects)
 	{
 		if (!goA->GetActive()) continue;
@@ -36,12 +38,29 @@ bool CollisionHandler::Raycast(Scene& aScene, Math::Vector3f aOrigin, Math::Vect
 		if (!colliderA || !colliderA->GetActive()) continue;
 
 		Math::Ray<float> aRay(aOrigin, aDirection);
-		auto info = colliderA->CheckOverlap(aRay);
-		if (info)
+		auto result = colliderA->CheckOverlap(aRay);
+		if (result)
 		{
-			aHitPoint = info.hitPoint;
-			return true;
+			if (info)
+			{
+				Math::Vector3f resultDiff = aOrigin - result.hitPoint;
+				Math::Vector3f infoDiff = aOrigin - info.hitPoint;
+				if (resultDiff.LengthSqr() < infoDiff.LengthSqr())
+				{
+					info = result;
+				}
+			}
+			else
+			{
+				info = result;
+			}
 		}
+	}
+
+	if (info)
+	{
+		aHitPoint = info.hitPoint;
+		return true;
 	}
 
 	aHitPoint = { 0, 0, 0 };
