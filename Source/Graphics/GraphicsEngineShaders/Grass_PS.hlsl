@@ -22,7 +22,8 @@ GBufferOutput main(MeshVStoPS input, bool isFrontFace : SV_IsFrontFace)
     float3 variationColor = lerp(0.5f, 5.0f, PerlinNoise.Sample(AnisoWrapSampler, worldUV).r);
     albedoMap.rgb *= variationColor;
     
-    float3 windColor = lerp(0.5f, 2.0f, PerlinNoise.Sample(AnisoWrapSampler, worldUV + FB_Time.xx * -0.1f).r);
+    float speed = -0.05f;
+    float3 windColor = lerp(0.5f, 2.0f, PerlinNoise.Sample(AnisoWrapSampler, worldUV + FB_Time.xx * speed).r);
     albedoMap.rgb *= windColor;
     
     const float2 normalMap = NormalTexture.Sample(AnisoWrapSampler, UVs).rg;

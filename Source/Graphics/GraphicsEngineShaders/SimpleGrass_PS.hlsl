@@ -13,7 +13,9 @@ GBufferOutput main(MeshVStoPS input, bool isFrontFace : SV_IsFrontFace)
     float3 darkColor = float3(0.243, 0.529, 0.235);
     float3 lightColor = float3(0.075, 0.729, 0.051);
     float3 variationColor = lerp(darkColor, lightColor, PerlinNoise.Sample(AnisoWrapSampler, worldUV).r);
-    float3 windColor = lerp(0.25, 1.0, PerlinNoise.Sample(AnisoWrapSampler, worldUV + FB_Time.xx * -0.1f).r * input.VertexColor0.rgb);
+    
+    float speed = -0.05f;
+    float3 windColor = lerp(0.25, 1.0, PerlinNoise.Sample(AnisoWrapSampler, worldUV + FB_Time.xx * speed).r * input.VertexColor0.rgb);
     color = variationColor * windColor;
     
     // Calculate normal based on whether we are rendering a frontface or backface.

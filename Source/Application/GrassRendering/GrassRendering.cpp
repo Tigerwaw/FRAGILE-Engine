@@ -11,6 +11,7 @@
 #include "AssetTypes/MaterialAsset.h"
 
 #include "CommonUtilities/Random.hpp"
+#include "CommonUtilities/PerlinNoise.h"
 
 Application* CreateApplication()
 {
@@ -20,7 +21,8 @@ Application* CreateApplication()
 
 void GrassRendering::InitializeApplication()
 {
-	Engine::Get().DrawColliders = true;
+	//Engine::Get().DrawColliders = true;
+	//Engine::Get().DrawBoundingBoxes = true;
 
 	Engine::Get().GetInputHandler().RegisterBinaryAction("F6", Keys::F6, GenericInput::ActionType::Clicked);
 	Engine::Get().GetInputHandler().RegisterBinaryAction("QUIT", Keys::ESCAPE, GenericInput::ActionType::Clicked);
@@ -32,24 +34,26 @@ void GrassRendering::InitializeApplication()
 	{
 		for (int j = -2; j < 2; j++)
 		{
-			int instanceRows = 100;
+			float density = 2.0f;
+			int instanceRows = static_cast<int>(std::roundf(100.0f * density));
+			float instancePosOffset = 1000.0f;
+
+			float defaultPosOffset = instancePosOffset / instanceRows;
+			float posOffsetVariation = defaultPosOffset * 0.8f;
 
 			std::shared_ptr<GameObject> instancedModelObj = std::make_shared<GameObject>();
-			Math::Vector3f instPosOffset(i * 1000.0f, 0.0f, j * 1000.0f);
+			Math::Vector3f instPosOffset(i * instancePosOffset, 0.0f, j * instancePosOffset);
 			instancedModelObj->AddComponent<Transform>(instPosOffset);
 			std::shared_ptr<InstancedModel> instancedModel = instancedModelObj->AddComponent<InstancedModel>(instanceRows * instanceRows);
 			instancedModel->SetMesh(AssetManager::Get().GetAsset<MeshAsset>("SM_GrassBlade.fbx")->mesh);
 			instancedModel->SetMaterialOnSlot(0, AssetManager::Get().GetAsset<MaterialAsset>("SimpleGrass.mat")->material);
+			//instancedModel->SetCastShadows(false);
 			//instancedModel->SetMesh(AssetManager::Get().GetAsset<MeshAsset>("SM_Grass.fbx")->mesh);
 			//instancedModel->SetMaterialOnSlot(0, AssetManager::Get().GetAsset<MaterialAsset>("Grass.mat")->material);
 			
 			float yRayOrigin = 1500.0f;
 
-			float defaultOffset = 10.0f;
-			float offsetVariation = 10.0f;
-
-			float minSize = 0.3f;
-			float maxSize = 1.5f;
+			float sizeVariation = 0.25f;
 
 			for (int outer = 0; outer < instanceRows; outer++)
 			{
@@ -57,13 +61,18 @@ void GrassRendering::InitializeApplication()
 				{
 					Math::Matrix4x4f instanceMatrix = Math::Matrix4x4f::CreateRollPitchYawMatrix({ 0.0f, Utilities::RandomInRange(-180.0f, 180.0f), 0.0f });
 
-					float scale = Utilities::RandomInRange(minSize, maxSize);
+					instanceMatrix(4, 1) = Utilities::RandomVariation(inner * defaultPosOffset, posOffsetVariation);
+					instanceMatrix(4, 3) = Utilities::RandomVariation(outer * defaultPosOffset, posOffsetVariation);
+
+					Math::Vector2f coordinates;
+					coordinates.x = 2000.0f + i * instancePosOffset + instanceMatrix(4, 1);
+					coordinates.y = 2000.0f + j * instancePosOffset + instanceMatrix(4, 3);
+					Math::Vector2f mapSize(instancePosOffset, instancePosOffset);
+					float noise = SamplePerlin(coordinates, mapSize, 24, 10.0f);
+					float scale = Math::Lerp(1.0f - sizeVariation, 1.0f + sizeVariation, (noise + 1.0f) * 0.5f);
 					instanceMatrix(1, 1) = scale;
 					instanceMatrix(2, 2) = scale;
 					instanceMatrix(3, 3) = scale;
-
-					instanceMatrix(4, 1) = Utilities::RandomVariation(inner * defaultOffset, offsetVariation);
-					instanceMatrix(4, 3) = Utilities::RandomVariation(outer * defaultOffset, offsetVariation);
 
 					Math::Vector3f hitPoint;
 					sh.Raycast({ instPosOffset.x + instanceMatrix(4, 1), instPosOffset.y + yRayOrigin, instPosOffset.z + instanceMatrix(4, 3) }, { 0.0f, -1.0f, 0.0f }, hitPoint);

@@ -169,6 +169,22 @@ float RandomNumber(float4 seed)
     return frac(sin(dot_product) * 43758.5453);
 }
 
+uint Hash(uint s)
+{
+    s ^= 2747636419u;
+    s *= 2654435769u;
+    s ^= s >> 16;
+    s *= 2654435769u;
+    s ^= s >> 16;
+    s *= 2654435769u;
+    return s;
+}
+
+float Random(uint seed)
+{
+    return float(Hash(seed)) / 4294967295.0; // 2^32-1
+}
+
 float GetLogDepth(float4 worldPosition)
 {
     float4 cameraPos = mul(FB_InvView, worldPosition);

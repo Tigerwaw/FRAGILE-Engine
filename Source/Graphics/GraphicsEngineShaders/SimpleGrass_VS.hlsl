@@ -3,30 +3,30 @@
 #include "Includes/ConstantBuffers/ObjectBuffer.hlsli"
 #include "Includes/ConstantBuffers/FrameBuffer.hlsli"
 
-MeshVStoPS main(MeshVertex vertex)
+MeshVStoPS main(MeshVertex vertex, uint instanceID : SV_InstanceID)
 {
     MeshVStoPS result;
-    
-    float4 localPosition = vertex.Position;
-    float3 localNormal = normalize(vertex.Normal);
-    float3 localTangent = normalize(vertex.Tangent);
-    
-    if (OB_IsInstanced)
-    {
-        localPosition = mul(vertex.RelativeTransform, localPosition);
-        localNormal = mul((float3x3) vertex.RelativeTransform, localNormal);
-        localTangent = mul((float3x3) vertex.RelativeTransform, localTangent);
-    }
+   
+    float4 localPosition = mul(vertex.RelativeTransform, vertex.Position);
+    float3 localNormal = mul((float3x3) vertex.RelativeTransform, normalize(vertex.Normal));
+    float3 localTangent = mul((float3x3) vertex.RelativeTransform, normalize(vertex.Tangent));
     
     result.Normal = mul((float3x3) OB_World, localNormal);
     result.Tangent = mul((float3x3) OB_World, localTangent);
     result.Binormal = cross(result.Normal, result.Tangent);
     result.WorldPos = mul(OB_World, localPosition);
-    float speed = -0.1;
-    float magnitude = 25.0;
-    float3 noise = PerlinNoise.SampleLevel(AnisoWrapSampler, result.WorldPos.xz + FB_Time.xx * speed, 0).rgb * vertex.VertexColor0.rgb * magnitude;
     
-    result.WorldPos.rgb += noise;
+    float hashedID = Random(instanceID);
+    float frequency = 1.0;
+    float amplitude = 10.0;
+    float instanceAmplitude = 0.5;
+    
+    float height = vertex.RelativeTransform._22 * hashedID;
+    float wave = cos(FB_Time.x * (frequency - height));
+    
+    wave = (wave * wave * amplitude) - hashedID * instanceAmplitude;
+    float sway = wave * vertex.VertexColor0.r * height;
+    result.WorldPos.rb += sway;
     
     result.ViewPos = mul(FB_InvView, result.WorldPos);
     result.Position = mul(FB_Projection, result.ViewPos);
