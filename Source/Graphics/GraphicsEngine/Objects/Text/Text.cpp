@@ -36,7 +36,6 @@ void Text::SetTextContent(const std::string& aTextContent)
 
 	myTextContent = aTextContent;
 	float X = 0;
-	float scalarOffset = 0.65f;
 
 	for (char c : myTextContent)
 	{
@@ -48,9 +47,9 @@ void Text::SetTextContent(const std::string& aTextContent)
 		Math::Vector4f bounds = glyph.UVBounds;
 		Math::Vector4f offsets = glyph.PlaneBounds;
 
-		offsets.x = glyph.PlaneBounds.x * charAdvance;
-		offsets.z = glyph.PlaneBounds.z * fontSize * scalarOffset;
-		offsets.y = glyph.PlaneBounds.y * charAdvance;
+		offsets.x = glyph.PlaneBounds.x * fontSize;
+		offsets.z = glyph.PlaneBounds.z * fontSize;
+		offsets.y = glyph.PlaneBounds.y * fontSize;
 		offsets.w = glyph.PlaneBounds.w * fontSize;
 
 		if (abs(offsets.w) > 0.005f)
@@ -63,7 +62,7 @@ void Text::SetTextContent(const std::string& aTextContent)
 		myTextData.vertices.emplace_back(X + offsets.z, offsets.y, bounds.z, 1 - bounds.y);
 		myTextData.vertices.emplace_back(X + offsets.z, offsets.w, bounds.z, 1 - bounds.w);
 
-		X += charAdvance + scalarOffset;
+		X += charAdvance;
 
 		myTextData.indices.emplace_back(currentVertexCount);
 		myTextData.indices.emplace_back(currentVertexCount + 1);
