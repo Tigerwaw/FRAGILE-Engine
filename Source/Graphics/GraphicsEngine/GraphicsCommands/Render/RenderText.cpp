@@ -3,31 +3,25 @@
 #include "Objects/Text/Text.h"
 #include "Objects/ConstantBuffers/ObjectBuffer.h"
 
-RenderText::RenderText(const TextData& aTextData)
+RenderText::RenderText(const std::shared_ptr<Text> aText, const Math::Matrix4x4f& aTransform)
 {
-	PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderText Copy Constructor");
-	myData = aTextData;
-}
-
-RenderText::RenderText(TextData&& aTextData)
-{
-	PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderText Move Constructor");
-	myData = std::move(aTextData);
+	myText = aText;
+	myTransform = aTransform;
 }
 
 void RenderText::Execute()
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderText Execute");
-	assert(myData.text->GetTexture() && "Text object has no texture!");
+	assert(myText->GetTexture() && "Text object has no texture!");
 
 	ObjectBuffer ob;
-	ob.World = myData.transform;
+	ob.World = myTransform;
 
 	GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, ob);
-	GraphicsEngine::Get().GetDrawer().RenderText(*myData.text);
+	GraphicsEngine::Get().GetDrawer().RenderText(*myText);
 }
 
 void RenderText::Destroy()
 {
-	myData.text = nullptr;
+	myText = nullptr;
 }

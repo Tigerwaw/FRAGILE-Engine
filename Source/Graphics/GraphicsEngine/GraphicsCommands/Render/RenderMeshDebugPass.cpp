@@ -7,16 +7,17 @@
 #include "Objects/ConstantBuffers/ObjectBuffer.h"
 #include "Objects/ConstantBuffers/MaterialBuffer.h"
 
-RenderMeshDebugPass::RenderMeshDebugPass(const RenderMeshData& aModelData)
+RenderMeshDebugPass::RenderMeshDebugPass(const std::shared_ptr<Mesh> aMesh, 
+                                         const std::vector<std::shared_ptr<Material>>& aMaterialList, 
+                                         const Math::Matrix4x4f& aTransform, 
+                                         const Math::Vector4f& aCustomShaderParams_1, 
+                                         const Math::Vector4f& aCustomShaderParams_2) :
+    myMaterialList(aMaterialList)
 {
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderMesh Copy Constructor");
-    myData = aModelData;
-}
-
-RenderMeshDebugPass::RenderMeshDebugPass(RenderMeshData&& aModelData)
-{
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderMeshDebugPass Move Constructor");
-    myData = std::move(aModelData);
+    myMesh = aMesh;
+    myTransform = aTransform;
+    myCustomShaderParams_1 = aCustomShaderParams_1;
+    myCustomShaderParams_2 = aCustomShaderParams_2;
 }
 
 void RenderMeshDebugPass::Execute()
@@ -24,17 +25,17 @@ void RenderMeshDebugPass::Execute()
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderMeshDebugPass Execute");
 
     ObjectBuffer objBufferData;
-    objBufferData.World = myData.transform;
+    objBufferData.World = myTransform;
     objBufferData.hasSkinning = false;
-    objBufferData.customData_1 = myData.customShaderParams_1;
-    objBufferData.customData_2 = myData.customShaderParams_2;
+    objBufferData.customData_1 = myCustomShaderParams_1;
+    objBufferData.customData_2 = myCustomShaderParams_2;
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, objBufferData);
 
-    GraphicsEngine::Get().GetDrawer().RenderMeshDebugPass(*myData.mesh, myData.materialList);
+    GraphicsEngine::Get().GetDrawer().RenderMeshDebugPass(*myMesh, myMaterialList);
 }
 
 void RenderMeshDebugPass::Destroy()
 {
-    myData.mesh = nullptr;
-    myData.materialList.~vector();
+    myMesh = nullptr;
+    myMaterialList.~vector();
 }

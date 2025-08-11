@@ -17,7 +17,7 @@ class ParticleEmitter
 		void Update(float aDeltaTime);
 
 		void SetMaterial(std::shared_ptr<Material> aMaterial) { myMaterial = aMaterial; }
-		std::shared_ptr<Material> GetMaterial() { return myMaterial; }
+		const std::shared_ptr<Material> GetMaterial() const { return myMaterial; }
 
 		const ParticleEmitterSettings& GetEmitterSettings() const { return mySettings; }
 

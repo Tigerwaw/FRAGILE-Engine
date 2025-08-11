@@ -9,20 +9,18 @@ struct PipelineStateObject;
 class RenderMeshDebugPass : GraphicsCommandBase
 {
 public:
-	struct RenderMeshData
-	{
-		std::shared_ptr<Mesh> mesh;
-		Math::Matrix4x4f transform;
-		std::vector<std::shared_ptr<Material>> materialList;
-		Math::Vector4f customShaderParams_1;
-		Math::Vector4f customShaderParams_2;
-	};
-
-	RenderMeshDebugPass(const RenderMeshData& aModelData);
-	RenderMeshDebugPass(RenderMeshData&& aModelData);
+	RenderMeshDebugPass(const std::shared_ptr<Mesh> aMesh, 
+						const std::vector<std::shared_ptr<Material>>& aMaterialList, 
+						const Math::Matrix4x4f& aTransform,
+						const Math::Vector4f& aCustomShaderParams_1,
+						const Math::Vector4f& aCustomShaderParams_2);
 	void Execute() override;
 	void Destroy() override;
 private:
-	RenderMeshData myData;
+	std::shared_ptr<Mesh> myMesh;
+	std::vector<std::shared_ptr<Material>> myMaterialList;
+	Math::Matrix4x4f myTransform;
+	Math::Vector4f myCustomShaderParams_1;
+	Math::Vector4f myCustomShaderParams_2;
 };
 

@@ -7,37 +7,37 @@
 #include "Objects/Texture.h"
 #include "Objects/Material.h"
 
-RenderSprite::RenderSprite(const SpriteData& aSpriteData)
+RenderSprite::RenderSprite(const std::shared_ptr<Material> aMaterial, const Math::Matrix4x4f& aTransform)
 {
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderSprite Copy Constructor");
-    myData = aSpriteData;
+    myMaterial = aMaterial;
+    myTransform = aTransform;
 }
 
-RenderSprite::RenderSprite(SpriteData&& aSpriteData)
+RenderSprite::RenderSprite(const std::shared_ptr<Texture> aTexture, const Math::Matrix4x4f& aTransform)
 {
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderSprite Move Constructor");
-    myData = std::move(aSpriteData);
+    myTexture = aTexture;
+    myTransform = aTransform;
 }
 
 void RenderSprite::Execute()
 {
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderSprite Execute");
-    if (!myData.texture && !myData.material) return;
+    if (!myTexture && !myMaterial) return;
 
     SpriteBuffer spriteBufferData;
-    spriteBufferData.Matrix = myData.matrix;
+    spriteBufferData.Matrix = myTransform;
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::SpriteBuffer, spriteBufferData);
 
-    if (myData.material)
+    if (myMaterial)
     {
-        GraphicsEngine::Get().ChangePipelineState(myData.material->GetPSO());
-        GraphicsEngine::Get().SetTextureResource_PS(0, myData.material->GetTexture(Material::TextureType::Albedo));
+        GraphicsEngine::Get().ChangePipelineState(myMaterial->GetPSO());
+        GraphicsEngine::Get().SetTextureResource_PS(0, myMaterial->GetTexture(Material::TextureType::Albedo));
         GraphicsEngine::Get().GetDrawer().RenderSprite();
         GraphicsEngine::Get().ClearTextureResource_PS(0);
     }
     else
     {
-        GraphicsEngine::Get().SetTextureResource_PS(0, *myData.texture);
+        GraphicsEngine::Get().SetTextureResource_PS(0, *myTexture);
         GraphicsEngine::Get().GetDrawer().RenderSprite();
         GraphicsEngine::Get().ClearTextureResource_PS(0);
     }
@@ -45,6 +45,6 @@ void RenderSprite::Execute()
 
 void RenderSprite::Destroy()
 {
-    myData.material = nullptr;
-    myData.texture = nullptr;
+    myMaterial = nullptr;
+    myTexture = nullptr;
 }

@@ -7,39 +7,40 @@
 #include "Objects/Texture.h"
 #include "Objects/Material.h"
 
-RenderSpritesheet::RenderSpritesheet(const SpritesheetData& aSpriteData)
+RenderSpritesheet::RenderSpritesheet(const std::shared_ptr<Material> aMaterial, 
+                                     const std::shared_ptr<Texture> aTexture, 
+                                     const Math::Matrix4x4f& aTransform,
+                                     const Math::Vector2f& aSheetDimensions, 
+                                     float aCurrentFrame)
 {
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderSpritesheet Copy Constructor");
-    myData = aSpriteData;
-}
-
-RenderSpritesheet::RenderSpritesheet(SpritesheetData&& aSpriteData)
-{
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderSpritesheet Move Constructor");
-    myData = std::move(aSpriteData);
+    myMaterial = aMaterial;
+    myTexture = aTexture;
+    myTransform = aTransform;
+    mySheetDimensions = aSheetDimensions;
+    myCurrentFrame = aCurrentFrame;
 }
 
 void RenderSpritesheet::Execute()
 {
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderSpritesheet Execute");
-    if (!myData.texture && !myData.material) return;
+    if (!myTexture && !myMaterial) return;
 
     SpriteBuffer spriteBufferData;
-    spriteBufferData.Matrix = myData.matrix;
-    spriteBufferData.CurrentFrame = myData.currentFrame;
-    spriteBufferData.SpriteSheetDimensions = myData.sheetDimensions;
+    spriteBufferData.Matrix = myTransform;
+    spriteBufferData.CurrentFrame = myCurrentFrame;
+    spriteBufferData.SpriteSheetDimensions = mySheetDimensions;
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::SpriteBuffer, spriteBufferData);
 
-    if (myData.material)
+    if (myMaterial)
     {
-        GraphicsEngine::Get().ChangePipelineState(myData.material->GetPSO());
-        GraphicsEngine::Get().SetTextureResource_PS(0, myData.material->GetTexture(Material::TextureType::Albedo));
+        GraphicsEngine::Get().ChangePipelineState(myMaterial->GetPSO());
+        GraphicsEngine::Get().SetTextureResource_PS(0, myMaterial->GetTexture(Material::TextureType::Albedo));
         GraphicsEngine::Get().GetDrawer().RenderSprite();
         GraphicsEngine::Get().ClearTextureResource_PS(0);
     }
     else
     {
-        GraphicsEngine::Get().SetTextureResource_PS(0, *myData.texture);
+        GraphicsEngine::Get().SetTextureResource_PS(0, *myTexture);
         GraphicsEngine::Get().GetDrawer().RenderSprite();
         GraphicsEngine::Get().ClearTextureResource_PS(0);
     }
@@ -47,6 +48,6 @@ void RenderSpritesheet::Execute()
 
 void RenderSpritesheet::Destroy()
 {
-    myData.material = nullptr;
-    myData.texture = nullptr;
+    myMaterial = nullptr;
+    myTexture = nullptr;
 }

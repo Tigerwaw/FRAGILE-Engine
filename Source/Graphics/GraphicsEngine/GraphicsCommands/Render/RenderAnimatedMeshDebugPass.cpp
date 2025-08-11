@@ -7,16 +7,15 @@
 #include "Objects/ConstantBuffers/ObjectBuffer.h"
 #include "Objects/ConstantBuffers/AnimationBuffer.h"
 
-RenderAnimatedMeshDebugPass::RenderAnimatedMeshDebugPass(const AnimMeshRenderData& aModelData)
+RenderAnimatedMeshDebugPass::RenderAnimatedMeshDebugPass(const std::shared_ptr<Mesh> aMesh, 
+                                                         const std::vector<std::shared_ptr<Material>>& aMaterialList, 
+                                                         const Math::Matrix4x4f& aTransform, 
+                                                         const std::array<Math::Matrix4x4f, 128>& aJointTransforms) :
+    myMaterialList(aMaterialList),
+    myJointTransforms(aJointTransforms)
 {
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderAnimatedMeshDebugPass Copy Constructor");
-    myData = aModelData;
-}
-
-RenderAnimatedMeshDebugPass::RenderAnimatedMeshDebugPass(AnimMeshRenderData&& aModelData)
-{
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderAnimatedMeshDebugPass Move Constructor");
-    myData = std::move(aModelData);
+    myMesh = aMesh;
+    myTransform = aTransform;
 }
 
 void RenderAnimatedMeshDebugPass::Execute()
@@ -24,19 +23,19 @@ void RenderAnimatedMeshDebugPass::Execute()
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderAnimatedMeshDebugPass Execute");
 
     ObjectBuffer objBufferData;
-    objBufferData.World = myData.transform;
+    objBufferData.World = myTransform;
     objBufferData.hasSkinning = true;
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, objBufferData);
 
     AnimationBuffer animBufferData;
-    memcpy_s(animBufferData.JointTransforms, sizeof(Math::Matrix4x4<float>) * 128, myData.jointTransforms.data(), sizeof(Math::Matrix4x4<float>) * 128);
+    memcpy_s(animBufferData.JointTransforms, sizeof(Math::Matrix4x4<float>) * 128, myJointTransforms.data(), sizeof(Math::Matrix4x4<float>) * 128);
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::AnimationBuffer, animBufferData);
 
-    GraphicsEngine::Get().GetDrawer().RenderMeshDebugPass(*myData.mesh, myData.materialList);
+    GraphicsEngine::Get().GetDrawer().RenderMeshDebugPass(*myMesh, myMaterialList);
 }
 
 void RenderAnimatedMeshDebugPass::Destroy()
 {
-    myData.mesh = nullptr;
-    myData.materialList.~vector();
+    myMesh = nullptr;
+    myMaterialList.~vector();
 }

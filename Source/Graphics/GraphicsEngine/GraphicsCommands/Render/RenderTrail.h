@@ -6,17 +6,11 @@
 class RenderTrail : public GraphicsCommandBase
 {
 public:
-	struct TrailData
-	{
-		std::vector<TrailEmitter> emitters;
-		Math::Matrix4x4f transform;
-	};
-
-	RenderTrail(const TrailData& aTrailData);
-	RenderTrail(TrailData&& aTrailData);
+	RenderTrail(const std::vector<TrailEmitter>& aEmitters, const Math::Matrix4x4f& aTransform);
 	void Execute() override;
 	void Destroy() override;
 private:
-	TrailData myData;
+	std::vector<TrailEmitter> myEmitters;
+	Math::Matrix4x4f myTransform;
 };
 

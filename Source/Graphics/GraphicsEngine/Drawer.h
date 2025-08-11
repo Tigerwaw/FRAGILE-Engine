@@ -21,7 +21,7 @@ public:
 	void RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount, const std::vector<std::shared_ptr<Material>>& aMaterialList, DynamicVertexBuffer& aInstanceBuffer);
 	void RenderSprite();
 	void RenderText(const Text& aText);
-	void RenderDebugLines(DynamicVertexBuffer& aDynamicBuffer, unsigned aLineAmount);
-	void RenderParticleEmitter(ParticleEmitter& aParticleEmitter);
-	void RenderTrailEmitter(TrailEmitter& aTrailEmitter);
+	void RenderDebugLines(const DynamicVertexBuffer& aDynamicBuffer, unsigned aLineAmount);
+	void RenderParticleEmitter(const ParticleEmitter& aParticleEmitter);
+	void RenderTrailEmitter(const TrailEmitter& aTrailEmitter);
 };

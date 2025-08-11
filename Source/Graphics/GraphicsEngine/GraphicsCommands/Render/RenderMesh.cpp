@@ -7,16 +7,18 @@
 #include "Objects/ConstantBuffers/ObjectBuffer.h"
 #include "Objects/ConstantBuffers/MaterialBuffer.h"
 
-RenderMesh::RenderMesh(const RenderMeshData& aModelData)
+RenderMesh::RenderMesh(const std::shared_ptr<Mesh> aMesh,
+                       const std::vector<std::shared_ptr<Material>>& aMaterialList,
+                       const Math::Matrix4x4f& aTransform,
+                       const Math::Vector4f& aCustomShaderParams_1,
+                       const Math::Vector4f& aCustomShaderParams_2) :
+    myMaterialList(aMaterialList)
 {
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderMesh Copy Constructor");
-    myData = aModelData;
-}
-
-RenderMesh::RenderMesh(RenderMeshData&& aModelData)
-{
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderMesh Move Constructor");
-    myData = std::move(aModelData);
+    myMesh = aMesh;
+    myMaterialList = aMaterialList;
+    myTransform = aTransform;
+    myCustomShaderParams_1 = aCustomShaderParams_1;
+    myCustomShaderParams_2 = aCustomShaderParams_2;
 }
 
 void RenderMesh::Execute()
@@ -24,17 +26,17 @@ void RenderMesh::Execute()
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderMesh Execute");
 
     ObjectBuffer objBufferData;
-    objBufferData.World = myData.transform;
+    objBufferData.World = myTransform;
     objBufferData.hasSkinning = false;
-    objBufferData.customData_1 = myData.customShaderParams_1;
-    objBufferData.customData_2 = myData.customShaderParams_2;
+    objBufferData.customData_1 = myCustomShaderParams_1;
+    objBufferData.customData_2 = myCustomShaderParams_2;
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, objBufferData);
 
-    GraphicsEngine::Get().GetDrawer().RenderMesh(*myData.mesh, myData.materialList);
+    GraphicsEngine::Get().GetDrawer().RenderMesh(*myMesh, myMaterialList);
 }
 
 void RenderMesh::Destroy()
 {
-    myData.mesh = nullptr;
-    myData.materialList.~vector();
+    myMesh = nullptr;
+    myMaterialList.~vector();
 }

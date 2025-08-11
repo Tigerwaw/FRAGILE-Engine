@@ -6,19 +6,16 @@ class Mesh;
 class RenderInstancedMeshShadow : public GraphicsCommandBase
 {
 public:
-	struct InstancedMeshShadowRenderData
-	{
-		std::shared_ptr<Mesh> mesh;
-		Math::Matrix4x4f transform;
-		DynamicVertexBuffer* instanceBuffer = nullptr;
-		unsigned meshCount = 0;
-	};
-
-	RenderInstancedMeshShadow(const InstancedMeshShadowRenderData& aInstancedModelData);
-	RenderInstancedMeshShadow(InstancedMeshShadowRenderData&& aInstancedModelData);
+	RenderInstancedMeshShadow(const std::shared_ptr<Mesh> aMesh, 
+							  const Math::Matrix4x4f& aTransform, 
+							  DynamicVertexBuffer* aInstanceBuffer, 
+							  unsigned aMeshCount);
 	void Execute() override;
 	void Destroy() override;
 private:
-	InstancedMeshShadowRenderData myData;
+	std::shared_ptr<Mesh> myMesh;
+	Math::Matrix4x4f myTransform;
+	DynamicVertexBuffer* myInstanceBuffer = nullptr;
+	unsigned myMeshCount = 0;
 };
 

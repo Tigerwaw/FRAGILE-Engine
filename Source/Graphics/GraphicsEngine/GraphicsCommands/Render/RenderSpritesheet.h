@@ -10,20 +10,18 @@ class Material;
 class RenderSpritesheet : GraphicsCommandBase
 {
 public:
-	struct SpritesheetData
-	{
-		std::shared_ptr<Material> material;
-		std::shared_ptr<Texture> texture;
-		Math::Matrix4x4f matrix;
-		Math::Vector2f sheetDimensions;
-		float currentFrame;
-	};
-
-	RenderSpritesheet(const SpritesheetData& aSpriteData);
-	RenderSpritesheet(SpritesheetData&& aSpriteData);
+	RenderSpritesheet(const std::shared_ptr<Material> aMaterial, 
+		const std::shared_ptr<Texture> aTexture, 
+		const Math::Matrix4x4f& aTransform,
+		const Math::Vector2f& aSheetDimensions,
+		float aCurrentFrame);
 	void Execute() override;
 	void Destroy() override;
 private:
-	SpritesheetData myData;
+	std::shared_ptr<Material> myMaterial;
+	std::shared_ptr<Texture> myTexture;
+	Math::Matrix4x4f myTransform;
+	Math::Vector2f mySheetDimensions;
+	float myCurrentFrame;
 };
 

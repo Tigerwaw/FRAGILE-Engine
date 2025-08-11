@@ -3,16 +3,10 @@
 
 #include "Objects/ConstantBuffers/ObjectBuffer.h"
 
-RenderParticles::RenderParticles(const RenderParticlesData& aParticleSystemData)
+RenderParticles::RenderParticles(const std::vector<ParticleEmitter>& aEmitters, const Math::Matrix4x4f& aTransform) 
+    : myEmitters(aEmitters)
 {
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderParticles Copy Constructor");
-    myData = aParticleSystemData;
-}
-
-RenderParticles::RenderParticles(RenderParticlesData&& aParticleSystemData)
-{
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderParticles Move Constructor");
-    myData = std::move(aParticleSystemData);
+    myTransform = aTransform;
 }
 
 void RenderParticles::Execute()
@@ -21,10 +15,10 @@ void RenderParticles::Execute()
     GraphicsEngine& gfx = GraphicsEngine::Get();
 
     ObjectBuffer objBufferData;
-    objBufferData.World = myData.transform;
+    objBufferData.World = myTransform;
     gfx.UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, objBufferData);
 
-    for (auto& emitter : myData.emitters)
+    for (auto& emitter : myEmitters)
     {
         gfx.GetDrawer().RenderParticleEmitter(emitter);
     }
@@ -32,5 +26,5 @@ void RenderParticles::Execute()
 
 void RenderParticles::Destroy()
 {
-    myData.emitters.~vector();
+    myEmitters.~vector();
 }

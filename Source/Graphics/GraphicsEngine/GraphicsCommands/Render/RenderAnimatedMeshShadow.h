@@ -7,18 +7,14 @@ class Mesh;
 class RenderAnimatedMeshShadow : GraphicsCommandBase
 {
 public:
-	struct AnimMeshShadowRenderData
-	{
-		std::shared_ptr<Mesh> mesh;
-		Math::Matrix4x4f transform;
-		std::array<Math::Matrix4x4f, 128> jointTransforms;
-	};
-
-	RenderAnimatedMeshShadow(const AnimMeshShadowRenderData& aModelData);
-	RenderAnimatedMeshShadow(AnimMeshShadowRenderData&& aModelData);
+	RenderAnimatedMeshShadow(const std::shared_ptr<Mesh> aMesh, 
+						     const Math::Matrix4x4f& aTransform, 
+						     const std::array<Math::Matrix4x4f, 128>& aJointTransforms);
 	void Execute() override;
 	void Destroy() override;
 private:
-	AnimMeshShadowRenderData myData;
+	std::shared_ptr<Mesh> myMesh;
+	Math::Matrix4x4f myTransform;
+	std::array<Math::Matrix4x4f, 128> myJointTransforms;
 };
 

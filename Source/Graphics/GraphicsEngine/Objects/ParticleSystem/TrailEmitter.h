@@ -15,7 +15,7 @@ public:
 	void Update(Math::Vector3f aFollowTarget, float aDeltaTime);
 
 	void SetMaterial(std::shared_ptr<Material> aMaterial) { myMaterial = aMaterial; }
-	std::shared_ptr<Material> GetMaterial() { return myMaterial; }
+	const std::shared_ptr<Material> GetMaterial() const { return myMaterial; }
 
 	TrailEmitterSettings& GetEmitterSettings() { return mySettings; }
 	const unsigned GetCurrentLength() const { return myCurrentLength; }

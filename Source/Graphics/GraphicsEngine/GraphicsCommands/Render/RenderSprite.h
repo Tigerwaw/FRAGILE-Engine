@@ -9,18 +9,13 @@ class Material;
 class RenderSprite : GraphicsCommandBase
 {
 public:
-	struct SpriteData
-	{
-		std::shared_ptr<Material> material;
-		std::shared_ptr<Texture> texture;
-		Math::Matrix4x4f matrix;
-	};
-
-	RenderSprite(const SpriteData& aSpriteData);
-	RenderSprite(SpriteData&& aSpriteData);
+	RenderSprite(const std::shared_ptr<Material> aMaterial, const Math::Matrix4x4f& aTransform);
+	RenderSprite(const std::shared_ptr<Texture> aTexture, const Math::Matrix4x4f& aTransform);
 	void Execute() override;
 	void Destroy() override;
 private:
-	SpriteData myData;
+	std::shared_ptr<Material> myMaterial;
+	std::shared_ptr<Texture> myTexture;
+	Math::Matrix4x4f myTransform;
 };
 

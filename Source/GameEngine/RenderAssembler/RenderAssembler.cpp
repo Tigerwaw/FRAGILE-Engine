@@ -487,15 +487,14 @@ void RenderAssembler::RenderDeferred(SceneRenderData& aRenderData)
 		PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Draw Skybox");
 		gfxList.Enqueue<BeginEvent>("Draw Skybox");
 		gfxList.Enqueue<SetRenderTarget>(gfx.GetIntermediateTexture(IntermediateTexture::HDR), gfx.GetDepthBuffer(), false, false);
-		RenderSkybox::RenderSkyboxData skyboxData;
-		skyboxData.mesh = aRenderData.ambientLight->GetSkyboxMesh();
-		skyboxData.texture = aRenderData.ambientLight->GetCubemap();
-		skyboxData.transform = aRenderData.ambientLight->gameObject->GetComponent<Transform>()->GetWorldMatrix();
+
+		auto transform = aRenderData.ambientLight->gameObject->GetComponent<Transform>()->GetWorldMatrix();
 		auto mainCamTransform = aRenderData.mainCamera->gameObject->GetComponent<Transform>()->GetWorldMatrix();
-		skyboxData.transform(4, 1) = mainCamTransform(4, 1);
-		skyboxData.transform(4, 2) = mainCamTransform(4, 2);
-		skyboxData.transform(4, 3) = mainCamTransform(4, 3);
-		gfxList.Enqueue<RenderSkybox>(std::move(skyboxData));
+		transform(4, 1) = mainCamTransform(4, 1);
+		transform(4, 2) = mainCamTransform(4, 2);
+		transform(4, 3) = mainCamTransform(4, 3);
+		gfxList.Enqueue<RenderSkybox>(aRenderData.ambientLight->GetSkyboxMesh(), aRenderData.ambientLight->GetCubemap(), transform);
+
 		gfxList.Enqueue<EndEvent>();
 	}
 	
@@ -518,10 +517,7 @@ void RenderAssembler::RenderDeferred(SceneRenderData& aRenderData)
 			std::shared_ptr<TextComponent> text = gameObject->GetComponent<TextComponent>();
 			if (text)
 			{
-				RenderText::TextData data;
-				data.text = text->GetText();
-				data.transform = text->gameObject->GetComponent<Transform>()->GetWorldMatrix();
-				gfx.GetGraphicsCommandList().Enqueue<RenderText>(std::move(data));
+				gfx.GetGraphicsCommandList().Enqueue<RenderText>(text->GetText(), text->gameObject->GetComponent<Transform>()->GetWorldMatrix());
 			}
 		}
 
@@ -537,19 +533,13 @@ void RenderAssembler::RenderDeferred(SceneRenderData& aRenderData)
 			std::shared_ptr<ParticleSystem> particleSystem = gameObject->GetComponent<ParticleSystem>();
 			if (particleSystem && particleSystem->GetActive())
 			{
-				RenderParticles::RenderParticlesData data;
-				data.emitters = particleSystem->GetEmitters();
-				data.transform = gameObject->GetComponent<Transform>()->GetWorldMatrix();
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderParticles>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderParticles>(particleSystem->GetEmitters(), gameObject->GetComponent<Transform>()->GetWorldMatrix());
 			}
 
 			std::shared_ptr<TrailSystem> trailSystem = gameObject->GetComponent<TrailSystem>();
 			if (trailSystem && trailSystem->GetActive())
 			{
-				RenderTrail::TrailData data;
-				data.emitters = trailSystem->GetEmitters();
-				data.transform = gameObject->GetComponent<Transform>()->GetWorldMatrix();
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderTrail>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderTrail>(trailSystem->GetEmitters(), gameObject->GetComponent<Transform>()->GetWorldMatrix());
 			}
 		}
 
@@ -722,14 +712,13 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 				UpdateBoundingBox(transform, model->GetBoundingBox());
 
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Mesh Data");
-				RenderMesh::RenderMeshData data;
-				data.mesh = model->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = model->GetMaterials();
-				data.customShaderParams_1 = model->GetCustomShaderData_1();
-				data.customShaderParams_2 = model->GetCustomShaderData_2();
 
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMesh>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMesh>(
+					model->GetMesh(),
+					model->GetMaterials(),
+					transform->GetWorldMatrix(),
+					model->GetCustomShaderData_1(),
+					model->GetCustomShaderData_2());
 			}
 		}
 
@@ -740,13 +729,12 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 				UpdateBoundingBox(transform, animModel->GetBoundingBox());
 
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Anim Mesh Data");
-				RenderAnimatedMesh::AnimMeshRenderData data;
-				data.mesh = animModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = animModel->GetMaterials();
-				data.jointTransforms = animModel->GetCurrentPose();
-
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMesh>(std::move(data));
+				
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMesh>(
+					animModel->GetMesh(),
+					animModel->GetMaterials(),
+					transform->GetWorldMatrix(),
+					animModel->GetCurrentPose());
 			}
 		}
 
@@ -757,14 +745,13 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 				UpdateBoundingBox(transform, instancedModel->GetBoundingBox());
 
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Instanced Mesh Data");
-				RenderInstancedMesh::InstancedMeshRenderData data;
-				data.mesh = instancedModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = instancedModel->GetMaterials();
-				data.instanceBuffer = &instancedModel->GetInstanceBuffer();
-				data.meshCount = instancedModel->GetMeshCount();
-
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMesh>(std::move(data));
+				
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMesh>(
+					instancedModel->GetMesh(),
+					instancedModel->GetMaterials(),
+					transform->GetWorldMatrix(),
+					&instancedModel->GetInstanceBuffer(),
+					instancedModel->GetMeshCount());
 			}
 		}
 	}
@@ -783,14 +770,13 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Mesh Data");
-				RenderMesh::RenderMeshData data;
-				data.mesh = model->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = model->GetMaterials();
-				data.customShaderParams_1 = model->GetCustomShaderData_1();
-				data.customShaderParams_2 = model->GetCustomShaderData_2();
 
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMesh>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMesh>(
+					model->GetMesh(),
+					model->GetMaterials(),
+					transform->GetWorldMatrix(),
+					model->GetCustomShaderData_1(),
+					model->GetCustomShaderData_2());
 			}
 		}
 
@@ -799,13 +785,12 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Anim Mesh Data");
-				RenderAnimatedMesh::AnimMeshRenderData data;
-				data.mesh = animModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = animModel->GetMaterials();
-				data.jointTransforms = animModel->GetCurrentPose();
 
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMesh>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMesh>(
+					animModel->GetMesh(),
+					animModel->GetMaterials(),
+					transform->GetWorldMatrix(),
+					animModel->GetCurrentPose());
 			}
 		}
 
@@ -814,14 +799,13 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, instancedModel->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Instanced Mesh Data");
-				RenderInstancedMesh::InstancedMeshRenderData data;
-				data.mesh = instancedModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = instancedModel->GetMaterials();
-				data.instanceBuffer = &instancedModel->GetInstanceBuffer();
-				data.meshCount = instancedModel->GetMeshCount();
 
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMesh>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMesh>(
+					instancedModel->GetMesh(),
+					instancedModel->GetMaterials(),
+					transform->GetWorldMatrix(),
+					&instancedModel->GetInstanceBuffer(),
+					instancedModel->GetMeshCount());
 			}
 		}
 	}
@@ -1106,10 +1090,10 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderCamera, transform, model->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Mesh Shadow Data");
-				RenderMeshShadow::RenderMeshShadowData data;
-				data.mesh = model->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshShadow>(std::move(data));
+
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshShadow>(
+					model->GetMesh(),
+					transform->GetWorldMatrix());
 			}
 		}
 
@@ -1118,11 +1102,11 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderCamera, transform, animModel->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Anim Mesh Shadow Data");
-				RenderAnimatedMeshShadow::AnimMeshShadowRenderData data;
-				data.mesh = animModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.jointTransforms = animModel->GetCurrentPose();
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshShadow>(std::move(data));
+
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshShadow>(
+					animModel->GetMesh(),
+					transform->GetWorldMatrix(),
+					animModel->GetCurrentPose());
 			}
 		}
 
@@ -1131,12 +1115,12 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderCamera, transform, instancedModel->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Instanced Mesh Shadow Data");
-				RenderInstancedMeshShadow::InstancedMeshShadowRenderData data;
-				data.mesh = instancedModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.instanceBuffer = &instancedModel->GetInstanceBuffer();
-				data.meshCount = instancedModel->GetMeshCount();
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMeshShadow>(std::move(data));
+
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMeshShadow>(
+					instancedModel->GetMesh(),
+					transform->GetWorldMatrix(),
+					&instancedModel->GetInstanceBuffer(),
+					instancedModel->GetMeshCount());
 			}
 		}
 	}
@@ -1155,10 +1139,10 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 			if (!model->GetShouldViewcull() || IsInsideRadius(aPointLight, transform, model->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Mesh Shadow Data");
-				RenderMeshShadow::RenderMeshShadowData data;
-				data.mesh = model->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshShadow>(std::move(data));
+
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshShadow>(
+					model->GetMesh(), 
+					transform->GetWorldMatrix());
 			}
 		}
 
@@ -1167,11 +1151,11 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 			if (!animModel->GetShouldViewcull() || IsInsideRadius(aPointLight, transform, animModel->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Anim Mesh Shadow Data");
-				RenderAnimatedMeshShadow::AnimMeshShadowRenderData data;
-				data.mesh = animModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.jointTransforms = animModel->GetCurrentPose();
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshShadow>(std::move(data));
+
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshShadow>(
+					animModel->GetMesh(),
+					transform->GetWorldMatrix(),
+					animModel->GetCurrentPose());
 			}
 		}
 
@@ -1180,12 +1164,12 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 			if (!instancedModel->GetShouldViewcull() || IsInsideRadius(aPointLight, transform, instancedModel->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Instanced Mesh Shadow Data");
-				RenderInstancedMeshShadow::InstancedMeshShadowRenderData data;
-				data.mesh = instancedModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.instanceBuffer = &instancedModel->GetInstanceBuffer();
-				data.meshCount = instancedModel->GetMeshCount();
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMeshShadow>(std::move(data));
+
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMeshShadow>(
+					instancedModel->GetMesh(),
+					transform->GetWorldMatrix(),
+					&instancedModel->GetInstanceBuffer(),
+					instancedModel->GetMeshCount());
 			}
 		}
 	}
@@ -1201,14 +1185,12 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
-				RenderMeshDebugPass::RenderMeshData data;
-				data.mesh = model->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = model->GetMaterials();
-				data.customShaderParams_1 = model->GetCustomShaderData_1();
-				data.customShaderParams_2 = model->GetCustomShaderData_2();
-
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshDebugPass>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshDebugPass>(
+					model->GetMesh(), 
+					model->GetMaterials(), 
+					transform->GetWorldMatrix(), 
+					model->GetCustomShaderData_1(), 
+					model->GetCustomShaderData_2());
 			}
 		}
 
@@ -1216,13 +1198,11 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
-				RenderAnimatedMeshDebugPass::AnimMeshRenderData data;
-				data.mesh = animModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = animModel->GetMaterials();
-				data.jointTransforms = animModel->GetCurrentPose();
-
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshDebugPass>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshDebugPass>(
+					animModel->GetMesh(), 
+					animModel->GetMaterials(), 
+					transform->GetWorldMatrix(), 
+					animModel->GetCurrentPose());
 			}
 		}
 
@@ -1230,14 +1210,12 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, instancedModel->GetBoundingBox()))
 			{
-				RenderInstancedMeshDebugPass::InstancedMeshRenderData data;
-				data.mesh = instancedModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = instancedModel->GetMaterials();
-				data.instanceBuffer = &instancedModel->GetInstanceBuffer();
-				data.meshCount = instancedModel->GetMeshCount();
-
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMeshDebugPass>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMeshDebugPass>(
+					instancedModel->GetMesh(), 
+					instancedModel->GetMaterials(), 
+					transform->GetWorldMatrix(),
+					&instancedModel->GetInstanceBuffer(),
+					instancedModel->GetMeshCount());
 			}
 		}
 	}
@@ -1250,14 +1228,12 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
-				RenderMeshDebugPass::RenderMeshData data;
-				data.mesh = model->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = model->GetMaterials();
-				data.customShaderParams_1 = model->GetCustomShaderData_1();
-				data.customShaderParams_2 = model->GetCustomShaderData_2();
-
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshDebugPass>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshDebugPass>(
+					model->GetMesh(),
+					model->GetMaterials(),
+					transform->GetWorldMatrix(),
+					model->GetCustomShaderData_1(),
+					model->GetCustomShaderData_2());
 			}
 		}
 
@@ -1265,13 +1241,11 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
-				RenderAnimatedMeshDebugPass::AnimMeshRenderData data;
-				data.mesh = animModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = animModel->GetMaterials();
-				data.jointTransforms = animModel->GetCurrentPose();
-
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshDebugPass>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshDebugPass>(
+					animModel->GetMesh(),
+					animModel->GetMaterials(),
+					transform->GetWorldMatrix(),
+					animModel->GetCurrentPose());
 			}
 		}
 
@@ -1279,14 +1253,12 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, instancedModel->GetBoundingBox()))
 			{
-				RenderInstancedMeshDebugPass::InstancedMeshRenderData data;
-				data.mesh = instancedModel->GetMesh();
-				data.transform = transform->GetWorldMatrix();
-				data.materialList = instancedModel->GetMaterials();
-				data.instanceBuffer = &instancedModel->GetInstanceBuffer();
-				data.meshCount = instancedModel->GetMeshCount();
-
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMeshDebugPass>(std::move(data));
+				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderInstancedMeshDebugPass>(
+					instancedModel->GetMesh(),
+					instancedModel->GetMaterials(),
+					transform->GetWorldMatrix(),
+					&instancedModel->GetInstanceBuffer(),
+					instancedModel->GetMeshCount());
 			}
 		}
 	}
@@ -1409,8 +1381,5 @@ void RenderAssembler::DrawTestUI()
 {
 	GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<ChangePipelineState>(GraphicsEngine::Get().GetPSO(PSOType::Sprite));
 	//GraphicsEngine::Get().ChangePipelineState(GraphicsEngine::Get().GetPSO(PSOType::Spritesheet));
-	RenderSprite::SpriteData data;
-	data.matrix = myTestSprite->GetMatrix();
-	data.texture = myTestSprite->GetTexture();
-	GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderSprite>(std::move(data));
+	GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderSprite>(myTestSprite->GetTexture(), myTestSprite->GetMatrix());
 }

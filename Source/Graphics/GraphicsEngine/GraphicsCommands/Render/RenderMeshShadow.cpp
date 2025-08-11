@@ -5,16 +5,10 @@
 #include "Objects/Mesh.h"
 #include "Objects/ConstantBuffers/ObjectBuffer.h"
 
-RenderMeshShadow::RenderMeshShadow(const RenderMeshShadowData& aModelData)
+RenderMeshShadow::RenderMeshShadow(const std::shared_ptr<Mesh> aMesh, const Math::Matrix4x4f& aTransform)
 {
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderMeshShadow Copy Constructor");
-    myData = aModelData;
-}
-
-RenderMeshShadow::RenderMeshShadow(RenderMeshShadowData&& aModelData)
-{
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderMeshShadow Move Constructor");
-    myData = std::move(aModelData);
+    myMesh = aMesh;
+    myTransform = aTransform;
 }
 
 void RenderMeshShadow::Execute()
@@ -22,14 +16,14 @@ void RenderMeshShadow::Execute()
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderMeshShadow Execute");
 
     ObjectBuffer objBufferData;
-    objBufferData.World = myData.transform;
+    objBufferData.World = myTransform;
     objBufferData.hasSkinning = false;
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, objBufferData);
 
-    GraphicsEngine::Get().GetDrawer().RenderMeshShadow(*myData.mesh);
+    GraphicsEngine::Get().GetDrawer().RenderMeshShadow(*myMesh);
 }
 
 void RenderMeshShadow::Destroy()
 {
-    myData.mesh = nullptr;
+    myMesh = nullptr;
 }

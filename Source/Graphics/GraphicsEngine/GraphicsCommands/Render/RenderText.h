@@ -7,16 +7,10 @@ class Text;
 class RenderText : public GraphicsCommandBase
 {
 public:
-	struct TextData
-	{
-		std::shared_ptr<Text> text;
-		Math::Matrix4x4f transform;
-	};
-
-	RenderText(const TextData& aTextData);
-	RenderText(TextData&& aTextData);
+	RenderText(const std::shared_ptr<Text> aText, const Math::Matrix4x4f& aTransform);
 	void Execute() override;
 	void Destroy() override;
 private:
-	TextData myData;
+	std::shared_ptr<Text> myText;
+	Math::Matrix4x4f myTransform;
 };

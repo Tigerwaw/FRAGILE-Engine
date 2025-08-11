@@ -9,19 +9,16 @@ struct PipelineStateObject;
 class RenderAnimatedMesh : GraphicsCommandBase
 {
 public:
-	struct AnimMeshRenderData
-	{
-		std::shared_ptr<Mesh> mesh;
-		Math::Matrix4x4f transform;
-		std::array<Math::Matrix4x4f, 128> jointTransforms;
-		std::vector<std::shared_ptr<Material>> materialList;
-	};
-
-	RenderAnimatedMesh(const AnimMeshRenderData& aModelData);
-	RenderAnimatedMesh(AnimMeshRenderData&& aModelData);
+	RenderAnimatedMesh(const std::shared_ptr<Mesh> aMesh,
+					   const std::vector<std::shared_ptr<Material>>& aMaterialList,
+					   const Math::Matrix4x4f& aTransform,
+					   const std::array<Math::Matrix4x4f, 128>& aJointTransforms);
 	void Execute() override;
 	void Destroy() override;
 private:
-	AnimMeshRenderData myData;
+	std::shared_ptr<Mesh> myMesh;
+	std::vector<std::shared_ptr<Material>> myMaterialList;
+	Math::Matrix4x4f myTransform;
+	std::array<Math::Matrix4x4f, 128> myJointTransforms;
 };
 

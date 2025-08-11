@@ -7,17 +7,11 @@ class Mesh;
 class RenderMeshShadow : GraphicsCommandBase
 {
 public:
-	struct RenderMeshShadowData
-	{
-		std::shared_ptr<Mesh> mesh;
-		Math::Matrix4x4f transform;
-	};
-
-	RenderMeshShadow(const RenderMeshShadowData& aModelData);
-	RenderMeshShadow(RenderMeshShadowData&& aModelData);
+	RenderMeshShadow(const std::shared_ptr<Mesh> aMesh, const Math::Matrix4x4f& aTransform);
 	void Execute() override;
 	void Destroy() override;
 private:
-	RenderMeshShadowData myData;
+	std::shared_ptr<Mesh> myMesh;
+	Math::Matrix4x4f myTransform;
 };
 

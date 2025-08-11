@@ -6,17 +6,11 @@
 class RenderParticles : public GraphicsCommandBase
 {
 public:
-	struct RenderParticlesData
-	{
-		std::vector<ParticleEmitter> emitters;
-		Math::Matrix4x4f transform;
-	};
-
-	RenderParticles(const RenderParticlesData& aParticleSystemData);
-	RenderParticles(RenderParticlesData&& aParticleSystemData);
+	RenderParticles(const std::vector<ParticleEmitter>& aEmitters, const Math::Matrix4x4f& aTransform);
 	void Execute() override;
 	void Destroy() override;
 private:
-	RenderParticlesData myData;
+	std::vector<ParticleEmitter> myEmitters;
+	Math::Matrix4x4f myTransform;
 };
 

@@ -9,18 +9,12 @@ struct PipelineStateObject;
 class RenderSkybox : GraphicsCommandBase
 {
 public:
-	struct RenderSkyboxData
-	{
-		std::shared_ptr<Mesh> mesh;
-		Math::Matrix4x4f transform;
-		std::shared_ptr<Texture> texture;
-	};
-
-	RenderSkybox(const RenderSkyboxData& aSkyboxData);
-	RenderSkybox(RenderSkyboxData&& aSkyboxData);
+	RenderSkybox(const std::shared_ptr<Mesh> aMesh, const std::shared_ptr<Texture> aTexture, const Math::Matrix4x4f& aTransform);
 	void Execute() override;
 	void Destroy() override;
 private:
-	RenderSkyboxData myData;
+	std::shared_ptr<Mesh> myMesh;
+	std::shared_ptr<Texture> myTexture;
+	Math::Matrix4x4f myTransform;
 };
 

@@ -361,7 +361,7 @@ void Drawer::RenderText(const Text& aText)
 	ge.ClearTextureResource_PS(0);
 }
 
-void Drawer::RenderDebugLines(DynamicVertexBuffer& aDynamicBuffer, unsigned aLineAmount)
+void Drawer::RenderDebugLines(const DynamicVertexBuffer& aDynamicBuffer, unsigned aLineAmount)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Debug Lines");
 	GraphicsEngine& ge = GraphicsEngine::Get();
@@ -371,7 +371,7 @@ void Drawer::RenderDebugLines(DynamicVertexBuffer& aDynamicBuffer, unsigned aLin
 	ge.myRHI->Draw(aLineAmount);
 }
 
-void Drawer::RenderParticleEmitter(ParticleEmitter& aParticleEmitter)
+void Drawer::RenderParticleEmitter(const ParticleEmitter& aParticleEmitter)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Particle Emitter");
 	GraphicsEngine& ge = GraphicsEngine::Get();
@@ -419,7 +419,7 @@ void Drawer::RenderParticleEmitter(ParticleEmitter& aParticleEmitter)
 	}
 }
 
-void Drawer::RenderTrailEmitter(TrailEmitter& aTrailEmitter)
+void Drawer::RenderTrailEmitter(const TrailEmitter& aTrailEmitter)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Trail Emitter");
 	GraphicsEngine& ge = GraphicsEngine::Get();

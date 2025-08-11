@@ -7,16 +7,15 @@
 #include "Objects/ConstantBuffers/ObjectBuffer.h"
 #include "Objects/ConstantBuffers/AnimationBuffer.h"
 
-RenderAnimatedMesh::RenderAnimatedMesh(const AnimMeshRenderData& aModelData)
+RenderAnimatedMesh::RenderAnimatedMesh(const std::shared_ptr<Mesh> aMesh,
+                                       const std::vector<std::shared_ptr<Material>>& aMaterialList,
+                                       const Math::Matrix4x4f& aTransform,
+                                       const std::array<Math::Matrix4x4f, 128>& aJointTransforms) :
+    myMaterialList(aMaterialList),
+    myJointTransforms(aJointTransforms)
 {
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderAnimatedMesh Copy Constructor");
-    myData = aModelData;
-}
-
-RenderAnimatedMesh::RenderAnimatedMesh(AnimMeshRenderData&& aModelData)
-{
-    PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderAnimatedMesh Move Constructor");
-    myData = std::move(aModelData);
+    myMesh = aMesh;
+    myTransform = aTransform;
 }
 
 void RenderAnimatedMesh::Execute()
@@ -24,19 +23,19 @@ void RenderAnimatedMesh::Execute()
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderAnimatedMesh Execute");
 
     ObjectBuffer objBufferData;
-    objBufferData.World = myData.transform;
+    objBufferData.World = myTransform;
     objBufferData.hasSkinning = true;
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, objBufferData);
 
     AnimationBuffer animBufferData;
-    memcpy_s(animBufferData.JointTransforms, sizeof(Math::Matrix4x4<float>) * 128, myData.jointTransforms.data(), sizeof(Math::Matrix4x4<float>) * 128);
+    memcpy_s(animBufferData.JointTransforms, sizeof(Math::Matrix4x4<float>) * 128, myJointTransforms.data(), sizeof(Math::Matrix4x4<float>) * 128);
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::AnimationBuffer, animBufferData);
 
-    GraphicsEngine::Get().GetDrawer().RenderMesh(*myData.mesh, myData.materialList);
+    GraphicsEngine::Get().GetDrawer().RenderMesh(*myMesh, myMaterialList);
 }
 
 void RenderAnimatedMesh::Destroy()
 {
-    myData.mesh = nullptr;
-    myData.materialList.~vector();
+    myMesh = nullptr;
+    myMaterialList.~vector();
 }

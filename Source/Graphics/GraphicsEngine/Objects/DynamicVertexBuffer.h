@@ -15,7 +15,7 @@ public:
     template<typename VertexType>
     bool UpdateVertexBuffer(std::vector<VertexType>& aVertexList);
 
-    FORCEINLINE Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() { return myVertexBuffer; }
+    const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return myVertexBuffer; }
     const size_t GetMaxVertexCount() const { return myMaxVertexCount; }
 private:
     Microsoft::WRL::ComPtr<ID3D11Buffer> myVertexBuffer;
