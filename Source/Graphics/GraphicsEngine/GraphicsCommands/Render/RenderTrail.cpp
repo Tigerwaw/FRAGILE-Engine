@@ -23,8 +23,3 @@ void RenderTrail::Execute()
         gfx.GetDrawer().RenderTrailEmitter(emitter);
     }
 }
-
-void RenderTrail::Destroy()
-{
-    myEmitters.~vector();
-}

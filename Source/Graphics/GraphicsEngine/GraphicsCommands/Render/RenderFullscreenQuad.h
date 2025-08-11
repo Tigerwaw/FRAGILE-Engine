@@ -6,5 +6,4 @@ class RenderFullscreenQuad : GraphicsCommandBase
 public:
 	RenderFullscreenQuad();
 	void Execute() override;
-	void Destroy() override;
 };

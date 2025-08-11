@@ -25,9 +25,3 @@ void RenderSkybox::Execute()
 
     GraphicsEngine::Get().GetDrawer().RenderSkybox(*myMesh, myTexture);
 }
-
-void RenderSkybox::Destroy()
-{
-    myMesh = nullptr;
-    myTexture = nullptr;
-}

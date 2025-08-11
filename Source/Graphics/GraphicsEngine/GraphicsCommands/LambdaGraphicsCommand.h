@@ -18,10 +18,5 @@ public:
 	{
 		myLambda();
 	}
-
-	void Destroy() override
-	{
-		myLambda.~GraphicsCommandFunction();
-	}
 };
 

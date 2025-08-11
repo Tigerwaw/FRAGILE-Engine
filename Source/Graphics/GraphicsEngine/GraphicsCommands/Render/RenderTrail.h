@@ -8,7 +8,6 @@ class RenderTrail : public GraphicsCommandBase
 public:
 	RenderTrail(const std::vector<TrailEmitter>& aEmitters, const Math::Matrix4x4f& aTransform);
 	void Execute() override;
-	void Destroy() override;
 private:
 	std::vector<TrailEmitter> myEmitters;
 	Math::Matrix4x4f myTransform;

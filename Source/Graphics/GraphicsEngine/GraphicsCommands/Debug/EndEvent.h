@@ -6,6 +6,5 @@ class EndEvent : public GraphicsCommandBase
 public:
     EndEvent();
     void Execute() override;
-    void Destroy() override;
 };
 

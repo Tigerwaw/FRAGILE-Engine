@@ -28,8 +28,3 @@ void RenderInstancedMeshShadow::Execute()
 
     GraphicsEngine::Get().GetDrawer().RenderInstancedMeshShadow(*myMesh, myMeshCount, *myInstanceBuffer);
 }
-
-void RenderInstancedMeshShadow::Destroy()
-{
-    myMesh = nullptr;
-}

@@ -44,7 +44,7 @@ void GraphicsCommandList::Execute()
         {
             GraphicsCommandBase* cmd = it.Next();
             cmd->Execute();
-            cmd->Destroy();
+            cmd->~GraphicsCommandBase();
         }
 
         isFinished = true;
@@ -68,7 +68,7 @@ void GraphicsCommandList::Reset()
             while (it)
             {
                 GraphicsCommandBase* cmd = it.Next();
-                cmd->Destroy();
+                cmd->~GraphicsCommandBase();
             }
         }
 

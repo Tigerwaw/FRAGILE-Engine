@@ -33,9 +33,3 @@ void RenderAnimatedMesh::Execute()
 
     GraphicsEngine::Get().GetDrawer().RenderMesh(*myMesh, myMaterialList);
 }
-
-void RenderAnimatedMesh::Destroy()
-{
-    myMesh = nullptr;
-    myMaterialList.~vector();
-}

@@ -23,9 +23,3 @@ void RenderDebugLines::Execute()
 	GraphicsEngine::Get().UpdateDynamicVertexBuffer(myLineVertices, *myLineBuffer);
 	GraphicsEngine::Get().GetDrawer().RenderDebugLines(*myLineBuffer, static_cast<unsigned>(myLineVertices.size()));
 }
-
-void RenderDebugLines::Destroy()
-{
-	myLineVertices.~vector();
-	myLineBuffer = nullptr;
-}

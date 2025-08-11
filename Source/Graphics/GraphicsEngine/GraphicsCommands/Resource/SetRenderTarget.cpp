@@ -15,9 +15,3 @@ void SetRenderTarget::Execute()
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD SetRenderTarget Execute");
     GraphicsEngine::Get().SetRenderTarget(myRenderTarget, myDepthStencil, myClearRenderTarget, myClearDepthStencil);
 }
-
-void SetRenderTarget::Destroy()
-{
-    myRenderTarget = nullptr;
-    myDepthStencil = nullptr;
-}

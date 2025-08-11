@@ -16,7 +16,6 @@ public:
 		const Math::Vector2f& aSheetDimensions,
 		float aCurrentFrame);
 	void Execute() override;
-	void Destroy() override;
 private:
 	std::shared_ptr<Material> myMaterial;
 	std::shared_ptr<Texture> myTexture;

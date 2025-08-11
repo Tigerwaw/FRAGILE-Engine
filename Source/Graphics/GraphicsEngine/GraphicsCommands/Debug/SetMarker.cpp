@@ -10,7 +10,3 @@ void SetMarker::Execute()
 {
 	GraphicsEngine::Get().SetMarker(myMarkerName);
 }
-
-void SetMarker::Destroy()
-{
-}

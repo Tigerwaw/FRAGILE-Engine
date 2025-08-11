@@ -33,9 +33,3 @@ void RenderMeshDebugPass::Execute()
 
     GraphicsEngine::Get().GetDrawer().RenderMeshDebugPass(*myMesh, myMaterialList);
 }
-
-void RenderMeshDebugPass::Destroy()
-{
-    myMesh = nullptr;
-    myMaterialList.~vector();
-}

@@ -22,8 +22,3 @@ void RenderMeshShadow::Execute()
 
     GraphicsEngine::Get().GetDrawer().RenderMeshShadow(*myMesh);
 }
-
-void RenderMeshShadow::Destroy()
-{
-    myMesh = nullptr;
-}

@@ -28,7 +28,3 @@ void UpdatePostProcessBuffer::Execute()
 
 	GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::PostProcessBuffer, ppBufferData);
 }
-
-void UpdatePostProcessBuffer::Destroy()
-{
-}

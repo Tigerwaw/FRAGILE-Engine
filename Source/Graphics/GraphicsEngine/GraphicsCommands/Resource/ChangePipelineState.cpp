@@ -12,8 +12,3 @@ void ChangePipelineState::Execute()
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD ChangePipelineState Execute");
     GraphicsEngine::Get().ChangePipelineState(myPipelineStateObject);
 }
-
-void ChangePipelineState::Destroy()
-{
-    myPipelineStateObject = nullptr;
-}

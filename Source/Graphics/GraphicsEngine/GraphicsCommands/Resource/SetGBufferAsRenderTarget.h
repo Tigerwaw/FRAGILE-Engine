@@ -9,7 +9,6 @@ class SetGBufferAsRenderTarget : public GraphicsCommandBase
 public:
     SetGBufferAsRenderTarget();
     void Execute() override;
-    void Destroy() override;
 private:
     std::shared_ptr<Texture> myAlbedo;
     std::shared_ptr<Texture> myMaterial;

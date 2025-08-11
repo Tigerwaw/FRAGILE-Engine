@@ -8,7 +8,6 @@ public:
     UpdateLightBuffer(const LightBuffer& aLightBuffer);
     UpdateLightBuffer(LightBuffer&& aLightBuffer);
     void Execute() override;
-    void Destroy() override;
 private:
     LightBuffer myLightBuffer;
 };

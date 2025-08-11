@@ -11,7 +11,6 @@ public:
 							  DynamicVertexBuffer* aInstanceBuffer, 
 							  unsigned aMeshCount);
 	void Execute() override;
-	void Destroy() override;
 private:
 	std::shared_ptr<Mesh> myMesh;
 	Math::Matrix4x4f myTransform;

@@ -8,7 +8,6 @@ class SetDefaultRenderTarget : public GraphicsCommandBase
 public:
     SetDefaultRenderTarget();
     void Execute() override;
-    void Destroy() override;
 private:
     std::shared_ptr<Texture> myRenderTarget;
     std::shared_ptr<Texture> myDepthStencil;

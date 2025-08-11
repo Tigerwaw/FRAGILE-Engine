@@ -20,8 +20,3 @@ void RenderText::Execute()
 	GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, ob);
 	GraphicsEngine::Get().GetDrawer().RenderText(*myText);
 }
-
-void RenderText::Destroy()
-{
-	myText = nullptr;
-}

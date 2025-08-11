@@ -25,12 +25,3 @@ void SetGBufferAsRenderTarget::Execute()
 	RTs.emplace_back(myWorldPosition);
 	GraphicsEngine::Get().SetRenderTargets(RTs, GraphicsEngine::Get().GetDepthBuffer(), true, true);
 }
-
-void SetGBufferAsRenderTarget::Destroy()
-{
-	myAlbedo = nullptr;
-	myMaterial = nullptr;
-	myEffects = nullptr;
-	myWorldNormal = nullptr;
-	myWorldPosition = nullptr;
-}

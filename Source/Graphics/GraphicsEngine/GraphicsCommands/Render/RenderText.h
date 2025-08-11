@@ -9,7 +9,6 @@ class RenderText : public GraphicsCommandBase
 public:
 	RenderText(const std::shared_ptr<Text> aText, const Math::Matrix4x4f& aTransform);
 	void Execute() override;
-	void Destroy() override;
 private:
 	std::shared_ptr<Text> myText;
 	Math::Matrix4x4f myTransform;

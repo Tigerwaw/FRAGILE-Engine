@@ -42,9 +42,3 @@ void RenderSprite::Execute()
         GraphicsEngine::Get().ClearTextureResource_PS(0);
     }
 }
-
-void RenderSprite::Destroy()
-{
-    myMaterial = nullptr;
-    myTexture = nullptr;
-}

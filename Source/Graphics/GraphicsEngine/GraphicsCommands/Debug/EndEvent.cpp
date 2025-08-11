@@ -9,7 +9,3 @@ void EndEvent::Execute()
 {
 	GraphicsEngine::Get().EndEvent();
 }
-
-void EndEvent::Destroy()
-{
-}

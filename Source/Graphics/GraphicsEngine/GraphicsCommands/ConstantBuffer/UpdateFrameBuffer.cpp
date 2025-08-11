@@ -18,7 +18,3 @@ void UpdateFrameBuffer::Execute()
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD UpdateFrameBuffer Execute");
 	GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::FrameBuffer, myFrameBuffer);
 }
-
-void UpdateFrameBuffer::Destroy()
-{
-}

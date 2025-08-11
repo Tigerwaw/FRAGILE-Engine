@@ -40,7 +40,3 @@ void UpdateShadowBuffer::Execute()
 
 	GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ShadowBuffer, shadowBufferData);
 }
-
-void UpdateShadowBuffer::Destroy()
-{
-}

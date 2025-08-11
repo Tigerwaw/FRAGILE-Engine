@@ -15,7 +15,6 @@ public:
 								 unsigned aMeshCount);
 
 	void Execute() override;
-	void Destroy() override;
 private:
 	std::shared_ptr<Mesh> myMesh;
 	std::vector<std::shared_ptr<Material>> myMaterialList;

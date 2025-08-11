@@ -23,12 +23,3 @@ void SetGBufferAsResource::Execute()
 	GraphicsEngine::Get().SetTextureResource_PS(3, *myWorldNormal);
 	GraphicsEngine::Get().SetTextureResource_PS(4, *myWorldPosition);
 }
-
-void SetGBufferAsResource::Destroy()
-{
-	myAlbedo = nullptr;
-	myMaterial = nullptr;
-	myEffects = nullptr;
-	myWorldNormal = nullptr;
-	myWorldPosition = nullptr;
-}

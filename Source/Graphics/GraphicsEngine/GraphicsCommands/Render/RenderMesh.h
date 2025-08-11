@@ -15,7 +15,6 @@ public:
 			   const Math::Vector4f& aCustomShaderParams_1,
 			   const Math::Vector4f& aCustomShaderParams_2);
 	void Execute() override;
-	void Destroy() override;
 private:
 	std::shared_ptr<Mesh> myMesh;
 	std::vector<std::shared_ptr<Material>> myMaterialList;

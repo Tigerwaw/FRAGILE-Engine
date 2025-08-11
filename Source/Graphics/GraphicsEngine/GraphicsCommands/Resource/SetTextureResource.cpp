@@ -15,8 +15,3 @@ void SetTextureResource::Execute()
     PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD SetTextureResource Execute");
     GraphicsEngine::Get().SetTextureResource_PS(mySlot, *myTexture);
 }
-
-void SetTextureResource::Destroy()
-{
-    myTexture = nullptr;
-}

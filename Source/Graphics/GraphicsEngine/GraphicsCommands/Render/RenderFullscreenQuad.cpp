@@ -10,7 +10,3 @@ void RenderFullscreenQuad::Execute()
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GFXCMD RenderFullscreenQuad Execute");
 	GraphicsEngine::Get().GetDrawer().RenderQuad();
 }
-
-void RenderFullscreenQuad::Destroy()
-{
-}

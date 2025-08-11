@@ -32,9 +32,3 @@ void RenderInstancedMesh::Execute()
 
     GraphicsEngine::Get().GetDrawer().RenderInstancedMesh(*myMesh, myMeshCount, myMaterialList, *myInstanceBuffer);
 }
-
-void RenderInstancedMesh::Destroy()
-{
-    myMesh = nullptr;
-    myMaterialList.~vector();
-}

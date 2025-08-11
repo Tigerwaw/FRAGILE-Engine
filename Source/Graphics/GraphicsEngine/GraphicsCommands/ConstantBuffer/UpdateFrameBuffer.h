@@ -8,7 +8,6 @@ public:
     UpdateFrameBuffer(const FrameBuffer& aFrameBuffer);
     UpdateFrameBuffer(FrameBuffer&& aFrameBuffer);
     void Execute() override;
-    void Destroy() override;
 private:
     FrameBuffer myFrameBuffer;
 };

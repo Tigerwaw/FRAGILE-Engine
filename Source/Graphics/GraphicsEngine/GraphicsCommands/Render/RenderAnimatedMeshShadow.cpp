@@ -30,8 +30,3 @@ void RenderAnimatedMeshShadow::Execute()
 
     GraphicsEngine::Get().GetDrawer().RenderMeshShadow(*myMesh);
 }
-
-void RenderAnimatedMeshShadow::Destroy()
-{
-    myMesh = nullptr;
-}

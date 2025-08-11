@@ -23,8 +23,3 @@ void RenderParticles::Execute()
         gfx.GetDrawer().RenderParticleEmitter(emitter);
     }
 }
-
-void RenderParticles::Destroy()
-{
-    myEmitters.~vector();
-}

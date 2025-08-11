@@ -7,6 +7,5 @@ class UpdatePostProcessBuffer : public GraphicsCommandBase
 public:
     UpdatePostProcessBuffer();
     void Execute() override;
-    void Destroy() override;
 };
 

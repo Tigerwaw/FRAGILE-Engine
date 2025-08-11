@@ -10,7 +10,3 @@ void BeginEvent::Execute()
 {
 	GraphicsEngine::Get().BeginEvent(myEventName);
 }
-
-void BeginEvent::Destroy()
-{
-}
