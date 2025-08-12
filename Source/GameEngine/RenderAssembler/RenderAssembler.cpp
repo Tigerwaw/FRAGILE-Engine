@@ -60,6 +60,7 @@ RenderAssembler::SceneRenderData RenderAssembler::AssembleLists(Scene& aScene)
 	PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Assemble Scene Data");
 
 	SceneRenderData sceneRenderData;
+	sceneRenderData.mainCamera = Camera::GetMainCamera();
 	sceneRenderData.castShadowsStatic.reserve(100);
 	sceneRenderData.castShadowsDynamic.reserve(100);
 	sceneRenderData.drawDeferred.reserve(100);
@@ -224,7 +225,13 @@ RenderAssembler::SceneRenderData RenderAssembler::AssembleLists(Scene& aScene)
 			std::shared_ptr<PointLight> pointLight = gameObject->GetComponent<PointLight>();
 			if (pointLight && pointLight->GetActive())
 			{
-				sceneRenderData.pointLights.emplace_back(pointLight);
+				std::shared_ptr<Transform> pointLightTransform = gameObject->GetComponent<Transform>();
+				std::shared_ptr<Camera> pointLightCam = gameObject->GetComponent<Camera>();
+
+				Math::AABB3D<float> aabb(pointLightTransform->GetTranslation(), pointLightCam->GetFarPlane(), pointLightCam->GetFarPlane(), pointLightCam->GetFarPlane());
+
+				if (IsInsideFrustum(sceneRenderData.mainCamera, pointLightTransform, aabb))
+					sceneRenderData.pointLights.emplace_back(pointLight);
 			}
 		}
 
@@ -232,18 +239,18 @@ RenderAssembler::SceneRenderData RenderAssembler::AssembleLists(Scene& aScene)
 			std::shared_ptr<SpotLight> spotLight = gameObject->GetComponent<SpotLight>();
 			if (spotLight && spotLight->GetActive())
 			{
-				sceneRenderData.spotLights.emplace_back(spotLight);
+				std::shared_ptr<Transform> spotLightTransform = gameObject->GetComponent<Transform>();
+				std::shared_ptr<Camera> spotLightCam = gameObject->GetComponent<Camera>();
+
+				if (IsInsideFrustum(sceneRenderData.mainCamera, spotLightTransform, spotLightCam->GetFrustumCorners()))
+					sceneRenderData.spotLights.emplace_back(spotLight);
 			}
 		}
 
 		std::shared_ptr<Camera> cam = gameObject->GetComponent<Camera>();
 		if (cam && cam->GetActive())
 		{
-			if (cam->IsMainCamera())
-			{
-				sceneRenderData.mainCamera = cam;
-			}
-			else if (Engine::Get().DrawCameraFrustums)
+			if (!cam->IsMainCamera() && Engine::Get().DrawCameraFrustums)
 			{
 				sceneRenderData.drawCameraFrustumsObjects.emplace_back(gameObject);
 			}
@@ -1087,7 +1094,7 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 
 		if (auto model = object->GetComponent<Model>())
 		{
-			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderCamera, transform, model->GetBoundingBox()))
+			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderCamera.get(), transform, model->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Mesh Shadow Data");
 
@@ -1099,7 +1106,7 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 
 		if (auto animModel = object->GetComponent<AnimatedModel>())
 		{
-			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderCamera, transform, animModel->GetBoundingBox()))
+			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderCamera.get(), transform, animModel->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Anim Mesh Shadow Data");
 
@@ -1112,7 +1119,7 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 
 		if (auto instancedModel = object->GetComponent<InstancedModel>())
 		{
-			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderCamera, transform, instancedModel->GetBoundingBox()))
+			if (!instancedModel->GetShouldViewcull() || IsInsideFrustum(aRenderCamera.get(), transform, instancedModel->GetBoundingBox()))
 			{
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Instanced Mesh Shadow Data");
 
@@ -1323,12 +1330,19 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 	}
 }
 
-bool RenderAssembler::IsInsideFrustum(std::shared_ptr<Camera> aRenderCamera, std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB)
+bool RenderAssembler::IsInsideFrustum(Camera* aRenderCamera, std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Is Inside Frustum");
 	if (!Engine::Get().UseViewCulling) return true;
 
 	return aRenderCamera->GetViewcullingIntersection(aObjectTransform, aObjectAABB);
+}
+
+bool RenderAssembler::IsInsideFrustum(Camera* aRenderCamera, std::shared_ptr<Transform> aObjectTransform, const std::array<Math::Vector3f, 8>& aLightFrustum)
+{
+	if (!Engine::Get().UseViewCulling) return true;
+
+	return aRenderCamera->GetViewcullingIntersection(aObjectTransform, aLightFrustum);
 }
 
 bool RenderAssembler::IsInsideRadius(std::shared_ptr<PointLight> aPointLight, std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB)
@@ -1340,9 +1354,13 @@ bool RenderAssembler::IsInsideRadius(std::shared_ptr<PointLight> aPointLight, st
 	std::shared_ptr<Camera> pointLightCam = aPointLight->gameObject->GetComponent<Camera>();
 	if (!pointLightTransform) return true;
 
-	Math::Sphere<float> sphere(pointLightTransform->GetTranslation(), pointLightCam->GetFarPlane());
-	sphere = sphere.GetSphereinNewSpace(pointLightTransform->GetWorldMatrix() * aObjectTransform->GetWorldMatrixInverse());
-	return Math::IntersectionSphereAABB(sphere, aObjectAABB);
+	Math::AABB3D<float> lightAABB(Math::Vector3f(), pointLightCam->GetFarPlane(), pointLightCam->GetFarPlane(), pointLightCam->GetFarPlane());
+	lightAABB = lightAABB.GetAABBinNewSpace(pointLightTransform->GetWorldMatrix() * aObjectTransform->GetWorldMatrixInverse());
+	return Math::IntersectionBetweenAABBS(lightAABB, aObjectAABB);
+
+	//Math::Sphere<float> sphere(Math::Vector3f(), pointLightCam->GetFarPlane());
+	//sphere = sphere.GetSphereinNewSpace(pointLightTransform->GetWorldMatrix() * aObjectTransform->GetWorldMatrixInverse());
+	//return Math::IntersectionSphereAABB(sphere, aObjectAABB);
 }
 
 void RenderAssembler::UpdateBoundingBox(std::shared_ptr<Transform> aTransform, const Math::AABB3D<float>& aBoundingBox)

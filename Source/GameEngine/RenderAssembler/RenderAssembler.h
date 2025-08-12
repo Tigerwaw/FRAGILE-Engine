@@ -1,5 +1,6 @@
 #pragma once
 #include "Math/AABB3D.hpp"
+#include "Math/Sphere.hpp"
 
 class GameObject;
 class Scene;
@@ -27,7 +28,7 @@ private:
     struct SceneRenderData
     {
         Math::AABB3D<float> sceneBoundingBox;
-        std::shared_ptr<Camera> mainCamera;
+        Camera* mainCamera;
         std::shared_ptr<AmbientLight> ambientLight;
         std::shared_ptr<DirectionalLight> directionalLight;
         std::vector<std::shared_ptr<PointLight>> pointLights;
@@ -64,7 +65,8 @@ private:
     void QueueObjectsDebug(SceneRenderData& aRenderData);
     void QueueDebugLines(SceneRenderData& aRenderData);
 
-    bool IsInsideFrustum(std::shared_ptr<Camera> aRenderCamera, std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB);
+    bool IsInsideFrustum(Camera* aRenderCamera, std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB);
+    bool IsInsideFrustum(Camera* aRenderCamera, std::shared_ptr<Transform> aObjectTransform, const std::array<Math::Vector3f, 8>& aLightFrustum);
     bool IsInsideRadius(std::shared_ptr<PointLight> aPointLight, std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB);
 
     void UpdateBoundingBox(std::shared_ptr<Transform> aTransform, const Math::AABB3D<float>& aBoundingBox);

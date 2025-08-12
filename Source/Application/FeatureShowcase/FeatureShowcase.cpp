@@ -729,7 +729,7 @@ void FeatureShowcase::PhysicsPlayground()
 	Math::Vector2f resolution = Engine::Get().GetResolution();
 	ImGui::SetNextWindowPos({ 0.8f * resolution.x, 0.32f * resolution.y });
 	ImGui::SetNextWindowContentSize({ 0.15f * resolution.x, 0.24f * resolution.y });
-	if (ImGui::Begin("Physics Playground", &myShowResolutionOptions))
+	if (ImGui::Begin("Physics Playground", &myShowPhysicsPlayground))
 	{
 		if (ImGui::Button("Spawn Physics Cube"))
 		{

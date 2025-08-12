@@ -11,8 +11,7 @@ class DirectionalLight : public LightSource
 {
 public:
 	DirectionalLight(float aIntensity = 1.0f, Math::Vector3f aColor = { 1.0f, 1.0f, 1.0f });
-	void RecalculateShadowFrustum(std::shared_ptr<GameObject> aRenderCamera, Math::AABB3D<float> aSceneBB);
-	void RecalculateShadowFrustum(std::shared_ptr<Camera> aRenderCamera, Math::AABB3D<float> aSceneBB);
+	void RecalculateShadowFrustum(Camera* aRenderCamera, Math::AABB3D<float> aSceneBB);
 
 	bool Serialize(nl::json& outJsonObject) override;
 	bool Deserialize(nl::json& aJsonObject) override;

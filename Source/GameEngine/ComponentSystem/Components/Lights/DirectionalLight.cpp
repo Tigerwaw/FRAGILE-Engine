@@ -10,15 +10,7 @@ DirectionalLight::DirectionalLight(float aIntensity, Math::Vector3f aColor) : Li
 {
 }
 
-void DirectionalLight::RecalculateShadowFrustum(std::shared_ptr<GameObject> aRenderCamera, Math::AABB3D<float> aSceneBB)
-{
-    if (!myCastsShadows) return;
-    std::shared_ptr<Camera> renderCam = aRenderCamera->GetComponent<Camera>();
-    if (!renderCam) return;
-    RecalculateShadowFrustum(aRenderCamera, aSceneBB);
-}
-
-void DirectionalLight::RecalculateShadowFrustum(std::shared_ptr<Camera> aRenderCamera, Math::AABB3D<float> aSceneBB)
+void DirectionalLight::RecalculateShadowFrustum(Camera* aRenderCamera, Math::AABB3D<float> aSceneBB)
 {
     if (!myCastsShadows) return;
     std::shared_ptr<Camera> lightCam = gameObject->GetComponent<Camera>();

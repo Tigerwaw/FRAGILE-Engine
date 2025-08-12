@@ -138,6 +138,20 @@ bool Camera::GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransf
 	return Math::IntersectionBetweenPlaneVolumeAABB(GetFrustumPlaneVolume(aObjectTransform->GetWorldMatrixInverse()), aObjectAABB);
 }
 
+bool Camera::GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransform, const std::array<Math::Vector3f, 8>& aLightFrustum)
+{
+	auto planeVolume = GetFrustumPlaneVolume(aObjectTransform->GetWorldMatrixInverse());
+
+	int cornersInside = 0;
+	for (auto& corner : aLightFrustum)
+	{
+		if (planeVolume.IsInside(corner))
+			++cornersInside;
+	}
+
+	return cornersInside > 0;
+}
+
 bool Camera::Serialize(nl::json& outJsonObject)
 {
 	outJsonObject;

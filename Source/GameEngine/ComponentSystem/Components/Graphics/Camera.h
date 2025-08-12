@@ -4,6 +4,7 @@
 #include "Math/Vector.hpp"
 #include "Math/PlaneVolume.hpp"
 #include "Math/AABB3D.hpp"
+#include "Math/Sphere.hpp"
 
 
 
@@ -33,6 +34,7 @@ public:
 	const std::array<Math::Vector3f, 8>& GetFrustumCorners() const { return myFrustumCorners; }
 	Math::PlaneVolume<float> GetFrustumPlaneVolume(Math::Matrix4x4f aObjectSpace = Math::Matrix4x4f());
 	bool GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB);
+	bool GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransform, const std::array<Math::Vector3f, 8>& aLightFrustum);
 
 	bool Serialize(nl::json& outJsonObject) override;
 	bool Deserialize(nl::json& aJsonObject) override;

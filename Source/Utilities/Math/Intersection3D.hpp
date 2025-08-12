@@ -167,7 +167,8 @@ namespace Math
 		return IntersectionInfo();
 	}
 
-	/*template <class T>
+	// Needs Testing
+	template <class T>
 	IntersectionInfo IntersectionSpherePlane(const Sphere<T>& aSphere, const Plane<T>& aPlane)
 	{
 		Vector3f closestPointOnPlane = aPlane.ClosestPointOnPlane(aSphere.GetPoint());
@@ -177,8 +178,6 @@ namespace Math
 			IntersectionInfo info;
 			info.intersected = true;
 			info.intersectionPoint = closestPointOnPlane;
-			info.pointA = aSphere.GetRadius() * -distanceToSphere.GetNormalized();
-			info.pointB = closestPointOnPlane;
 			info.normal = distanceToSphere.GetNormalized();
 			info.depth = distanceToSphere.Length();
 			return info;
@@ -187,6 +186,7 @@ namespace Math
 		return IntersectionInfo();
 	}
 
+	// Needs Testing
 	template <class T>
 	IntersectionInfo IntersectionAABBPlane(const AABB3D<T>& aAABB, const Plane<T>& aPlane)
 	{
@@ -197,15 +197,13 @@ namespace Math
 			IntersectionInfo info;
 			info.intersected = true;
 			info.intersectionPoint = closestPointOnPlane;
-			info.pointA = aAABB.GetExtents() * -distanceToAABB.GetNormalized();
-			info.pointB = closestPointOnPlane;
 			info.normal = distanceToAABB.GetNormalized();
 			info.depth = distanceToAABB.Length();
 			return info;
 		}
 
 		return IntersectionInfo();
-	}*/
+	}
 
 	template<class T>
 	IntersectionInfo IntersectionBetweenAABBS(const AABB3D<T>& aBoundingBoxOne, const AABB3D<T>& aBoundingBoxTwo)
@@ -291,6 +289,20 @@ namespace Math
 			}
 
 			if (cornersInPlane == 0) return IntersectionInfo();
+		}
+
+		IntersectionInfo info;
+		info.intersected = true;
+		return info;
+	}
+
+	template<class T>
+	IntersectionInfo IntersectionBetweenPlaneVolumeSphere(const PlaneVolume<T>& aPlaneVolume, const Sphere<T>& aSphere)
+	{
+		for (const Plane<T>& plane : aPlaneVolume.GetPlanes())
+		{
+			if (!IntersectionSpherePlane(aSphere, plane))
+				return IntersectionInfo();
 		}
 
 		IntersectionInfo info;
