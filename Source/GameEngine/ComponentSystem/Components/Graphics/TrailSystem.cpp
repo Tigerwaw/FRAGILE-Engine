@@ -8,6 +8,7 @@
 #include "Time/Timer.h"
 #include "CommonUtilities/SerializationUtils.hpp"
 #include "AssetManager.h"
+#include "AssetTypes/MaterialAsset.h"
 
 TrailSystem::~TrailSystem()
 {
@@ -25,6 +26,8 @@ void TrailSystem::Update()
 	{
 		emitter.Update(gameObject->GetComponent<Transform>()->GetTranslation(true), dt);
 	}
+
+	UpdateBoundingBox();
 }
 
 void TrailSystem::ResetEmitters()
@@ -33,6 +36,8 @@ void TrailSystem::ResetEmitters()
 	{
 		emitter.ResetTrail();
 	}
+
+	UpdateBoundingBox();
 }
 
 TrailEmitter& TrailSystem::AddEmitter(const TrailEmitterSettings& aSettings)
@@ -40,6 +45,7 @@ TrailEmitter& TrailSystem::AddEmitter(const TrailEmitterSettings& aSettings)
 	TrailEmitter& emitter = myEmitters.emplace_back(TrailEmitter());
 	emitter.mySettings = aSettings;
 	emitter.InitInternal();
+	myBoundingBox = emitter.GetBoundingBox();
 	return emitter;
 }
 
@@ -99,4 +105,27 @@ bool TrailSystem::Deserialize(nl::json& aJsonObject)
 	}
 
 	return true;
+}
+
+void TrailSystem::UpdateBoundingBox()
+{
+	myBoundingBox = myEmitters[0].GetBoundingBox();
+
+	for (auto& emitter : myEmitters)
+	{
+		Math::Vector3f bbMin = myBoundingBox.GetMin();
+		Math::Vector3f bbMax = myBoundingBox.GetMax();
+
+		Math::Vector3f bbEmitterMin = emitter.GetBoundingBox().GetMin();
+		Math::Vector3f bbEmitterMax = emitter.GetBoundingBox().GetMax();
+
+		bbMin.x = std::fminf(bbEmitterMin.x, bbMin.x);
+		bbMax.x = std::fmaxf(bbEmitterMax.x, bbMax.x);
+		bbMin.y = std::fminf(bbEmitterMin.y, bbMin.y);
+		bbMax.y = std::fmaxf(bbEmitterMax.y, bbMax.y);
+		bbMin.z = std::fminf(bbEmitterMin.z, bbMin.z);
+		bbMax.z = std::fmaxf(bbEmitterMax.z, bbMax.z);
+
+		myBoundingBox.InitWithMinAndMax(bbMin, bbMax);
+	}
 }

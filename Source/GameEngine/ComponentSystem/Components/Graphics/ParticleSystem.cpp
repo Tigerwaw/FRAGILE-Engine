@@ -6,6 +6,7 @@
 #include "Time/Timer.h"
 #include "CommonUtilities/SerializationUtils.hpp"
 #include "AssetManager.h"
+#include "AssetTypes/MaterialAsset.h"
 
 ParticleSystem::~ParticleSystem()
 {
@@ -24,6 +25,18 @@ void ParticleSystem::Update()
 	{
 		emitter.Update(dt);
 	}
+	
+	UpdateBoundingBox();
+}
+
+void ParticleSystem::ResetEmitters()
+{
+	for (auto& emitter : myEmitters)
+	{
+		emitter.ResetParticles();
+	}
+
+	UpdateBoundingBox();
 }
 
 ParticleEmitter& ParticleSystem::AddEmitter(const ParticleEmitterSettings& aSettings)
@@ -121,4 +134,27 @@ bool ParticleSystem::Deserialize(nl::json& aJsonObject)
 	}
 
 	return true;
+}
+
+void ParticleSystem::UpdateBoundingBox()
+{
+	myBoundingBox.InitWithMinAndMax({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+
+	for (auto& emitter : myEmitters)
+	{
+		Math::Vector3f bbMin = myBoundingBox.GetMin();
+		Math::Vector3f bbMax = myBoundingBox.GetMax();
+
+		Math::Vector3f bbEmitterMin = emitter.GetBoundingBox().GetMin();
+		Math::Vector3f bbEmitterMax = emitter.GetBoundingBox().GetMax();
+
+		bbMin.x = std::fminf(bbEmitterMin.x, bbMin.x);
+		bbMax.x = std::fmaxf(bbEmitterMax.x, bbMax.x);
+		bbMin.y = std::fminf(bbEmitterMin.y, bbMin.y);
+		bbMax.y = std::fmaxf(bbEmitterMax.y, bbMax.y);
+		bbMin.z = std::fminf(bbEmitterMin.z, bbMin.z);
+		bbMax.z = std::fmaxf(bbEmitterMax.z, bbMax.z);
+
+		myBoundingBox.InitWithMinAndMax(bbMin, bbMax);
+	}
 }

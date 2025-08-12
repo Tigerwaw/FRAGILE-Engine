@@ -9,6 +9,8 @@
 #include "ComponentSystem/Components/Graphics/Model.h"
 #include "ComponentSystem/Components/Graphics/AnimatedModel.h"
 #include "ComponentSystem/Components/Graphics/InstancedModel.h"
+#include "ComponentSystem/Components/Graphics/ParticleSystem.h"
+#include "ComponentSystem/Components/Graphics/TrailSystem.h"
 #include "ComponentSystem/GameObject.h"
 #include "ComponentSystem/Components/Transform.h"
 #include "Math/MathConstants.hpp"
@@ -114,6 +116,19 @@ void DebugDrawer::DrawBoundingBox(std::shared_ptr<InstancedModel> aModel, Math::
     Math::Matrix4x4f objectMatrix = aModel->gameObject->GetComponent<Transform>()->GetWorldMatrix();
     Math::AABB3D<float> boundingBox = aModel->GetBoundingBox();
     DrawBoundingBox(boundingBox, objectMatrix, aColor);
+}
+
+void DebugDrawer::DrawBoundingBox(std::shared_ptr<ParticleSystem> aParticleSystem, Math::Vector4f aColor)
+{
+    Math::Matrix4x4f objectMatrix = aParticleSystem->gameObject->GetComponent<Transform>()->GetWorldMatrix();
+    Math::AABB3D<float> boundingBox = aParticleSystem->GetBoundingBox();
+    DrawBoundingBox(boundingBox, objectMatrix, aColor);
+}
+
+void DebugDrawer::DrawBoundingBox(std::shared_ptr<TrailSystem> aTrailSystem, Math::Vector4f aColor)
+{
+    Math::AABB3D<float> boundingBox = aTrailSystem->GetBoundingBox();
+    DrawBoundingBox(boundingBox, Math::Matrix4x4f(), aColor);
 }
 
 void DebugDrawer::DrawBoundingSphere(Math::Sphere<float> aSphere, Math::Matrix4x4f aWorldMatrix, Math::Vector4f aColor)

@@ -65,6 +65,7 @@ private:
     void QueueObjectsDebug(SceneRenderData& aRenderData);
     void QueueDebugLines(SceneRenderData& aRenderData);
 
+    bool IsInsideFrustum(Camera* aRenderCamera, const Math::AABB3D<float>& aObjectAABB);
     bool IsInsideFrustum(Camera* aRenderCamera, std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB);
     bool IsInsideFrustum(Camera* aRenderCamera, std::shared_ptr<Transform> aObjectTransform, const std::array<Math::Vector3f, 8>& aLightFrustum);
     bool IsInsideRadius(std::shared_ptr<PointLight> aPointLight, std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB);

@@ -11,6 +11,8 @@ class Camera;
 class Model;
 class AnimatedModel;
 class InstancedModel;
+class ParticleSystem;
+class TrailSystem;
 
 class DynamicVertexBuffer;
 
@@ -27,6 +29,8 @@ public:
     void DrawBoundingBox(std::shared_ptr<Model> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
     void DrawBoundingBox(std::shared_ptr<AnimatedModel> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
     void DrawBoundingBox(std::shared_ptr<InstancedModel> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
+    void DrawBoundingBox(std::shared_ptr<ParticleSystem> aParticleSystem, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
+    void DrawBoundingBox(std::shared_ptr<TrailSystem> aTrailSystem, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
     void DrawBoundingSphere(Math::Sphere<float> aSphere, Math::Matrix4x4f aWorldMatrix = Math::Matrix4x4f(), Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
 private:
 

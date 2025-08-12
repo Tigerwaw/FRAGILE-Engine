@@ -133,6 +133,11 @@ Math::PlaneVolume<float> Camera::GetFrustumPlaneVolume(Math::Matrix4x4f aToObjec
 	return volume;
 }
 
+bool Camera::GetViewcullingIntersection(const Math::AABB3D<float>& aObjectAABB)
+{
+	return Math::IntersectionBetweenPlaneVolumeAABB(GetFrustumPlaneVolume(), aObjectAABB);
+}
+
 bool Camera::GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB)
 {
 	return Math::IntersectionBetweenPlaneVolumeAABB(GetFrustumPlaneVolume(aObjectTransform->GetWorldMatrixInverse()), aObjectAABB);

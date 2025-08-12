@@ -17,6 +17,7 @@ namespace GraphicsSettings
 	inline constexpr unsigned TEXT_BUFFER_VERTEX_COUNT = 1024;
 	inline constexpr unsigned TEXT_BUFFER_INDEX_COUNT = 1024;
 	inline constexpr unsigned PARTICLE_BUFFER_VERTEX_COUNT = 4096;
+	inline constexpr unsigned TRAIL_BUFFER_VERTEX_COUNT = 4096;
 }
 
 enum class ShaderType : unsigned

@@ -33,6 +33,7 @@ public:
 
 	const std::array<Math::Vector3f, 8>& GetFrustumCorners() const { return myFrustumCorners; }
 	Math::PlaneVolume<float> GetFrustumPlaneVolume(Math::Matrix4x4f aObjectSpace = Math::Matrix4x4f());
+	bool GetViewcullingIntersection(const Math::AABB3D<float>& aObjectAABB);
 	bool GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB);
 	bool GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransform, const std::array<Math::Vector3f, 8>& aLightFrustum);
 

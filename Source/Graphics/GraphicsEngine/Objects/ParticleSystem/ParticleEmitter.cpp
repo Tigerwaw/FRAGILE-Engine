@@ -13,6 +13,8 @@ ParticleEmitter::~ParticleEmitter()
 
 void ParticleEmitter::Update(float aDeltaTime)
 {
+	myBoundingBox.InitWithMinAndMax({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+
 	for (size_t i = 0; i < myParticles.size(); i++)
 	{
 		ParticleVertex& particle = myParticles[i];
@@ -29,6 +31,16 @@ void ParticleEmitter::Update(float aDeltaTime)
 	}
 
 	myVertexBuffer->UpdateVertexBuffer(myParticles);
+}
+
+void ParticleEmitter::ResetParticles()
+{
+	myBoundingBox.InitWithMinAndMax({ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f });
+
+	for (size_t i = 0; i < myParticles.size(); i++)
+	{
+		InitParticle(myParticles[i], i);
+	}
 }
 
 void ParticleEmitter::InitParticle(ParticleVertex& aParticle, size_t aIndex)
@@ -50,6 +62,8 @@ void ParticleEmitter::InitParticle(ParticleVertex& aParticle, size_t aIndex)
 	aParticle.GravityScale = mySettings.GravityScale;
 	aParticle.Angle = mySettings.Angle.Get(0);
 	aParticle.ChannelMask = mySettings.ChannelMask;
+
+	UpdateBoundingBox(Math::ToVector3(aParticle.Position));
 }
 
 void ParticleEmitter::UpdateParticle(ParticleVertex& aParticle, float aDeltaTime)
@@ -61,6 +75,8 @@ void ParticleEmitter::UpdateParticle(ParticleVertex& aParticle, float aDeltaTime
 	aParticle.Angle = mySettings.Angle.Get(lifeTimePercentage);
 	aParticle.Size = mySettings.Size.Get(lifeTimePercentage);
 	aParticle.Color = mySettings.Color.Get(lifeTimePercentage);
+
+	UpdateBoundingBox(Math::ToVector3(aParticle.Position));
 }
 
 void ParticleEmitter::InitInternal()
@@ -76,4 +92,19 @@ void ParticleEmitter::InitInternal()
 
 	myVertexBuffer = std::make_shared<DynamicVertexBuffer>();
 	myVertexBuffer->CreateBuffer("Particle_VertexBuffer", myParticles, GraphicsSettings::PARTICLE_BUFFER_VERTEX_COUNT);
+}
+
+void ParticleEmitter::UpdateBoundingBox(const Math::Vector3f& aPosition)
+{
+	Math::Vector3f bbMin = myBoundingBox.GetMin();
+	Math::Vector3f bbMax = myBoundingBox.GetMax();
+
+	bbMin.x = std::fminf(aPosition.x, bbMin.x);
+	bbMax.x = std::fmaxf(aPosition.x, bbMax.x);
+	bbMin.y = std::fminf(aPosition.y, bbMin.y);
+	bbMax.y = std::fmaxf(aPosition.y, bbMax.y);
+	bbMin.z = std::fminf(aPosition.z, bbMin.z);
+	bbMax.z = std::fmaxf(aPosition.z, bbMax.z);
+
+	myBoundingBox.InitWithMinAndMax(bbMin, bbMax);
 }

@@ -188,12 +188,22 @@ RenderAssembler::SceneRenderData RenderAssembler::AssembleLists(Scene& aScene)
 			if (particleSystem && particleSystem->GetActive())
 			{
 				sceneRenderData.drawParticleSystems.emplace_back(gameObject);
+
+				if (Engine::Get().DrawBoundingBoxes)
+				{
+					sceneRenderData.drawBoundingBoxesObjects.emplace_back(gameObject);
+				}
 			}
 
 			std::shared_ptr<TrailSystem> trailSystem = gameObject->GetComponent<TrailSystem>();
 			if (trailSystem && trailSystem->GetActive())
 			{
 				sceneRenderData.drawParticleSystems.emplace_back(gameObject);
+
+				if (Engine::Get().DrawBoundingBoxes)
+				{
+					sceneRenderData.drawBoundingBoxesObjects.emplace_back(gameObject);
+				}
 			}
 		}
 
@@ -540,13 +550,17 @@ void RenderAssembler::RenderDeferred(SceneRenderData& aRenderData)
 			std::shared_ptr<ParticleSystem> particleSystem = gameObject->GetComponent<ParticleSystem>();
 			if (particleSystem && particleSystem->GetActive())
 			{
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderParticles>(particleSystem->GetEmitters(), gameObject->GetComponent<Transform>()->GetWorldMatrix());
+				auto transform = gameObject->GetComponent<Transform>();
+
+				if (IsInsideFrustum(aRenderData.mainCamera, transform, particleSystem->GetBoundingBox()))
+					GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderParticles>(particleSystem->GetEmitters(), transform->GetWorldMatrix());
 			}
 
 			std::shared_ptr<TrailSystem> trailSystem = gameObject->GetComponent<TrailSystem>();
 			if (trailSystem && trailSystem->GetActive())
 			{
-				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderTrail>(trailSystem->GetEmitters(), gameObject->GetComponent<Transform>()->GetWorldMatrix());
+				if (IsInsideFrustum(aRenderData.mainCamera, trailSystem->GetBoundingBox()))
+					GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderTrail>(trailSystem->GetEmitters(), gameObject->GetComponent<Transform>()->GetWorldMatrix());
 			}
 		}
 
@@ -1296,6 +1310,16 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 			{
 				Engine::Get().GetDebugDrawer().DrawBoundingBox(instancedModel);
 			}
+			
+			if (auto particleSystem = gameObject->GetComponent<ParticleSystem>())
+			{
+				Engine::Get().GetDebugDrawer().DrawBoundingBox(particleSystem);
+			}
+			
+			if (auto trailSystem = gameObject->GetComponent<TrailSystem>())
+			{
+				Engine::Get().GetDebugDrawer().DrawBoundingBox(trailSystem);
+			}
 		}
 	}
 
@@ -1330,9 +1354,15 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 	}
 }
 
+bool RenderAssembler::IsInsideFrustum(Camera* aRenderCamera, const Math::AABB3D<float>& aObjectAABB)
+{
+	if (!Engine::Get().UseViewCulling) return true;
+
+	return aRenderCamera->GetViewcullingIntersection(aObjectAABB);
+}
+
 bool RenderAssembler::IsInsideFrustum(Camera* aRenderCamera, std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB)
 {
-	PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Is Inside Frustum");
 	if (!Engine::Get().UseViewCulling) return true;
 
 	return aRenderCamera->GetViewcullingIntersection(aObjectTransform, aObjectAABB);
