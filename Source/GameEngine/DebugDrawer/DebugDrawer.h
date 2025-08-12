@@ -22,16 +22,16 @@ public:
     void InitializeDebugDrawer();
     void DrawObjects();
     void ClearObjects();
-    void DrawLine(Math::Vector3f aFromPosition, Math::Vector3f aToPosition, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
-    void DrawLine(DebugLine aLine);
-    void DrawCameraFrustum(std::shared_ptr<Camera> aCamera, Math::Vector4f aColor = { 0.0f, 0.0f, 1.0f, 1.0f });
-    void DrawBoundingBox(Math::AABB3D<float> aAABB, Math::Matrix4x4f aWorldMatrix = Math::Matrix4x4f(), Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
-    void DrawBoundingBox(std::shared_ptr<Model> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
-    void DrawBoundingBox(std::shared_ptr<AnimatedModel> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
-    void DrawBoundingBox(std::shared_ptr<InstancedModel> aModel, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
-    void DrawBoundingBox(std::shared_ptr<ParticleSystem> aParticleSystem, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
-    void DrawBoundingBox(std::shared_ptr<TrailSystem> aTrailSystem, Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
-    void DrawBoundingSphere(Math::Sphere<float> aSphere, Math::Matrix4x4f aWorldMatrix = Math::Matrix4x4f(), Math::Vector4f aColor = { 1.0f, 1.0f, 1.0f, 1.0f });
+    void DrawLine(const Math::Vector3f& aFromPosition, const Math::Vector3f& aToPosition, const Math::Vector4f& aColor);
+    void DrawLine(const DebugLine& aLine);
+    void DrawCameraFrustum(std::shared_ptr<Camera> aCamera, const Math::Vector4f& aColor);
+    void DrawBoundingBox(const Math::AABB3D<float>& aAABB, const Math::Matrix4x4f& aWorldMatrix, const Math::Vector4f& aColor);
+    void DrawBoundingSphere(const Math::Sphere<float>& aSphere, const Math::Matrix4x4f& aWorldMatrix, const Math::Vector4f& aColor);
+    void DrawBoundingBox(std::shared_ptr<Model> aModel, const Math::Vector4f& aColor);
+    void DrawBoundingBox(std::shared_ptr<AnimatedModel> aModel, const Math::Vector4f& aColor);
+    void DrawBoundingBox(std::shared_ptr<InstancedModel> aModel, const Math::Vector4f& aColor);
+    void DrawBoundingBox(std::shared_ptr<ParticleSystem> aParticleSystem, const Math::Vector4f& aColor);
+    void DrawBoundingBox(std::shared_ptr<TrailSystem> aTrailSystem, const Math::Vector4f& aColor);
 private:
 
     std::vector<DebugLineVertex> myLineVertices;

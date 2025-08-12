@@ -47,7 +47,7 @@ void DebugDrawer::ClearObjects()
     }
 }
 
-void DebugDrawer::DrawLine(Math::Vector3f aFromPosition, Math::Vector3f aToPosition, Math::Vector4f aColor)
+void DebugDrawer::DrawLine(const Math::Vector3f& aFromPosition, const Math::Vector3f& aToPosition, const Math::Vector4f& aColor)
 {
     if (myLineVertices.size() >= MAX_DEBUG_LINES)
     {
@@ -63,12 +63,12 @@ void DebugDrawer::DrawLine(Math::Vector3f aFromPosition, Math::Vector3f aToPosit
     myLineVertices.emplace_back(DebugLineVertex(aFromPosition, aToPosition, aColor));
 }
 
-void DebugDrawer::DrawLine(DebugLine aLine)
+void DebugDrawer::DrawLine(const DebugLine& aLine)
 {
     DrawLine(aLine.From, aLine.To, aLine.Color);
 }
 
-void DebugDrawer::DrawCameraFrustum(std::shared_ptr<Camera> aCamera, Math::Vector4f aColor)
+void DebugDrawer::DrawCameraFrustum(std::shared_ptr<Camera> aCamera, const Math::Vector4f& aColor)
 {
     Math::Matrix4x4f camMatrix = aCamera->gameObject->GetComponent<Transform>()->GetMatrix();
     std::array<Math::Vector3f, 8> frustumVolume = aCamera->GetFrustumCorners();
@@ -97,41 +97,41 @@ void DebugDrawer::DrawCameraFrustum(std::shared_ptr<Camera> aCamera, Math::Vecto
     DrawLine(frustumVolume[3], frustumVolume[7], aColor);
 }
 
-void DebugDrawer::DrawBoundingBox(std::shared_ptr<Model> aModel, Math::Vector4f aColor)
+void DebugDrawer::DrawBoundingBox(std::shared_ptr<Model> aModel, const Math::Vector4f& aColor)
 {
     Math::Matrix4x4f objectMatrix = aModel->gameObject->GetComponent<Transform>()->GetWorldMatrix();
     Math::AABB3D<float> boundingBox = aModel->GetBoundingBox();
     DrawBoundingBox(boundingBox, objectMatrix, aColor);
 }
 
-void DebugDrawer::DrawBoundingBox(std::shared_ptr<AnimatedModel> aModel, Math::Vector4f aColor)
+void DebugDrawer::DrawBoundingBox(std::shared_ptr<AnimatedModel> aModel, const Math::Vector4f& aColor)
 {
     Math::Matrix4x4f objectMatrix = aModel->gameObject->GetComponent<Transform>()->GetWorldMatrix();
     Math::AABB3D<float> boundingBox = aModel->GetBoundingBox();
     DrawBoundingBox(boundingBox, objectMatrix, aColor);
 }
 
-void DebugDrawer::DrawBoundingBox(std::shared_ptr<InstancedModel> aModel, Math::Vector4f aColor)
+void DebugDrawer::DrawBoundingBox(std::shared_ptr<InstancedModel> aModel, const Math::Vector4f& aColor)
 {
     Math::Matrix4x4f objectMatrix = aModel->gameObject->GetComponent<Transform>()->GetWorldMatrix();
     Math::AABB3D<float> boundingBox = aModel->GetBoundingBox();
     DrawBoundingBox(boundingBox, objectMatrix, aColor);
 }
 
-void DebugDrawer::DrawBoundingBox(std::shared_ptr<ParticleSystem> aParticleSystem, Math::Vector4f aColor)
+void DebugDrawer::DrawBoundingBox(std::shared_ptr<ParticleSystem> aParticleSystem, const Math::Vector4f& aColor)
 {
     Math::Matrix4x4f objectMatrix = aParticleSystem->gameObject->GetComponent<Transform>()->GetWorldMatrix();
     Math::AABB3D<float> boundingBox = aParticleSystem->GetBoundingBox();
     DrawBoundingBox(boundingBox, objectMatrix, aColor);
 }
 
-void DebugDrawer::DrawBoundingBox(std::shared_ptr<TrailSystem> aTrailSystem, Math::Vector4f aColor)
+void DebugDrawer::DrawBoundingBox(std::shared_ptr<TrailSystem> aTrailSystem, const Math::Vector4f& aColor)
 {
     Math::AABB3D<float> boundingBox = aTrailSystem->GetBoundingBox();
     DrawBoundingBox(boundingBox, Math::Matrix4x4f(), aColor);
 }
 
-void DebugDrawer::DrawBoundingSphere(Math::Sphere<float> aSphere, Math::Matrix4x4f aWorldMatrix, Math::Vector4f aColor)
+void DebugDrawer::DrawBoundingSphere(const Math::Sphere<float>& aSphere, const Math::Matrix4x4f& aWorldMatrix, const Math::Vector4f& aColor)
 {
     int numPoints = 20;
     float angleinc = 2.0f * Math::PI / static_cast<float>(numPoints);
@@ -169,7 +169,7 @@ void DebugDrawer::DrawBoundingSphere(Math::Sphere<float> aSphere, Math::Matrix4x
     }
 }
 
-void DebugDrawer::DrawBoundingBox(Math::AABB3D<float> aAABB, Math::Matrix4x4f aWorldMatrix, Math::Vector4f aColor)
+void DebugDrawer::DrawBoundingBox(const Math::AABB3D<float>& aAABB, const Math::Matrix4x4f& aWorldMatrix, const Math::Vector4f& aColor)
 {
     std::array<Math::Vector3f, 8> corners = aAABB.GetCorners();
 

@@ -1298,27 +1298,27 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 		{
 			if (auto model = gameObject->GetComponent<Model>())
 			{
-				Engine::Get().GetDebugDrawer().DrawBoundingBox(model);
+				Engine::Get().GetDebugDrawer().DrawBoundingBox(model, { 1.0f, 1.0f, 1.0f, 1.0f } );
 			}
 			
 			if (auto animModel = gameObject->GetComponent<AnimatedModel>())
 			{
-				Engine::Get().GetDebugDrawer().DrawBoundingBox(animModel);
+				Engine::Get().GetDebugDrawer().DrawBoundingBox(animModel, { 1.0f, 1.0f, 1.0f, 1.0f });
 			}
 			
 			if (auto instancedModel = gameObject->GetComponent<InstancedModel>())
 			{
-				Engine::Get().GetDebugDrawer().DrawBoundingBox(instancedModel);
+				Engine::Get().GetDebugDrawer().DrawBoundingBox(instancedModel, { 1.0f, 1.0f, 1.0f, 1.0f });
 			}
 			
 			if (auto particleSystem = gameObject->GetComponent<ParticleSystem>())
 			{
-				Engine::Get().GetDebugDrawer().DrawBoundingBox(particleSystem);
+				Engine::Get().GetDebugDrawer().DrawBoundingBox(particleSystem, { 1.0f, 1.0f, 1.0f, 1.0f });
 			}
 			
 			if (auto trailSystem = gameObject->GetComponent<TrailSystem>())
 			{
-				Engine::Get().GetDebugDrawer().DrawBoundingBox(trailSystem);
+				Engine::Get().GetDebugDrawer().DrawBoundingBox(trailSystem, { 1.0f, 1.0f, 1.0f, 1.0f });
 			}
 		}
 	}
@@ -1348,7 +1348,7 @@ void RenderAssembler::QueueDebugLines(SceneRenderData& aRenderData)
 		{
 			if (auto cam = gameObject->GetComponent<Camera>())
 			{
-				Engine::Get().GetDebugDrawer().DrawCameraFrustum(cam);
+				Engine::Get().GetDebugDrawer().DrawCameraFrustum(cam, { 0.0f, 0.0f, 1.0f, 1.0f } );
 			}
 		}
 	}
