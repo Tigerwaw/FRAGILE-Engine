@@ -20,7 +20,7 @@ namespace Math
 		Sphere<T>(const Vector3<T>& aCenter, T aRadius);
 		// Init the sphere with a center and a radius, the same as the constructor above.
 		void InitWithCenterAndRadius(const Vector3<T>& aCenter, T aRadius);
-		Sphere<T> GetSphereinNewSpace(const Matrix4x4<T> aMatrix) const;
+		Sphere<T> GetSphereinNewSpace(const Matrix4x4<T>& aMatrix) const;
 
 		// Returns whether a point is inside the sphere: it is inside when the point is on the
 		// sphere surface or inside of the sphere.
@@ -67,10 +67,9 @@ namespace Math
 	}
 
 	template<class T>
-	inline Sphere<T> Sphere<T>::GetSphereinNewSpace(const Matrix4x4<T> aMatrix) const
+	inline Sphere<T> Sphere<T>::GetSphereinNewSpace(const Matrix4x4<T>& aMatrix) const
 	{
-		Vector3<T> newCenter = ToVector3(ToVector4(myPoint) * aMatrix);
-		newCenter += { aMatrix(4, 1), aMatrix(4, 2), aMatrix(4, 3) };
+		Vector3<T> newCenter = ToVector3(ToVector4(myPoint, 1.0f) * aMatrix);
 		Vector3<T> scale = Vector3<T>::Abs(Matrix4x4<T>::CreateScaleVector(aMatrix));
 		T maxScale = static_cast<T>(std::max(scale.x, std::max(scale.y, scale.z)));
 		T newRadius = GetRadius() * maxScale;

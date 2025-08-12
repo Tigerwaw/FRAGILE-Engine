@@ -221,7 +221,7 @@ const Math::Vector3f Transform::GetTranslation(bool aInWorldSpace) const
 {
 	if (aInWorldSpace)
 	{
-		return Math::ToVector3(Math::ToVector4(myPosition) * myToWorldMatrix);
+		return Math::ToVector3(Math::ToVector4(myPosition, 1.0f) * myToWorldMatrix);
 	}
 	else
 	{
@@ -233,7 +233,7 @@ const Math::Vector3f Transform::GetRotation(bool aInWorldSpace) const
 {
 	if (aInWorldSpace)
 	{
-		return Math::ToVector3(Math::ToVector4(myRotation * Math::DEGREES_TO_RADIANS) * myToWorldMatrix) * Math::RADIANS_TO_DEGREES;
+		return Math::ToVector3(Math::ToVector4(myRotation * Math::DEGREES_TO_RADIANS, 0.0f) * myToWorldMatrix) * Math::RADIANS_TO_DEGREES;
 	}
 	else
 	{
@@ -245,7 +245,7 @@ const Math::Vector3f Transform::GetScale(bool aInWorldSpace) const
 {
 	if (aInWorldSpace)
 	{
-		return Math::ToVector3(Math::ToVector4(myScale) * myToWorldMatrix);
+		return Math::ToVector3(Math::ToVector4(myScale, 0.0f) * myToWorldMatrix);
 	}
 	else
 	{

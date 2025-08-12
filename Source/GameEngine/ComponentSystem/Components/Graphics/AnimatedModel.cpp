@@ -464,8 +464,7 @@ void AnimatedModel::UpdateAnimation(AnimationLayer& aAnimLayer, unsigned aJointI
 {
     PIXScopedEvent(PIX_COLOR_INDEX(2), "AnimatedModel Update Animation");
 
-    Mesh::Skeleton::Joint currentJoint = myMesh->GetSkeleton().myJoints[aJointIdx];
-
+    const Mesh::Skeleton::Joint& currentJoint = myMesh->GetSkeleton().myJoints[aJointIdx];
     Math::Matrix4x4f currentFrameJointTransform = aAnimLayer.currentPose[aJointIdx];
     currentFrameJointTransform = currentFrameJointTransform * aParentJointTransform;
     Math::Matrix4x4f result = currentJoint.BindPoseInverse * currentFrameJointTransform;

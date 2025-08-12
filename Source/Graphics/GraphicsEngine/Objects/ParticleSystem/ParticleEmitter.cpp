@@ -57,7 +57,7 @@ void ParticleEmitter::UpdateParticle(ParticleVertex& aParticle, float aDeltaTime
 	float lifeTimePercentage = aParticle.Lifetime / mySettings.Lifetime;
 
 	aParticle.Velocity += Math::Vector3f(0, -9.81f * mySettings.GravityScale * aDeltaTime, 0);
-	aParticle.Position += Math::ToVector4(aParticle.Velocity * aDeltaTime);
+	aParticle.Position += Math::ToVector4(aParticle.Velocity * aDeltaTime, 0.0f);
 	aParticle.Angle = mySettings.Angle.Get(lifeTimePercentage);
 	aParticle.Size = mySettings.Size.Get(lifeTimePercentage);
 	aParticle.Color = mySettings.Color.Get(lifeTimePercentage);

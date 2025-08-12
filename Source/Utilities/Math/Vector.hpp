@@ -18,7 +18,7 @@ namespace Math
 	}
 
 	template<class T>
-	static Vector3<T> ToVector3(Vector2<T> aVector2, T aZ = 0)
+	static Vector3<T> ToVector3(Vector2<T> aVector2, T aZ)
 	{
 		return Vector3<T>(aVector2.x, aVector2.y, aZ);
 	}
@@ -30,13 +30,13 @@ namespace Math
 	}
 
 	template<class T>
-	static Vector4<T> ToVector4(Vector2<T> aVector2, T aZ = 0, T aW = 0)
+	static Vector4<T> ToVector4(Vector2<T> aVector2, T aZ, T aW)
 	{
 		return Vector4<T>(aVector2.x, aVector2.y, aZ, aW);
 	}
 
 	template<class T>
-	static Vector4<T> ToVector4(Vector3<T> aVector3, T aW = 0)
+	static Vector4<T> ToVector4(Vector3<T> aVector3, T aW )
 	{
 		return Vector4<T>(aVector3.x, aVector3.y, aVector3.z, aW);
 	}
