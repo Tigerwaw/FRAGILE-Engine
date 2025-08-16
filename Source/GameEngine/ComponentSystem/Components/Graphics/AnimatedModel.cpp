@@ -13,6 +13,8 @@
 #include "AssetTypes/MeshAsset.h"
 #include "AssetTypes/AnimationAsset.h"
 #include "AssetManager.h"
+#include "Camera.h"
+#include "ComponentSystem/Components/Transform.h"
 
 AnimatedModel::~AnimatedModel()
 {
@@ -97,6 +99,16 @@ const Math::AABB3D<float> AnimatedModel::GetBoundingBox() const
     }
 
     return myMesh->GetBoundingBox();
+}
+
+void AnimatedModel::SetAnimationHalfLODDistance(float aDistance)
+{
+    myHalfFramesLODDistance = aDistance * aDistance;
+}
+
+void AnimatedModel::SetAnimationQuarterLODDistance(float aDistance)
+{
+    myQuarterFramesLODDistance = aDistance * aDistance;
 }
 
 void AnimatedModel::AddAnimationLayer(unsigned aJointID)
@@ -456,14 +468,16 @@ bool AnimatedModel::UpdateAnimationState(AnimationState& aAnimationState)
     PIXScopedEvent(PIX_COLOR_INDEX(2), "AnimatedModel Update Animation State");
 
     aAnimationState.currentTime += Engine::Get().GetTimer().GetDeltaTime() * aAnimationState.speedMultiplier;
-    if (aAnimationState.currentTime < aAnimationState.frameTime) return false;
+    int lodLevel = static_cast<int>(GetAnimationLOD());
+
+    if (aAnimationState.currentTime < aAnimationState.frameTime + (aAnimationState.frameTime * lodLevel)) return false;
 
     aAnimationState.currentTime = 0;
-    aAnimationState.currentFrame++;
+    aAnimationState.currentFrame += 1 + lodLevel;
 
     for (auto& event : aAnimationState.events)
     {
-        if (event.frame == aAnimationState.currentFrame)
+        if (event.frame < aAnimationState.currentFrame)
         {
             //gameObject->SendEvent(event.eventTypeToSend);
             event.hasBeenCalledThisLoop = true;
@@ -531,19 +545,40 @@ void AnimatedModel::BlendPoses(AnimationLayer& aAnimLayer, float aBlendFactor)
     for (size_t i = aAnimLayer.startJointID; i < skeleton.myJoints.size(); i++)
     {
         const Mesh::Skeleton::Joint& currentJoint = skeleton.myJoints[i];
-        Math::Matrix4x4f currentStateJointTransform = aAnimLayer.currentState->animation->Frames[aAnimLayer.currentState->currentFrame].BoneTransforms[currentJoint.Name];
-        Math::Matrix4x4f nextStateJointTransform = aAnimLayer.nextState->animation->Frames[aAnimLayer.nextState->currentFrame].BoneTransforms[currentJoint.Name];
+        const Math::Matrix4x4f& currentStateJointTransform = aAnimLayer.currentState->animation->Frames[aAnimLayer.currentState->currentFrame].BoneTransforms[currentJoint.Name];
+        const Math::Matrix4x4f& nextStateJointTransform = aAnimLayer.nextState->animation->Frames[aAnimLayer.nextState->currentFrame].BoneTransforms[currentJoint.Name];
          
-        const Math::Vector3f T = Math::Vector3f::Lerp(Math::Matrix4x4f::CreateTranslationVector(currentStateJointTransform), Math::Matrix4x4f::CreateTranslationVector(nextStateJointTransform), aBlendFactor);
-        const Math::Quatf R = Math::Quatf::Slerp(Math::Quatf(currentStateJointTransform), Math::Quatf(nextStateJointTransform), aBlendFactor);
+        Math::Vector3f T = Math::Vector3f::Lerp(Math::Matrix4x4f::CreateTranslationVector(currentStateJointTransform), Math::Matrix4x4f::CreateTranslationVector(nextStateJointTransform), aBlendFactor);
+        Math::Quatf R = Math::Quatf::Slerp(Math::Quatf(currentStateJointTransform), Math::Quatf(nextStateJointTransform), aBlendFactor);
         //Math::Vector3 currentS = Math::Matrix4x4f::CreateScaleVector(currentStateJointTransform);
         //Math::Vector3 nextS = Math::Matrix4x4f::CreateScaleVector(nextStateJointTransform);
-        //const Math::Vector3f S = Math::Vector3f::Lerp(currentS, nextS, aBlendFactor);
+        //Math::Vector3f S = Math::Vector3f::Lerp(currentS, nextS, aBlendFactor);
         //std::cout << S.x << ", " << S.y << ", " << S.z << std::endl;
-        const Math::Vector3f S = { 1.0f, 1.0f, 1.0f };
+        Math::Vector3f S = { 1.0f, 1.0f, 1.0f };
 
         aAnimLayer.currentPose[i] = Math::Matrix4x4f::CreateScaleMatrix(S) * R.GetRotationMatrix4x4f() * Math::Matrix4x4f::CreateTranslationMatrix(T);
     }
+}
+
+AnimatedModel::AnimLODLevel AnimatedModel::GetAnimationLOD() const
+{
+    if (myShouldLODAnimations)
+    {
+        if (auto cam = Camera::GetMainCamera())
+        {
+            Math::Vector3f diff = cam->gameObject->GetComponent<Transform>()->GetTranslation(true) - gameObject->GetComponent<Transform>()->GetTranslation(true);
+            float diffLengthSqr = diff.LengthSqr();
+
+            if (diffLengthSqr > myQuarterFramesLODDistance)
+                return AnimLODLevel::LOD2;
+            else if (diffLengthSqr > myHalfFramesLODDistance)
+                return AnimLODLevel::LOD1;
+            else
+                return AnimLODLevel::LOD0;
+        }
+    }
+
+    return AnimLODLevel::LOD0;
 }
 
 const bool AnimatedModel::ValidateMesh() const

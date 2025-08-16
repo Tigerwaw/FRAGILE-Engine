@@ -46,6 +46,13 @@ public:
         bool isPlaying = true;
     };
 
+    enum class AnimLODLevel
+    {
+        LOD0 = 0, // 100% of frames
+        LOD1 = 1, // 50% of frames
+        LOD2 = 3, // 25% of frames
+    };
+
     ~AnimatedModel() override;
     AnimatedModel();
     AnimatedModel(std::shared_ptr<Mesh> aMesh);
@@ -61,6 +68,11 @@ public:
     std::shared_ptr<Material> GetMaterialOnSlot(unsigned aSlot) { return myMaterials[mySlotToIndex[aSlot]]; }
     const std::vector<std::shared_ptr<Material>>& GetMaterials() { return myMaterials; }
     const Math::AABB3D<float> GetBoundingBox() const;
+
+    bool GetShouldLODAnimations() const { return myShouldLODAnimations; }
+    void SetShouldLODAnimations(bool aFlag) { myShouldLODAnimations = aFlag; }
+    void SetAnimationHalfLODDistance(float aDistance);
+    void SetAnimationQuarterLODDistance(float aDistance);
 
     void PlayAnimation();
     void StopAnimation();
@@ -105,6 +117,7 @@ private:
     void UpdateAnimation(AnimationLayer& aAnimLayer, unsigned aJointIdx, const Math::Matrix4x4f& aParentJointTransform, std::array<Math::Matrix4x4f, 128>& outTransforms);
     void UpdatePose(AnimationLayer& aAnimLayer);
     void BlendPoses(AnimationLayer& aAnimLayer, float aBlendFactor);
+    AnimLODLevel GetAnimationLOD() const;
 
     const bool ValidateMesh() const;
     const bool ValidateJointIndex(unsigned aStartJoint) const;
@@ -118,6 +131,9 @@ private:
     std::unordered_map<unsigned, unsigned> mySlotToIndex;
     bool myShouldViewcull = true;
     bool myCastShadows = true;
+    bool myShouldLODAnimations = true;
+    float myHalfFramesLODDistance = 1000000.0f;
+    float myQuarterFramesLODDistance = 10000000.0f;
 
     std::vector<AnimationLayer> myAnimationLayers;
     std::unordered_map<std::string, unsigned> myJointNameToLayerIndex;
