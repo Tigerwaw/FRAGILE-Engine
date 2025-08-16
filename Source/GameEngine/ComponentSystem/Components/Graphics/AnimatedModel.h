@@ -99,8 +99,9 @@ public:
     bool Deserialize(nl::json& aJsonObject) override;
 
 private:
-    void UpdateAnimationLayer(AnimationLayer& aAnimationLayer);
-    void UpdateAnimationState(AnimationState& aAnimationState);
+    [[nodiscard]] bool  UpdateAnimationLayer(AnimationLayer& aAnimationLayer);
+    [[nodiscard]] bool UpdateAnimationState(AnimationState& aAnimationState);
+    void UpdateAnimationLayerPose(AnimationLayer& aAnimationLayer);
     void UpdateAnimation(AnimationLayer& aAnimLayer, unsigned aJointIdx, const Math::Matrix4x4f& aParentJointTransform, std::array<Math::Matrix4x4f, 128>& outTransforms);
     void UpdatePose(AnimationLayer& aAnimLayer);
     void BlendPoses(AnimationLayer& aAnimLayer, float aBlendFactor);

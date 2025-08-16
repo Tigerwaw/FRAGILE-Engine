@@ -52,9 +52,21 @@ void AnimatedModel::Update()
     if (myAnimationLayers.empty()) return;
 
     PIXScopedEvent(PIX_COLOR_INDEX(2), "AnimatedModel Update");
+
+    int updatedLayers = 0;
+
     for (auto& animationLayer : myAnimationLayers)
     {
-        UpdateAnimationLayer(animationLayer);
+        if (UpdateAnimationLayer(animationLayer))
+            ++updatedLayers;
+    }
+
+    if (updatedLayers > 0)
+    {
+        for (auto& animationLayer : myAnimationLayers)
+        {
+            UpdateAnimationLayerPose(animationLayer);
+        }
     }
 }
 
@@ -387,25 +399,42 @@ bool AnimatedModel::Deserialize(nl::json& aJsonObject)
     return true;
 }
 
-void AnimatedModel::UpdateAnimationLayer(AnimationLayer& aAnimationLayer)
+bool AnimatedModel::UpdateAnimationLayer(AnimationLayer& aAnimationLayer)
 {
-    if (!aAnimationLayer.isPlaying) return;
+    if (!aAnimationLayer.isPlaying) return false;
     PIXScopedEvent(PIX_COLOR_INDEX(2), "AnimatedModel Update Animation Layer");
 
-    UpdateAnimationState(*aAnimationLayer.currentState);
+    bool updateAnimation = true;
 
     if (aAnimationLayer.isBlending)
     {
-        UpdateAnimationState(*aAnimationLayer.nextState);
+        bool updateCurrent = UpdateAnimationState(*aAnimationLayer.currentState);
+        bool updateNext = UpdateAnimationState(*aAnimationLayer.nextState);
+        updateAnimation = updateCurrent || updateNext;
 
         aAnimationLayer.currentBlendTime += Engine::Get().GetTimer().GetDeltaTime();
-        float blendFactor = aAnimationLayer.currentBlendTime / aAnimationLayer.maxBlendTime;
-        BlendPoses(aAnimationLayer, blendFactor);
         if (aAnimationLayer.currentBlendTime >= aAnimationLayer.maxBlendTime)
         {
             aAnimationLayer.currentState = aAnimationLayer.nextState;
             aAnimationLayer.isBlending = false;
         }
+    }
+    else
+    {
+        updateAnimation = UpdateAnimationState(*aAnimationLayer.currentState);
+    }
+
+    return updateAnimation;
+}
+
+void AnimatedModel::UpdateAnimationLayerPose(AnimationLayer& aAnimationLayer)
+{
+    PIXScopedEvent(PIX_COLOR_INDEX(2), "AnimatedModel Update Animation Layer Pose");
+
+    if (aAnimationLayer.isBlending)
+    {
+        float blendFactor = aAnimationLayer.currentBlendTime / aAnimationLayer.maxBlendTime;
+        BlendPoses(aAnimationLayer, blendFactor);
     }
     else
     {
@@ -422,12 +451,12 @@ void AnimatedModel::UpdateAnimationLayer(AnimationLayer& aAnimationLayer)
     UpdateAnimation(aAnimationLayer, aAnimationLayer.startJointID, parentBoneMatrix, myJointTransforms);
 }
 
-void AnimatedModel::UpdateAnimationState(AnimationState& aAnimationState)
+bool AnimatedModel::UpdateAnimationState(AnimationState& aAnimationState)
 {
     PIXScopedEvent(PIX_COLOR_INDEX(2), "AnimatedModel Update Animation State");
 
     aAnimationState.currentTime += Engine::Get().GetTimer().GetDeltaTime() * aAnimationState.speedMultiplier;
-    if (aAnimationState.currentTime < aAnimationState.frameTime) return;
+    if (aAnimationState.currentTime < aAnimationState.frameTime) return false;
 
     aAnimationState.currentTime = 0;
     aAnimationState.currentFrame++;
@@ -455,9 +484,12 @@ void AnimatedModel::UpdateAnimationState(AnimationState& aAnimationState)
         else
         {
             // Freeze last frame
+            // Maybe make it automatically return to its last state?
             aAnimationState.currentFrame = static_cast<unsigned>(aAnimationState.animation->Frames.size() - 1);
         }
     }
+
+    return true;
 }
 
 void AnimatedModel::UpdateAnimation(AnimationLayer& aAnimLayer, unsigned aJointIdx, const Math::Matrix4x4f& aParentJointTransform, std::array<Math::Matrix4x4f, 128>& outTransforms)
@@ -481,11 +513,12 @@ void AnimatedModel::UpdatePose(AnimationLayer& aAnimLayer)
 {
     PIXScopedEvent(PIX_COLOR_INDEX(2), "AnimatedModel Update Pose");
 
+    assert(aAnimLayer.currentState->animation->Frames.size() > 0 && "Current animation has no frames!");
+
     const Mesh::Skeleton& skeleton = myMesh->GetSkeleton();
     for (size_t i = aAnimLayer.startJointID; i < skeleton.myJoints.size(); i++)
     {
         const Mesh::Skeleton::Joint& currentJoint = skeleton.myJoints[i];
-        if (aAnimLayer.currentState->animation->Frames.size() == 0) continue;
         aAnimLayer.currentPose[i] = aAnimLayer.currentState->animation->Frames[aAnimLayer.currentState->currentFrame].BoneTransforms[currentJoint.Name];
     }
 }
