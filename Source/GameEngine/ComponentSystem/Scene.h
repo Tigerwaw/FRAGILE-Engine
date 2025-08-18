@@ -1,6 +1,6 @@
 #pragma once
 #include "Math/AABB3D.hpp"
-
+#include "CommonUtilities/StaticStack.hpp"
 
 class GameObject;
 class Camera;
@@ -33,6 +33,7 @@ private:
 	void DestroyInternal(GameObject* aGameObject);
 	void DestroyHierarchy(Transform* aTransform);
 	void UpdateBoundingBox(std::shared_ptr<GameObject> aGameObject);
+	unsigned GetFreeID();
 
 	std::vector<std::shared_ptr<GameObject>> myGameObjects;
 	std::vector<std::shared_ptr<GameObject>> myGameObjectsToDestroy;
@@ -41,4 +42,5 @@ private:
 	Math::AABB3D<float> myBoundingBox;
 
 	unsigned myCurrentGameObjectID = 0;
+	Utilities::StaticStack<unsigned, 1000> myFreeIDs;
 };

@@ -93,11 +93,10 @@ void Scene::Instantiate(std::shared_ptr<GameObject> aGameObject)
 
 	UpdateBoundingBox(aGameObject);
 
-	aGameObject->SetID(myCurrentGameObjectID);
-	myCurrentGameObjectID++;
+	aGameObject->SetID(GetFreeID());
 	myGameObjects.emplace_back(aGameObject);
 
-	LOG(LogScene, Log, "Created GameObject {}!", aGameObject->GetName());
+	LOG(LogScene, Log, "Created GameObject {} with ID {}!", aGameObject->GetName(), aGameObject->GetID());
 }
 
 void Scene::Destroy(std::shared_ptr<GameObject> aGameObject)
@@ -117,7 +116,7 @@ void Scene::Destroy(std::shared_ptr<GameObject> aGameObject)
 		}
 	}
 
-	LOG(LogScene, Warning, "Could not find GameObject {} in scene!", aGameObject->GetName());
+	LOG(LogScene, Warning, "Could not find GameObject {} with ID {} in scene!", aGameObject->GetName(), aGameObject->GetID());
 }
 
 void Scene::DestroyInternal(GameObject* aGameObject)
@@ -126,8 +125,10 @@ void Scene::DestroyInternal(GameObject* aGameObject)
 	{
 		if (myGameObjects[i].get() == aGameObject)
 		{
-			LOG(LogScene, Log, "Destroyed GameObject {}!", aGameObject->GetName());
+			LOG(LogScene, Log, "Destroyed GameObject {} with ID {}!", aGameObject->GetName(), aGameObject->GetID());
+			unsigned id = aGameObject->GetID();
 			myGameObjects.erase(myGameObjects.begin() + i);
+			myFreeIDs.Push(id);
 			return;
 		}
 	}
@@ -196,4 +197,12 @@ void Scene::UpdateBoundingBox(std::shared_ptr<GameObject> aGameObject)
 
 		myBoundingBox.InitWithMinAndMax(bbMin, bbMax);
 	}
+}
+
+unsigned Scene::GetFreeID()
+{
+	if (!myFreeIDs.IsEmpty())
+		return myFreeIDs.Pop();
+
+	return ++myCurrentGameObjectID;
 }

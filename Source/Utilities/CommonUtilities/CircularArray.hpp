@@ -9,6 +9,7 @@ namespace Utilities
 	public:
 		CircularArray();
 		T& Push_back(T& aItem);
+		T& Emplace_back(T&& aItem);
 		T Pop_Front();
 		T& Peek_Front();
 		T& Peek_Next();
@@ -44,6 +45,23 @@ namespace Utilities
 		}
 
 		myArray[myLastIndex] = aItem;
+		myLastIndex = newLastIndex;
+
+		return myArray[lastIndex];
+	}
+
+	template<typename T, int MAXSIZE>
+	inline T& CircularArray<T, MAXSIZE>::Emplace_back(T&& aItem)
+	{
+		int lastIndex = myLastIndex;
+		int newLastIndex = (myLastIndex + 1) % myMaxSize;
+
+		if (newLastIndex == myFirstIndex)
+		{
+			myFirstIndex = (myFirstIndex + 1) % myMaxSize;
+		}
+
+		myArray[myLastIndex] = std::move(aItem);
 		myLastIndex = newLastIndex;
 
 		return myArray[lastIndex];
