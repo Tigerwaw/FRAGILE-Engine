@@ -47,9 +47,7 @@ void GrassRendering::InitializeApplication()
 			std::shared_ptr<InstancedModel> instancedModel = instancedModelObj->AddComponent<InstancedModel>(instanceRows * instanceRows);
 			instancedModel->SetMesh(AssetManager::Get().GetAsset<MeshAsset>("SM_GrassBlade.fbx")->mesh);
 			instancedModel->SetMaterialOnSlot(0, AssetManager::Get().GetAsset<MaterialAsset>("SimpleGrass.mat")->material);
-			//instancedModel->SetCastShadows(false);
-			//instancedModel->SetMesh(AssetManager::Get().GetAsset<MeshAsset>("SM_Grass.fbx")->mesh);
-			//instancedModel->SetMaterialOnSlot(0, AssetManager::Get().GetAsset<MaterialAsset>("Grass.mat")->material);
+			instancedModel->SetCastShadows(false);
 			
 			float yRayOrigin = 1500.0f;
 
@@ -68,8 +66,9 @@ void GrassRendering::InitializeApplication()
 					coordinates.x = 2000.0f + i * instancePosOffset + instanceMatrix(4, 1);
 					coordinates.y = 2000.0f + j * instancePosOffset + instanceMatrix(4, 3);
 					Math::Vector2f mapSize(instancePosOffset, instancePosOffset);
-					float noise = SamplePerlin(coordinates, mapSize, 24, 10.0f);
-					float scale = Math::Lerp(1.0f - sizeVariation, 1.0f + sizeVariation, (noise + 1.0f) * 0.5f);
+					float noise = SamplePerlin(coordinates, mapSize, 24, 5.0f);
+					float randomVariation = Utilities::RandomVariation(1.0f, 0.2f);
+					float scale = Math::Lerp(1.0f - sizeVariation, 1.0f + sizeVariation, (1.0f + noise + randomVariation) * 0.3f);
 					instanceMatrix(1, 1) = scale;
 					instanceMatrix(2, 2) = scale;
 					instanceMatrix(3, 3) = scale;

@@ -82,7 +82,7 @@
         {
           "Type": "Transform",
           "Position": [ -500.0, 500.0, -500.0 ],
-          "Rotation": [ 45.0, 25.0, 0.0 ],
+          "Rotation": [ 45.0, 210.0, 0.0 ],
           "Scale": [ 1.0, 1.0, 1.0 ]
         },
         {
@@ -193,36 +193,6 @@
             "Width": 332.0,
             "Height": 166.0,
             "Depth": 450.0
-          }
-        }
-      ]
-    },
-    {
-      "Name": "CastleStructure",
-      "Active": true,
-      "Static": true,
-      "Components": [
-        {
-          "Type": "Transform",
-          "Position": [ 0.0, 0.0, 500.0 ],
-          "Rotation": [ 0.0, 20.0, 0.0 ],
-          "Scale": [ 1.0, 1.0, 1.0 ]
-        },
-        {
-          "Type": "Model",
-          "Model": "SM_Castle_Structure_High.fbx",
-          "Materials": [
-            "Castle_Structure.MAT"
-          ]
-        },
-        {
-          "Type": "BoxCollider",
-          "IsTrigger": false,
-          "CenterOffset": [ 0.0, 45.0, 0.0 ],
-          "Extents": {
-            "Width": 217.0,
-            "Height": 91.0,
-            "Depth": 132.0
           }
         }
       ]

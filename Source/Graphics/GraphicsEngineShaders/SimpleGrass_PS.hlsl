@@ -20,11 +20,12 @@ GBufferOutput main(MeshVStoPS input, bool isFrontFace : SV_IsFrontFace)
     
     // Calculate normal based on whether we are rendering a frontface or backface.
     int frontFacing = ((int) isFrontFace * 2) - 1;
+    float3 adjustedNormal = lerp(input.Normal * frontFacing, float3(0.0, 1.0, 0.0), input.VertexColor0.r);
     
     output.Albedo = float4(color, 1.0f);
-    output.Material = float4(1.0f, 1.0f, 0.0f, 0);
+    output.Material = float4(1.0f, 0.5f, 0.0f, 0);
     output.Effects = 0;
-    output.WorldNormal = float4(normalize(input.Normal * frontFacing), 0);
+    output.WorldNormal = float4(normalize(adjustedNormal), 0);
     output.WorldPosition = input.WorldPos;
     
     return output;

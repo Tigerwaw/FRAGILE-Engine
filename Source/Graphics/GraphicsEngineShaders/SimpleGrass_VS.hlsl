@@ -18,7 +18,7 @@ MeshVStoPS main(MeshVertex vertex, uint instanceID : SV_InstanceID)
     
     float hashedID = Random(instanceID);
     float frequency = 1.0;
-    float amplitude = 10.0;
+    float amplitude = 20.0;
     float instanceAmplitude = 0.5;
     
     float height = vertex.RelativeTransform._22 * hashedID;
