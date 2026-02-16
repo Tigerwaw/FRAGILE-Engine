@@ -31,9 +31,9 @@ void GrassRendering::InitializeApplication()
 	auto& sh = Engine::Get().GetSceneHandler();
 	sh.LoadScene("Scenes/GrassRendering.SCENE");
 
-	for (int i = -2; i < 2; i++)
+	for (int i = myChunkRangeMin; i < myChunkRangeMax; i++)
 	{
-		for (int j = -2; j < 2; j++)
+		for (int j = myChunkRangeMin; j < myChunkRangeMax; j++)
 		{
 			std::shared_ptr<GameObject> instancedModelObj = std::make_shared<GameObject>();
 			Math::Vector3f currentChunkOffset(i * myChunkOffset, 0.0f, j * myChunkOffset);

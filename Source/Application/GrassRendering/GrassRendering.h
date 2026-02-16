@@ -15,8 +15,10 @@ private:
 private:
     unsigned currentDebugMode = 0;
 
-    const float myDensity = 2.0f;
-    const float myChunkOffset = 1000.0f;
+    const int myChunkRangeMin = -4;
+    const int myChunkRangeMax = 4;
+    const float myDensity = 1.0f;
+    const float myChunkOffset = 500.0f;
     const float myYRayOrigin = 1500.0f;
     const float mySizeVariation = 0.25f;
 
