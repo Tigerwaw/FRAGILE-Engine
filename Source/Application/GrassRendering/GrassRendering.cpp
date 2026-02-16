@@ -3,6 +3,7 @@
 #include <Application/AppSettings.h>
 #include <GameEngine/Engine.h>
 #include <GameEngine/Time/Timer.h>
+#include <future>
 
 #include "GameEngine/ComponentSystem/GameObject.h"
 #include "GameEngine/ComponentSystem/Components/Transform.h"
@@ -34,52 +35,31 @@ void GrassRendering::InitializeApplication()
 	{
 		for (int j = -2; j < 2; j++)
 		{
-			float density = 2.0f;
-			int instanceRows = static_cast<int>(std::roundf(100.0f * density));
-			float instancePosOffset = 1000.0f;
-
-			float defaultPosOffset = instancePosOffset / instanceRows;
-			float posOffsetVariation = defaultPosOffset * 0.8f;
-
 			std::shared_ptr<GameObject> instancedModelObj = std::make_shared<GameObject>();
-			Math::Vector3f instPosOffset(i * instancePosOffset, 0.0f, j * instancePosOffset);
-			instancedModelObj->AddComponent<Transform>(instPosOffset);
-			std::shared_ptr<InstancedModel> instancedModel = instancedModelObj->AddComponent<InstancedModel>(instanceRows * instanceRows);
+			Math::Vector3f currentChunkOffset(i * myChunkOffset, 0.0f, j * myChunkOffset);
+			instancedModelObj->AddComponent<Transform>(currentChunkOffset);
+			std::shared_ptr<InstancedModel> instancedModel = instancedModelObj->AddComponent<InstancedModel>(myInstanceRows * myInstanceRows);
 			instancedModel->SetMesh(AssetManager::Get().GetAsset<MeshAsset>("SM_GrassBlade.fbx")->mesh);
 			instancedModel->SetMaterialOnSlot(0, AssetManager::Get().GetAsset<MaterialAsset>("SimpleGrass.mat")->material);
 			instancedModel->SetCastShadows(false);
-			
-			float yRayOrigin = 1500.0f;
 
-			float sizeVariation = 0.25f;
+			std::vector<std::future<Math::Matrix4x4f>> futureTransforms;
 
-			for (int outer = 0; outer < instanceRows; outer++)
+			for (int outer = 0; outer < myInstanceRows; outer++)
 			{
-				for (int inner = 0; inner < instanceRows; inner++)
+				for (int inner = 0; inner < myInstanceRows; inner++)
 				{
-					Math::Matrix4x4f instanceMatrix = Math::Matrix4x4f::CreateRollPitchYawMatrix({ 0.0f, Utilities::RandomInRange(-180.0f, 180.0f), 0.0f });
-
-					instanceMatrix(4, 1) = Utilities::RandomVariation(inner * defaultPosOffset, posOffsetVariation);
-					instanceMatrix(4, 3) = Utilities::RandomVariation(outer * defaultPosOffset, posOffsetVariation);
-
-					Math::Vector2f coordinates;
-					coordinates.x = 2000.0f + i * instancePosOffset + instanceMatrix(4, 1);
-					coordinates.y = 2000.0f + j * instancePosOffset + instanceMatrix(4, 3);
-					Math::Vector2f mapSize(instancePosOffset, instancePosOffset);
-					float noise = SamplePerlin(coordinates, mapSize, 24, 5.0f);
-					float randomVariation = Utilities::RandomVariation(1.0f, 0.2f);
-					float scale = Math::Lerp(1.0f - sizeVariation, 1.0f + sizeVariation, (1.0f + noise + randomVariation) * 0.3f);
-					instanceMatrix(1, 1) = scale;
-					instanceMatrix(2, 2) = scale;
-					instanceMatrix(3, 3) = scale;
-
-					Math::Vector3f hitPoint;
-					sh.Raycast({ instPosOffset.x + instanceMatrix(4, 1), instPosOffset.y + yRayOrigin, instPosOffset.z + instanceMatrix(4, 3) }, { 0.0f, -1.0f, 0.0f }, hitPoint);
-					instanceMatrix(4, 2) = hitPoint.y;
-
-					if (instanceMatrix(4, 2) < 1.0f)
-						instancedModel->AddInstanceNoBufferUpdate(instanceMatrix);
+					futureTransforms.emplace_back(std::async(std::launch::async, &GrassRendering::CalculateInstanceTransform, this, inner, outer, i, j, currentChunkOffset));
 				}
+			}
+
+			for (auto& futureTransform : futureTransforms)
+			{
+				futureTransform.wait();
+
+				Math::Matrix4x4f transform = futureTransform.get();
+				if (transform(4, 2) < 1.0f)
+					instancedModel->AddInstanceNoBufferUpdate(transform);
 			}
 
 			instancedModel->UpdateInstanceBuffer();
@@ -161,4 +141,29 @@ void GrassRendering::UpdateDebug()
 		}
 	}
 	ImGui::End();
+}
+
+Math::Matrix4x4f GrassRendering::CalculateInstanceTransform(int aInner, int aOuter, int aChunkHorizontalIndex, int aChunkVerticalIndex, Math::Vector3f aCurrentChunkOffset) const
+{
+	Math::Matrix4x4f instanceMatrix = Math::Matrix4x4f::CreateRollPitchYawMatrix({ 0.0f, Utilities::RandomInRange(-180.0f, 180.0f), 0.0f });
+
+	instanceMatrix(4, 1) = Utilities::RandomVariation(aInner * myInstanceOffset, myInstanceOffsetVariation);
+	instanceMatrix(4, 3) = Utilities::RandomVariation(aOuter * myInstanceOffset, myInstanceOffsetVariation);
+
+	Math::Vector2f coordinates;
+	coordinates.x = 2000.0f + aChunkHorizontalIndex * myChunkOffset + instanceMatrix(4, 1);
+	coordinates.y = 2000.0f + aChunkVerticalIndex * myChunkOffset + instanceMatrix(4, 3);
+	Math::Vector2f mapSize(myChunkOffset, myChunkOffset);
+	float noise = SamplePerlin(coordinates, mapSize, 24, 5.0f);
+	float randomVariation = Utilities::RandomVariation(1.0f, 0.2f);
+	float scale = Math::Lerp(1.0f - mySizeVariation, 1.0f + mySizeVariation, (1.0f + noise + randomVariation) * 0.3f);
+	instanceMatrix(1, 1) = scale;
+	instanceMatrix(2, 2) = scale;
+	instanceMatrix(3, 3) = scale;
+
+	Math::Vector3f hitPoint;
+	Engine::Get().GetSceneHandler().Raycast({ aCurrentChunkOffset.x + instanceMatrix(4, 1), aCurrentChunkOffset.y + myYRayOrigin, aCurrentChunkOffset.z + instanceMatrix(4, 3) }, { 0.0f, -1.0f, 0.0f }, hitPoint);
+	instanceMatrix(4, 2) = hitPoint.y;
+
+	return instanceMatrix;
 }
