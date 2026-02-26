@@ -10,12 +10,14 @@
 RenderAnimatedMesh::RenderAnimatedMesh(const std::shared_ptr<Mesh> aMesh,
                                        const std::vector<std::shared_ptr<Material>>& aMaterialList,
                                        const Math::Matrix4x4f& aTransform,
-                                       const std::array<Math::Matrix4x4f, 128>& aJointTransforms) :
+                                       const std::array<Math::Matrix4x4f, 128>& aJointTransforms,
+                                       float aLODHeuristic) :
     myMaterialList(aMaterialList),
     myJointTransforms(aJointTransforms)
 {
     myMesh = aMesh;
     myTransform = aTransform;
+    myLODHeuristic = aLODHeuristic;
 }
 
 void RenderAnimatedMesh::Execute()
@@ -31,5 +33,5 @@ void RenderAnimatedMesh::Execute()
     memcpy_s(animBufferData.JointTransforms, sizeof(Math::Matrix4x4<float>) * 128, myJointTransforms.data(), sizeof(Math::Matrix4x4<float>) * 128);
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::AnimationBuffer, animBufferData);
 
-    GraphicsEngine::Get().GetDrawer().RenderMesh(*myMesh, myMaterialList);
+    GraphicsEngine::Get().GetDrawer().RenderMesh(*myMesh, myMaterialList, myLODHeuristic);
 }

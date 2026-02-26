@@ -35,18 +35,19 @@ void Drawer::RenderSkybox(const Mesh& aMesh, const std::shared_ptr<Texture> aTex
 
 	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
-		ge.myRHI->SetVertexBuffer(submesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
-		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+		const Mesh::Submesh::LOD& lod = submesh.GetLOD(0);
+		ge.myRHI->SetVertexBuffer(lod.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
+		ge.myRHI->SetIndexBuffer(lod.GetIndexBuffer());
 
 		ge.SetTextureResource_PS(0, *aTexture);
-		ge.myRHI->DrawIndexed(0, submesh.NumIndices);
+		ge.myRHI->DrawIndexed(0, lod.GetNumIndices());
 		ge.myDrawcallAmount++;
 
 		ge.ClearTextureResource_PS(0);
 	}
 }
 
-void Drawer::RenderMesh(const Mesh& aMesh, const std::vector<std::shared_ptr<Material>>& aMaterialList)
+void Drawer::RenderMesh(const Mesh& aMesh, const std::vector<std::shared_ptr<Material>>& aMaterialList, float aLODHeuristic)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Mesh");
 	GraphicsEngine& ge = GraphicsEngine::Get();
@@ -56,8 +57,9 @@ void Drawer::RenderMesh(const Mesh& aMesh, const std::vector<std::shared_ptr<Mat
 
 	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
-		ge.myRHI->SetVertexBuffer(submesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
-		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+		const Mesh::Submesh::LOD& lod = submesh.GetLOD(submesh.GetAppropriateLODLevel(aLODHeuristic));
+		ge.myRHI->SetVertexBuffer(lod.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
+		ge.myRHI->SetIndexBuffer(lod.GetIndexBuffer());
 		std::array<unsigned, GraphicsSettings::MAX_MATERIAL_TEXTURES> slotsToClear = { 0 };
 		unsigned currentSlotIndex = 0;
 
@@ -90,7 +92,7 @@ void Drawer::RenderMesh(const Mesh& aMesh, const std::vector<std::shared_ptr<Mat
 			}
 		}
 
-		ge.myRHI->DrawIndexed(0, submesh.NumIndices);
+		ge.myRHI->DrawIndexed(0, lod.GetNumIndices());
 		ge.myDrawcallAmount++;
 
 		for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)
@@ -110,14 +112,15 @@ void Drawer::RenderMeshShadow(const Mesh& aMesh)
 
 	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
-		ge.myRHI->SetVertexBuffer(submesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
-		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
-		ge.myRHI->DrawIndexed(0, submesh.NumIndices);
+		const Mesh::Submesh::LOD& lod = submesh.GetLOD(0);
+		ge.myRHI->SetVertexBuffer(lod.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
+		ge.myRHI->SetIndexBuffer(lod.GetIndexBuffer());
+		ge.myRHI->DrawIndexed(0, lod.GetNumIndices());
 		ge.myDrawcallAmount++;
 	}
 }
 
-void Drawer::RenderMeshDebugPass(const Mesh& aMesh, const std::vector<std::shared_ptr<Material>>& aMaterialList)
+void Drawer::RenderMeshDebugPass(const Mesh& aMesh, const std::vector<std::shared_ptr<Material>>& aMaterialList, float aLODHeuristic)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Mesh");
 	GraphicsEngine& ge = GraphicsEngine::Get();
@@ -127,8 +130,9 @@ void Drawer::RenderMeshDebugPass(const Mesh& aMesh, const std::vector<std::share
 
 	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
-		ge.myRHI->SetVertexBuffer(submesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
-		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+		const Mesh::Submesh::LOD& lod = submesh.GetLOD(submesh.GetAppropriateLODLevel(aLODHeuristic));
+		ge.myRHI->SetVertexBuffer(lod.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
+		ge.myRHI->SetIndexBuffer(lod.GetIndexBuffer());
 
 		std::array<unsigned, GraphicsSettings::MAX_MATERIAL_TEXTURES> slotsToClear = { 0 };
 		unsigned currentSlotIndex = 0;
@@ -158,7 +162,7 @@ void Drawer::RenderMeshDebugPass(const Mesh& aMesh, const std::vector<std::share
 			}
 		}
 
-		ge.myRHI->DrawIndexed(0, submesh.NumIndices);
+		ge.myRHI->DrawIndexed(0, lod.GetNumIndices());
 		ge.myDrawcallAmount++;
 
 		for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)
@@ -170,7 +174,7 @@ void Drawer::RenderMeshDebugPass(const Mesh& aMesh, const std::vector<std::share
 	ge.ClearTextureResource_PS(127);
 }
 
-void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const std::vector<std::shared_ptr<Material>>& aMaterialList, DynamicVertexBuffer& aInstanceBuffer)
+void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const std::vector<std::shared_ptr<Material>>& aMaterialList, DynamicVertexBuffer& aInstanceBuffer, float aLODHeuristic)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Instanced Mesh");
 	GraphicsEngine& ge = GraphicsEngine::Get();
@@ -185,7 +189,8 @@ void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const s
 		std::vector<unsigned> strides;
 		std::vector<unsigned> offsets;
 
-		buffers.emplace_back(*submesh.GetVertexBuffer().GetAddressOf());
+		const Mesh::Submesh::LOD& lod = submesh.GetLOD(submesh.GetAppropriateLODLevel(aLODHeuristic));
+		buffers.emplace_back(*lod.GetVertexBuffer().GetAddressOf());
 		buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
 
 		strides.emplace_back(ge.myCurrentPSO->VertexStride);
@@ -195,7 +200,7 @@ void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const s
 		offsets.emplace_back(0);
 
 		ge.myRHI->SetVertexBuffers(buffers, strides, offsets);
-		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+		ge.myRHI->SetIndexBuffer(lod.GetIndexBuffer());
 
 		std::array<unsigned, GraphicsSettings::MAX_MATERIAL_TEXTURES> slotsToClear = { 0 };
 		unsigned currentSlotIndex = 0;
@@ -229,7 +234,7 @@ void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const s
 			}
 		}
 
-		ge.myRHI->DrawIndexedInstanced(submesh.NumIndices, aMeshCount, 0, 0, 0);
+		ge.myRHI->DrawIndexedInstanced(lod.GetNumIndices(), aMeshCount, 0, 0, 0);
 		ge.myDrawcallAmount++;
 
 		for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)
@@ -254,7 +259,8 @@ void Drawer::RenderInstancedMeshShadow(const Mesh& aMesh, unsigned aMeshCount, D
 		std::vector<unsigned> strides;
 		std::vector<unsigned> offsets;
 
-		buffers.emplace_back(*submesh.GetVertexBuffer().GetAddressOf());
+		const Mesh::Submesh::LOD& lod = submesh.GetLOD(0);
+		buffers.emplace_back(*lod.GetVertexBuffer().GetAddressOf());
 		buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
 
 		strides.emplace_back(ge.myCurrentPSO->VertexStride);
@@ -264,14 +270,14 @@ void Drawer::RenderInstancedMeshShadow(const Mesh& aMesh, unsigned aMeshCount, D
 		offsets.emplace_back(0);
 
 		ge.myRHI->SetVertexBuffers(buffers, strides, offsets);
-		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+		ge.myRHI->SetIndexBuffer(lod.GetIndexBuffer());
 
-		ge.myRHI->DrawIndexedInstanced(submesh.NumIndices, aMeshCount, 0, 0, 0);
+		ge.myRHI->DrawIndexedInstanced(lod.GetNumIndices(), aMeshCount, 0, 0, 0);
 		ge.myDrawcallAmount++;
 	}
 }
 
-void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount, const std::vector<std::shared_ptr<Material>>& aMaterialList, DynamicVertexBuffer& aInstanceBuffer)
+void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount, const std::vector<std::shared_ptr<Material>>& aMaterialList, DynamicVertexBuffer& aInstanceBuffer, float aLODHeuristic)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Instanced Mesh Debug Pass");
 	GraphicsEngine& ge = GraphicsEngine::Get();
@@ -286,7 +292,8 @@ void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount
 		std::vector<unsigned> strides;
 		std::vector<unsigned> offsets;
 
-		buffers.emplace_back(*submesh.GetVertexBuffer().GetAddressOf());
+		const Mesh::Submesh::LOD& lod = submesh.GetLOD(submesh.GetAppropriateLODLevel(aLODHeuristic));
+		buffers.emplace_back(*lod.GetVertexBuffer().GetAddressOf());
 		buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
 
 		strides.emplace_back(ge.myCurrentPSO->VertexStride);
@@ -296,7 +303,7 @@ void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount
 		offsets.emplace_back(0);
 
 		ge.myRHI->SetVertexBuffers(buffers, strides, offsets);
-		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+		ge.myRHI->SetIndexBuffer(lod.GetIndexBuffer());
 
 		std::array<unsigned, GraphicsSettings::MAX_MATERIAL_TEXTURES> slotsToClear = { 0 };
 		unsigned currentSlotIndex = 0;
@@ -326,7 +333,7 @@ void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount
 			}
 		}
 
-		ge.myRHI->DrawIndexedInstanced(submesh.NumIndices, aMeshCount, 0, 0, 0);
+		ge.myRHI->DrawIndexedInstanced(lod.GetNumIndices(), aMeshCount, 0, 0, 0);
 		ge.myDrawcallAmount++;
 
 		for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)

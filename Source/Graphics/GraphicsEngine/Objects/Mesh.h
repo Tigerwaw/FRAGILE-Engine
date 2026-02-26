@@ -13,12 +13,15 @@ public:
 	{
 		friend class Mesh;
 
-		unsigned NumVertices = 0;
-		unsigned NumIndices = 0;
-		unsigned MaterialIndex = 0;
+		struct LOD
+		{
+			friend class Mesh;
 
-		FORCEINLINE const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return myVertexBuffer; }
-		FORCEINLINE const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetIndexBuffer() const { return myIndexBuffer; }
+			float Distance;
+
+			unsigned GetNumIndices() const { return static_cast<unsigned>(myIndices.size()); }
+			FORCEINLINE const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return myVertexBuffer; }
+			FORCEINLINE const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetIndexBuffer() const { return myIndexBuffer; }
 
 		private:
 			std::vector<Vertex> myVertices;
@@ -26,6 +29,16 @@ public:
 
 			Microsoft::WRL::ComPtr<ID3D11Buffer> myVertexBuffer;
 			Microsoft::WRL::ComPtr<ID3D11Buffer> myIndexBuffer;
+		};
+
+		void AddLOD(unsigned aLODLevel, std::vector<Vertex>&& aVertexList, std::vector<unsigned>&& aIndexList);
+		const LOD& GetLOD(unsigned aLODLevel) const;
+		unsigned GetAppropriateLODLevel(float aDistance) const;
+
+		unsigned MaterialIndex = 0;
+
+	private:
+		std::map<unsigned, LOD> myLODs;
 	};
 
 	struct Skeleton
@@ -45,7 +58,8 @@ public:
 	Mesh();
 	~Mesh();
 
-	void AddSubmesh(std::vector<Vertex>&& aVertexList, std::vector<unsigned>&& aIndexList, unsigned aMaterialIndex);
+	void AddSubmesh(Submesh&& aSubmesh);
+	void AddLOD(unsigned aSubmeshIndex, std::vector<Vertex>&& aVertexList, std::vector<unsigned>&& aIndexList);
 	void SetSkeleton(Skeleton&& aSkeleton);
 	void InitBoundingBox(Math::Vector3f aMinPoint, Math::Vector3f aMaxPoint);
 

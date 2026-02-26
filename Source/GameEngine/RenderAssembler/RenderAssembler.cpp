@@ -721,10 +721,13 @@ void RenderAssembler::QueueDeferredLightPasses(SceneRenderData& aRenderData)
 void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Queue All Deferred Objects");
+	
+	Math::Vector3f cameraWorldPos = aRenderData.mainCamera->gameObject->GetComponent<Transform>()->GetTranslation(true);
 
 	for (auto& gameObject : aRenderData.drawDeferred)
 	{
 		auto transform = gameObject->GetComponent<Transform>();
+		float lodHeuristic = (transform->GetTranslation(true) - cameraWorldPos).LengthSqr();
 
 		if (auto model = gameObject->GetComponent<Model>())
 		{
@@ -739,7 +742,8 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 					model->GetMaterials(),
 					transform->GetWorldMatrix(),
 					model->GetCustomShaderData_1(),
-					model->GetCustomShaderData_2());
+					model->GetCustomShaderData_2(),
+					lodHeuristic);
 			}
 		}
 
@@ -755,7 +759,8 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 					animModel->GetMesh(),
 					animModel->GetMaterials(),
 					transform->GetWorldMatrix(),
-					animModel->GetCurrentPose());
+					animModel->GetCurrentPose(),
+					lodHeuristic);
 			}
 		}
 
@@ -782,9 +787,12 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Queue All Forward Objects");
 
+	Math::Vector3f cameraWorldPos = aRenderData.mainCamera->gameObject->GetComponent<Transform>()->GetTranslation(true);
+
 	for (auto& gameObject : aRenderData.drawForward)
 	{
 		auto transform = gameObject->GetComponent<Transform>();
+		float lodHeuristic = (transform->GetTranslation(true) - cameraWorldPos).LengthSqr();
 
 		if (auto model = gameObject->GetComponent<Model>())
 		{
@@ -797,7 +805,8 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 					model->GetMaterials(),
 					transform->GetWorldMatrix(),
 					model->GetCustomShaderData_1(),
-					model->GetCustomShaderData_2());
+					model->GetCustomShaderData_2(),
+					lodHeuristic);
 			}
 		}
 
@@ -811,7 +820,8 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 					animModel->GetMesh(),
 					animModel->GetMaterials(),
 					transform->GetWorldMatrix(),
-					animModel->GetCurrentPose());
+					animModel->GetCurrentPose(),
+					lodHeuristic);
 			}
 		}
 
@@ -1198,9 +1208,12 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 
 void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 {
+	Math::Vector3f cameraWorldPos = aRenderData.mainCamera->gameObject->GetComponent<Transform>()->GetTranslation(true);
+
 	for (auto& gameObject : aRenderData.drawForward)
 	{
 		auto transform = gameObject->GetComponent<Transform>();
+		float lodHeuristic = (transform->GetTranslation(true) - cameraWorldPos).LengthSqr();
 
 		if (auto model = gameObject->GetComponent<Model>())
 		{
@@ -1211,7 +1224,8 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 					model->GetMaterials(), 
 					transform->GetWorldMatrix(), 
 					model->GetCustomShaderData_1(), 
-					model->GetCustomShaderData_2());
+					model->GetCustomShaderData_2(),
+					lodHeuristic);
 			}
 		}
 
@@ -1223,7 +1237,8 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 					animModel->GetMesh(), 
 					animModel->GetMaterials(), 
 					transform->GetWorldMatrix(), 
-					animModel->GetCurrentPose());
+					animModel->GetCurrentPose(),
+					lodHeuristic);
 			}
 		}
 
@@ -1244,6 +1259,7 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 	for (auto& gameObject : aRenderData.drawDeferred)
 	{
 		auto transform = gameObject->GetComponent<Transform>();
+		float lodHeuristic = (transform->GetTranslation(true) - cameraWorldPos).LengthSqr();
 
 		if (auto model = gameObject->GetComponent<Model>())
 		{
@@ -1254,7 +1270,8 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 					model->GetMaterials(),
 					transform->GetWorldMatrix(),
 					model->GetCustomShaderData_1(),
-					model->GetCustomShaderData_2());
+					model->GetCustomShaderData_2(),
+					lodHeuristic);
 			}
 		}
 
@@ -1266,7 +1283,8 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 					animModel->GetMesh(),
 					animModel->GetMaterials(),
 					transform->GetWorldMatrix(),
-					animModel->GetCurrentPose());
+					animModel->GetCurrentPose(),
+					lodHeuristic);
 			}
 		}
 

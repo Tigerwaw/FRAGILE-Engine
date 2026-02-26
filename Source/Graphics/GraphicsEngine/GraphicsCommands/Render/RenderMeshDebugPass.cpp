@@ -11,13 +11,15 @@ RenderMeshDebugPass::RenderMeshDebugPass(const std::shared_ptr<Mesh> aMesh,
                                          const std::vector<std::shared_ptr<Material>>& aMaterialList, 
                                          const Math::Matrix4x4f& aTransform, 
                                          const Math::Vector4f& aCustomShaderParams_1, 
-                                         const Math::Vector4f& aCustomShaderParams_2) :
+                                         const Math::Vector4f& aCustomShaderParams_2,
+                                         float aLODHeuristic) :
     myMaterialList(aMaterialList)
 {
     myMesh = aMesh;
     myTransform = aTransform;
     myCustomShaderParams_1 = aCustomShaderParams_1;
     myCustomShaderParams_2 = aCustomShaderParams_2;
+    myLODHeuristic = aLODHeuristic;
 }
 
 void RenderMeshDebugPass::Execute()
@@ -31,5 +33,5 @@ void RenderMeshDebugPass::Execute()
     objBufferData.customData_2 = myCustomShaderParams_2;
     GraphicsEngine::Get().UpdateAndSetConstantBuffer(ConstantBufferType::ObjectBuffer, objBufferData);
 
-    GraphicsEngine::Get().GetDrawer().RenderMeshDebugPass(*myMesh, myMaterialList);
+    GraphicsEngine::Get().GetDrawer().RenderMeshDebugPass(*myMesh, myMaterialList, myLODHeuristic);
 }

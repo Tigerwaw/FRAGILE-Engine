@@ -317,7 +317,10 @@ Mesh ResourceVendor::CreatePlanePrimitive() const
 	};
 
 	Mesh plane;
-	plane.AddSubmesh(std::move(vertexList), std::move(indexList), 0);
+	Mesh::Submesh submesh;
+	submesh.MaterialIndex = 0;
+	submesh.AddLOD(0, std::move(vertexList), std::move(indexList));
+	plane.AddSubmesh(std::move(submesh));
 	plane.InitBoundingBox({ -1.0f, -0.001f, -1.0f }, { 1.0f, 0.001f, 1.0f });
 	return plane;
 }
@@ -495,7 +498,10 @@ Mesh ResourceVendor::CreateCubePrimitive() const
 	};
 
 	Mesh cube;
-	cube.AddSubmesh(std::move(vertexList), std::move(indexList), 0);
+	Mesh::Submesh submesh;
+	submesh.MaterialIndex = 0;
+	submesh.AddLOD(0, std::move(vertexList), std::move(indexList));
+	cube.AddSubmesh(std::move(submesh));
 	cube.InitBoundingBox({ -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f });
 	return cube;
 }
@@ -639,7 +645,10 @@ Mesh ResourceVendor::CreateRampPrimitive() const
 	};
 
 	Mesh ramp;
-	ramp.AddSubmesh(std::move(vertexList), std::move(indexList), 0);
+	Mesh::Submesh submesh;
+	submesh.MaterialIndex = 0;
+	submesh.AddLOD(0, std::move(vertexList), std::move(indexList));
+	ramp.AddSubmesh(std::move(submesh));
 	ramp.InitBoundingBox({ -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f });
 	return ramp;
 }
