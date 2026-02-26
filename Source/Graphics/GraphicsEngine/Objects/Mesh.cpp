@@ -8,14 +8,21 @@ using namespace Microsoft::WRL;
 Mesh::Mesh() = default;
 Mesh::~Mesh() = default;
 
-void Mesh::Initialize(std::vector<Vertex>&& aVertexList, std::vector<unsigned>&& aIndexList, std::vector<Element>&& aElementList, Skeleton aSkeleton)
+void Mesh::AddSubmesh(std::vector<Vertex>&& aVertexList, std::vector<unsigned>&& aIndexList, unsigned aMaterialIndex)
 {
-	myVertices = std::move(aVertexList);
-	myIndices = std::move(aIndexList);
-	myElements = std::move(aElementList);
-	mySkeleton = aSkeleton;
-	GraphicsEngine::Get().GetResourceVendor().CreateVertexBuffer("Vertex Buffer", myVertices, myVertexBuffer);
-	GraphicsEngine::Get().GetResourceVendor().CreateIndexBuffer("Index Buffer", myIndices, myIndexBuffer);
+	Submesh& newSubmesh = mySubmeshes.emplace_back();
+	newSubmesh.myVertices = std::move(aVertexList);
+	newSubmesh.myIndices = std::move(aIndexList);
+	newSubmesh.MaterialIndex = aMaterialIndex;
+	newSubmesh.NumVertices = static_cast<unsigned>(newSubmesh.myVertices.size());
+	newSubmesh.NumIndices = static_cast<unsigned>(newSubmesh.myIndices.size());
+	GraphicsEngine::Get().GetResourceVendor().CreateVertexBuffer("Vertex Buffer", newSubmesh.myVertices, newSubmesh.myVertexBuffer);
+	GraphicsEngine::Get().GetResourceVendor().CreateIndexBuffer("Index Buffer", newSubmesh.myIndices, newSubmesh.myIndexBuffer);
+}
+
+void Mesh::SetSkeleton(Skeleton&& aSkeleton)
+{
+	mySkeleton = std::move(aSkeleton);
 }
 
 void Mesh::InitBoundingBox(Math::Vector3f aMinPoint, Math::Vector3f aMaxPoint)

@@ -24,7 +24,7 @@ Model::Model()
 Model::Model(std::shared_ptr<Mesh> aMesh)
 {
     myMesh = aMesh;
-    for (auto& element : myMesh->GetElements())
+    for (auto& element : myMesh->GetSubmeshes())
     {
         SetMaterialOnSlot(element.MaterialIndex, GraphicsEngine::Get().GetDefaultMaterial());
     }
@@ -33,7 +33,7 @@ Model::Model(std::shared_ptr<Mesh> aMesh)
 Model::Model(std::shared_ptr<Mesh> aMesh, std::shared_ptr<Material> aMaterial)
 {
     myMesh = aMesh;
-    for (auto& element : myMesh->GetElements())
+    for (auto& element : myMesh->GetSubmeshes())
     {
         SetMaterialOnSlot(element.MaterialIndex, aMaterial);
     }

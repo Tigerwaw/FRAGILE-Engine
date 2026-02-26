@@ -107,6 +107,16 @@ void FeatureShowcase::InitializeApplication()
 
 	Engine::Get().GetSceneHandler().Instantiate(instancedModelObj);
 
+	{
+		std::shared_ptr<GameObject> loddedObject = std::make_shared<GameObject>();
+		loddedObject->AddComponent<Transform>(Math::Vector3f(0.0f, 0, -2500.0f));
+		std::shared_ptr<Model> loddedModel = loddedObject->AddComponent<Model>();
+		loddedModel->SetMesh(AssetManager::Get().GetAsset<MeshAsset>("SM_CastleStairs.fbx")->mesh);
+		loddedModel->SetMaterialOnSlot(0, AssetManager::Get().GetAsset<MaterialAsset>("Castle_Stairs.mat")->material);
+		Engine::Get().GetSceneHandler().Instantiate(loddedObject);
+	}
+
+
 	Engine::Get().DrawColliders = true;
 }
 

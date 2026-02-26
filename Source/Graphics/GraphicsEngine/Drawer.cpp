@@ -31,14 +31,15 @@ void Drawer::RenderSkybox(const Mesh& aMesh, const std::shared_ptr<Texture> aTex
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Skybox");
 	GraphicsEngine& ge = GraphicsEngine::Get();
 	ge.ChangePipelineState(ge.GetPSO(PSOType::Skybox));
-	ge.myRHI->SetVertexBuffer(aMesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
-	ge.myRHI->SetIndexBuffer(aMesh.GetIndexBuffer());
 	ge.myRHI->SetPrimitiveTopology(Topology::TRIANGLELIST);
 
-	for (const auto& element : aMesh.GetElements())
+	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
+		ge.myRHI->SetVertexBuffer(submesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
+		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+
 		ge.SetTextureResource_PS(0, *aTexture);
-		ge.myRHI->DrawIndexed(element.IndexOffset, element.NumIndices);
+		ge.myRHI->DrawIndexed(0, submesh.NumIndices);
 		ge.myDrawcallAmount++;
 
 		ge.ClearTextureResource_PS(0);
@@ -49,25 +50,25 @@ void Drawer::RenderMesh(const Mesh& aMesh, const std::vector<std::shared_ptr<Mat
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Mesh");
 	GraphicsEngine& ge = GraphicsEngine::Get();
-	ge.myRHI->SetVertexBuffer(aMesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
-	ge.myRHI->SetIndexBuffer(aMesh.GetIndexBuffer());
 	ge.myRHI->SetPrimitiveTopology(Topology::TRIANGLELIST);
 
 	ge.SetTextureResource_PS(127, *ge.myBRDFLUTTexture);
 
-	for (const auto& element : aMesh.GetElements())
+	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
+		ge.myRHI->SetVertexBuffer(submesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
+		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
 		std::array<unsigned, GraphicsSettings::MAX_MATERIAL_TEXTURES> slotsToClear = { 0 };
 		unsigned currentSlotIndex = 0;
 
-		if (aMaterialList.size() > element.MaterialIndex)
+		if (aMaterialList.size() > submesh.MaterialIndex)
 		{
-			MaterialBuffer matBufferData = aMaterialList[element.MaterialIndex]->MaterialSettings();
+			MaterialBuffer matBufferData = aMaterialList[submesh.MaterialIndex]->MaterialSettings();
 			ge.UpdateAndSetConstantBuffer(ConstantBufferType::MaterialBuffer, matBufferData);
 
-			ge.ChangePipelineState(aMaterialList[element.MaterialIndex]->GetPSO());
+			ge.ChangePipelineState(aMaterialList[submesh.MaterialIndex]->GetPSO());
 
-			for (auto& [slot, texture] : aMaterialList[element.MaterialIndex]->GetTextures())
+			for (auto& [slot, texture] : aMaterialList[submesh.MaterialIndex]->GetTextures())
 			{
 				ge.SetTextureResource_PS(slot, *texture);
 				slotsToClear[currentSlotIndex] = slot;
@@ -89,7 +90,7 @@ void Drawer::RenderMesh(const Mesh& aMesh, const std::vector<std::shared_ptr<Mat
 			}
 		}
 
-		ge.myRHI->DrawIndexed(element.IndexOffset, element.NumIndices);
+		ge.myRHI->DrawIndexed(0, submesh.NumIndices);
 		ge.myDrawcallAmount++;
 
 		for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)
@@ -105,13 +106,13 @@ void Drawer::RenderMeshShadow(const Mesh& aMesh)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Mesh Shadow");
 	GraphicsEngine& ge = GraphicsEngine::Get();
-	ge.myRHI->SetVertexBuffer(aMesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
-	ge.myRHI->SetIndexBuffer(aMesh.GetIndexBuffer());
 	ge.myRHI->SetPrimitiveTopology(Topology::TRIANGLELIST);
 
-	for (const auto& element : aMesh.GetElements())
+	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
-		ge.myRHI->DrawIndexed(element.IndexOffset, element.NumIndices);
+		ge.myRHI->SetVertexBuffer(submesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
+		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+		ge.myRHI->DrawIndexed(0, submesh.NumIndices);
 		ge.myDrawcallAmount++;
 	}
 }
@@ -120,23 +121,24 @@ void Drawer::RenderMeshDebugPass(const Mesh& aMesh, const std::vector<std::share
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Mesh");
 	GraphicsEngine& ge = GraphicsEngine::Get();
-	ge.myRHI->SetVertexBuffer(aMesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
-	ge.myRHI->SetIndexBuffer(aMesh.GetIndexBuffer());
 	ge.myRHI->SetPrimitiveTopology(Topology::TRIANGLELIST);
 
 	ge.SetTextureResource_PS(127, *ge.myBRDFLUTTexture);
 
-	for (const auto& element : aMesh.GetElements())
+	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
+		ge.myRHI->SetVertexBuffer(submesh.GetVertexBuffer(), ge.myCurrentPSO->VertexStride, 0);
+		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+
 		std::array<unsigned, GraphicsSettings::MAX_MATERIAL_TEXTURES> slotsToClear = { 0 };
 		unsigned currentSlotIndex = 0;
 
-		if (aMaterialList.size() > element.MaterialIndex)
+		if (aMaterialList.size() > submesh.MaterialIndex)
 		{
-			MaterialBuffer matBufferData = aMaterialList[element.MaterialIndex]->MaterialSettings();
+			MaterialBuffer matBufferData = aMaterialList[submesh.MaterialIndex]->MaterialSettings();
 			ge.UpdateAndSetConstantBuffer(ConstantBufferType::MaterialBuffer, matBufferData);
 
-			for (auto& [slot, texture] : aMaterialList[element.MaterialIndex]->GetTextures())
+			for (auto& [slot, texture] : aMaterialList[submesh.MaterialIndex]->GetTextures())
 			{
 				ge.SetTextureResource_PS(slot, *texture);
 				slotsToClear[currentSlotIndex] = slot;
@@ -156,7 +158,7 @@ void Drawer::RenderMeshDebugPass(const Mesh& aMesh, const std::vector<std::share
 			}
 		}
 
-		ge.myRHI->DrawIndexed(element.IndexOffset, element.NumIndices);
+		ge.myRHI->DrawIndexed(0, submesh.NumIndices);
 		ge.myDrawcallAmount++;
 
 		for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)
@@ -173,38 +175,39 @@ void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const s
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Instanced Mesh");
 	GraphicsEngine& ge = GraphicsEngine::Get();
 
-	std::vector<ID3D11Buffer*> buffers;
-	std::vector<unsigned> strides;
-	std::vector<unsigned> offsets;
-
-	buffers.emplace_back(*aMesh.GetVertexBuffer().GetAddressOf());
-	buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
-
-	strides.emplace_back(ge.myCurrentPSO->VertexStride);
-	strides.emplace_back(static_cast<unsigned>(sizeof(Math::Matrix4x4f)));
-
-	offsets.emplace_back(0);
-	offsets.emplace_back(0);
-
-	ge.myRHI->SetVertexBuffers(buffers, strides, offsets);
-	ge.myRHI->SetIndexBuffer(aMesh.GetIndexBuffer());
 	ge.myRHI->SetPrimitiveTopology(Topology::TRIANGLELIST);
 
 	ge.SetTextureResource_PS(127, *ge.myBRDFLUTTexture);
 
-	for (const auto& element : aMesh.GetElements())
+	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
+		std::vector<ID3D11Buffer*> buffers;
+		std::vector<unsigned> strides;
+		std::vector<unsigned> offsets;
+
+		buffers.emplace_back(*submesh.GetVertexBuffer().GetAddressOf());
+		buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
+
+		strides.emplace_back(ge.myCurrentPSO->VertexStride);
+		strides.emplace_back(static_cast<unsigned>(sizeof(Math::Matrix4x4f)));
+
+		offsets.emplace_back(0);
+		offsets.emplace_back(0);
+
+		ge.myRHI->SetVertexBuffers(buffers, strides, offsets);
+		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+
 		std::array<unsigned, GraphicsSettings::MAX_MATERIAL_TEXTURES> slotsToClear = { 0 };
 		unsigned currentSlotIndex = 0;
 
-		if (aMaterialList.size() > element.MaterialIndex)
+		if (aMaterialList.size() > submesh.MaterialIndex)
 		{
-			MaterialBuffer matBufferData = aMaterialList[element.MaterialIndex]->MaterialSettings();
+			MaterialBuffer matBufferData = aMaterialList[submesh.MaterialIndex]->MaterialSettings();
 			ge.UpdateAndSetConstantBuffer(ConstantBufferType::MaterialBuffer, matBufferData);
 
-			ge.ChangePipelineState(aMaterialList[element.MaterialIndex]->GetPSO());
+			ge.ChangePipelineState(aMaterialList[submesh.MaterialIndex]->GetPSO());
 
-			for (auto& [slot, texture] : aMaterialList[element.MaterialIndex]->GetTextures())
+			for (auto& [slot, texture] : aMaterialList[submesh.MaterialIndex]->GetTextures())
 			{
 				ge.SetTextureResource_PS(slot, *texture);
 				slotsToClear[currentSlotIndex] = slot;
@@ -226,7 +229,7 @@ void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const s
 			}
 		}
 
-		ge.myRHI->DrawIndexedInstanced(element.NumIndices, aMeshCount, element.IndexOffset, 0, 0);
+		ge.myRHI->DrawIndexedInstanced(submesh.NumIndices, aMeshCount, 0, 0, 0);
 		ge.myDrawcallAmount++;
 
 		for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)
@@ -243,26 +246,27 @@ void Drawer::RenderInstancedMeshShadow(const Mesh& aMesh, unsigned aMeshCount, D
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Instanced Mesh Shadow");
 	GraphicsEngine& ge = GraphicsEngine::Get();
 
-	std::vector<ID3D11Buffer*> buffers;
-	std::vector<unsigned> strides;
-	std::vector<unsigned> offsets;
-
-	buffers.emplace_back(*aMesh.GetVertexBuffer().GetAddressOf());
-	buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
-
-	strides.emplace_back(ge.myCurrentPSO->VertexStride);
-	strides.emplace_back(static_cast<unsigned>(sizeof(Math::Matrix4x4f)));
-
-	offsets.emplace_back(0);
-	offsets.emplace_back(0);
-
-	ge.myRHI->SetVertexBuffers(buffers, strides, offsets);
-	ge.myRHI->SetIndexBuffer(aMesh.GetIndexBuffer());
 	ge.myRHI->SetPrimitiveTopology(Topology::TRIANGLELIST);
 
-	for (const auto& element : aMesh.GetElements())
+	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
-		ge.myRHI->DrawIndexedInstanced(element.NumIndices, aMeshCount, element.IndexOffset, 0, 0);
+		std::vector<ID3D11Buffer*> buffers;
+		std::vector<unsigned> strides;
+		std::vector<unsigned> offsets;
+
+		buffers.emplace_back(*submesh.GetVertexBuffer().GetAddressOf());
+		buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
+
+		strides.emplace_back(ge.myCurrentPSO->VertexStride);
+		strides.emplace_back(static_cast<unsigned>(sizeof(Math::Matrix4x4f)));
+
+		offsets.emplace_back(0);
+		offsets.emplace_back(0);
+
+		ge.myRHI->SetVertexBuffers(buffers, strides, offsets);
+		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+
+		ge.myRHI->DrawIndexedInstanced(submesh.NumIndices, aMeshCount, 0, 0, 0);
 		ge.myDrawcallAmount++;
 	}
 }
@@ -272,36 +276,37 @@ void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Instanced Mesh Debug Pass");
 	GraphicsEngine& ge = GraphicsEngine::Get();
 
-	std::vector<ID3D11Buffer*> buffers;
-	std::vector<unsigned> strides;
-	std::vector<unsigned> offsets;
-
-	buffers.emplace_back(*aMesh.GetVertexBuffer().GetAddressOf());
-	buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
-
-	strides.emplace_back(ge.myCurrentPSO->VertexStride);
-	strides.emplace_back(static_cast<unsigned>(sizeof(Math::Matrix4x4f)));
-
-	offsets.emplace_back(0);
-	offsets.emplace_back(0);
-
-	ge.myRHI->SetVertexBuffers(buffers, strides, offsets);
-	ge.myRHI->SetIndexBuffer(aMesh.GetIndexBuffer());
 	ge.myRHI->SetPrimitiveTopology(Topology::TRIANGLELIST);
 
 	ge.SetTextureResource_PS(127, *ge.myBRDFLUTTexture);
 
-	for (const auto& element : aMesh.GetElements())
+	for (const auto& submesh : aMesh.GetSubmeshes())
 	{
+		std::vector<ID3D11Buffer*> buffers;
+		std::vector<unsigned> strides;
+		std::vector<unsigned> offsets;
+
+		buffers.emplace_back(*submesh.GetVertexBuffer().GetAddressOf());
+		buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
+
+		strides.emplace_back(ge.myCurrentPSO->VertexStride);
+		strides.emplace_back(static_cast<unsigned>(sizeof(Math::Matrix4x4f)));
+
+		offsets.emplace_back(0);
+		offsets.emplace_back(0);
+
+		ge.myRHI->SetVertexBuffers(buffers, strides, offsets);
+		ge.myRHI->SetIndexBuffer(submesh.GetIndexBuffer());
+
 		std::array<unsigned, GraphicsSettings::MAX_MATERIAL_TEXTURES> slotsToClear = { 0 };
 		unsigned currentSlotIndex = 0;
 
-		if (aMaterialList.size() > element.MaterialIndex)
+		if (aMaterialList.size() > submesh.MaterialIndex)
 		{
-			MaterialBuffer matBufferData = aMaterialList[element.MaterialIndex]->MaterialSettings();
+			MaterialBuffer matBufferData = aMaterialList[submesh.MaterialIndex]->MaterialSettings();
 			ge.UpdateAndSetConstantBuffer(ConstantBufferType::MaterialBuffer, matBufferData);
 
-			for (auto& [slot, texture] : aMaterialList[element.MaterialIndex]->GetTextures())
+			for (auto& [slot, texture] : aMaterialList[submesh.MaterialIndex]->GetTextures())
 			{
 				ge.SetTextureResource_PS(slot, *texture);
 				slotsToClear[currentSlotIndex] = slot;
@@ -321,7 +326,7 @@ void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount
 			}
 		}
 
-		ge.myRHI->DrawIndexedInstanced(element.NumIndices, aMeshCount, element.IndexOffset, 0, 0);
+		ge.myRHI->DrawIndexedInstanced(submesh.NumIndices, aMeshCount, 0, 0, 0);
 		ge.myDrawcallAmount++;
 
 		for (unsigned slotIndex = 0; slotIndex < currentSlotIndex; slotIndex++)

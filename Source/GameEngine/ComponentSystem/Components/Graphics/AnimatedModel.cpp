@@ -32,7 +32,7 @@ AnimatedModel::AnimatedModel()
 AnimatedModel::AnimatedModel(std::shared_ptr<Mesh> aMesh)
 {
     SetMesh(aMesh);
-    for (auto& element : myMesh->GetElements())
+    for (auto& element : myMesh->GetSubmeshes())
     {
         SetMaterialOnSlot(element.MaterialIndex, GraphicsEngine::Get().GetDefaultMaterial());
     }

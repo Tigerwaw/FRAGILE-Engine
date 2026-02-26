@@ -27,7 +27,7 @@ void InstancedModel::Update()
 void InstancedModel::SetMesh(std::shared_ptr<Mesh> aMesh)
 {
 	myMesh = aMesh;
-	for (auto& element : myMesh->GetElements())
+	for (auto& element : myMesh->GetSubmeshes())
 	{
 		SetMaterialOnSlot(element.MaterialIndex, GraphicsEngine::Get().GetDefaultMaterial());
 	}

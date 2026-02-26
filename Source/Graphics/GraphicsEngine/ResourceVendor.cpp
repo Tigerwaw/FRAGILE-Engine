@@ -316,16 +316,9 @@ Mesh ResourceVendor::CreatePlanePrimitive() const
 		2, 3, 0,
 	};
 
-	std::vector<Mesh::Element> elementList;
-	Mesh::Element& element = elementList.emplace_back();
-	element.VertexOffset = 0;
-	element.IndexOffset = 0;
-	element.NumVertices = static_cast<unsigned>(vertexList.size());
-	element.NumIndices = static_cast<unsigned>(indexList.size());
-
 	Mesh plane;
+	plane.AddSubmesh(std::move(vertexList), std::move(indexList), 0);
 	plane.InitBoundingBox({ -1.0f, -0.001f, -1.0f }, { 1.0f, 0.001f, 1.0f });
-	plane.Initialize(std::move(vertexList), std::move(indexList), std::move(elementList), Mesh::Skeleton());
 	return plane;
 }
 
@@ -501,16 +494,9 @@ Mesh ResourceVendor::CreateCubePrimitive() const
 		20,22,23
 	};
 
-	std::vector<Mesh::Element> elementList;
-	Mesh::Element& element = elementList.emplace_back();
-	element.VertexOffset = 0;
-	element.IndexOffset = 0;
-	element.NumVertices = static_cast<unsigned>(vertexList.size());
-	element.NumIndices = static_cast<unsigned>(indexList.size());
-
 	Mesh cube;
+	cube.AddSubmesh(std::move(vertexList), std::move(indexList), 0);
 	cube.InitBoundingBox({ -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f });
-	cube.Initialize(std::move(vertexList), std::move(indexList), std::move(elementList), Mesh::Skeleton());
 	return cube;
 }
 
@@ -652,15 +638,8 @@ Mesh ResourceVendor::CreateRampPrimitive() const
 		15, 16, 17,
 	};
 
-	std::vector<Mesh::Element> elementList;
-	Mesh::Element& element = elementList.emplace_back();
-	element.VertexOffset = 0;
-	element.IndexOffset = 0;
-	element.NumVertices = static_cast<unsigned>(vertexList.size());
-	element.NumIndices = static_cast<unsigned>(indexList.size());
-
 	Mesh ramp;
+	ramp.AddSubmesh(std::move(vertexList), std::move(indexList), 0);
 	ramp.InitBoundingBox({ -1.0f, -1.0f, -1.0f }, { 1.0f, 1.0f, 1.0f });
-	ramp.Initialize(std::move(vertexList), std::move(indexList), std::move(elementList), Mesh::Skeleton());
 	return ramp;
 }

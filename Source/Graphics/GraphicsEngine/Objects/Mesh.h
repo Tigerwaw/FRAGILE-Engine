@@ -9,13 +9,23 @@ struct Vertex;
 class Mesh
 {
 public:
-	struct Element
+	struct Submesh
 	{
-		unsigned VertexOffset = 0;
-		unsigned IndexOffset = 0;
+		friend class Mesh;
+
 		unsigned NumVertices = 0;
 		unsigned NumIndices = 0;
 		unsigned MaterialIndex = 0;
+
+		FORCEINLINE const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return myVertexBuffer; }
+		FORCEINLINE const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetIndexBuffer() const { return myIndexBuffer; }
+
+		private:
+			std::vector<Vertex> myVertices;
+			std::vector<unsigned> myIndices;
+
+			Microsoft::WRL::ComPtr<ID3D11Buffer> myVertexBuffer;
+			Microsoft::WRL::ComPtr<ID3D11Buffer> myIndexBuffer;
 	};
 
 	struct Skeleton
@@ -35,22 +45,16 @@ public:
 	Mesh();
 	~Mesh();
 
-	void Initialize(std::vector<Vertex>&& aVertexList, std::vector<unsigned>&& aIndexList, std::vector<Element>&& aElementList, Skeleton aSkeleton);
+	void AddSubmesh(std::vector<Vertex>&& aVertexList, std::vector<unsigned>&& aIndexList, unsigned aMaterialIndex);
+	void SetSkeleton(Skeleton&& aSkeleton);
 	void InitBoundingBox(Math::Vector3f aMinPoint, Math::Vector3f aMaxPoint);
 
-	FORCEINLINE const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return myVertexBuffer; }
-	FORCEINLINE const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetIndexBuffer() const { return myIndexBuffer; }
-	FORCEINLINE const std::vector<Element>& GetElements() const { return myElements; }
+	FORCEINLINE const std::vector<Submesh>& GetSubmeshes() const { return mySubmeshes; }
 	FORCEINLINE const Skeleton& GetSkeleton() const { return mySkeleton; }
 	FORCEINLINE const Math::AABB3D<float>& GetBoundingBox() const { return myBoundingBox; }
 
 private:
-	std::vector<Vertex> myVertices;
-	std::vector<unsigned> myIndices;
-	std::vector<Element> myElements;
+	std::vector<Submesh> mySubmeshes;
 	Skeleton mySkeleton;
 	Math::AABB3D<float> myBoundingBox;
-
-	Microsoft::WRL::ComPtr<ID3D11Buffer> myVertexBuffer;
-	Microsoft::WRL::ComPtr<ID3D11Buffer> myIndexBuffer;
 };
