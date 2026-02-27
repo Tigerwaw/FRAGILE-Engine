@@ -157,6 +157,50 @@ bool Camera::GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransf
 	return cornersInside > 0;
 }
 
+float Camera::GetBoundingBoxScreenPercentage(std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB)
+{
+	Math::Matrix4x4f camWorldInv = gameObject->GetComponent<Transform>()->GetWorldMatrixInverse();
+	Math::AABB3D<float> aabbWorldSpace = aObjectAABB.GetAABBinNewSpace(aObjectTransform->GetWorldMatrix());
+	Math::AABB3D<float> aabbViewSpace = aabbWorldSpace.GetAABBinNewSpace(camWorldInv);
+
+	Math::Vector3f newMin = { FLT_MAX, FLT_MAX, FLT_MAX };
+	Math::Vector3f newMax = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+
+	for (Math::Vector3f corner : aabbViewSpace.GetCorners())
+	{
+		Math::Vector4f newCorner = ToVector4(corner, 1.0f) * myProjectionMatrix;
+		newCorner.x /= newCorner.w;
+		newCorner.y /= newCorner.w;
+		newCorner.z /= newCorner.w;
+		corner = ToVector3(newCorner);
+
+		newMin.x = std::fminf(corner.x, newMin.x);
+		newMax.x = std::fmaxf(corner.x, newMax.x);
+		newMin.y = std::fminf(corner.y, newMin.y);
+		newMax.y = std::fmaxf(corner.y, newMax.y);
+		newMin.z = std::fminf(corner.z, newMin.z);
+		newMax.z = std::fmaxf(corner.z, newMax.z);
+	}
+
+	newMin.x = ((newMin.x + 1.0f) * 0.5f) * myViewportDimensions.x;
+	newMin.y = ((newMin.y + 1.0f) * 0.5f) * myViewportDimensions.y;
+
+	Math::Vector2f objectSides;
+	objectSides.x = newMax.x - newMin.x;
+	objectSides.y = newMax.y - newMin.y;
+
+	float objectArea = objectSides.x * objectSides.y;
+	float viewportArea = myViewportDimensions.x * myViewportDimensions.y;
+	float screenPercentage = objectArea / viewportArea;
+	return screenPercentage;
+
+	// Move bounding box into world space
+	// Move bounding box into camera space
+	// Move bounding box into screen space
+	// Get 2D extents (min x/y, max x/y of all 8 points)
+	// Compare volumes of 2D bounding box and viewport
+}
+
 bool Camera::Serialize(nl::json& outJsonObject)
 {
 	outJsonObject;

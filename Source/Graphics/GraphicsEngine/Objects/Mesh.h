@@ -17,7 +17,7 @@ public:
 		{
 			friend class Mesh;
 
-			float Distance;
+			float ScreenPercentage;
 
 			unsigned GetNumIndices() const { return static_cast<unsigned>(myIndices.size()); }
 			FORCEINLINE const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return myVertexBuffer; }
@@ -33,7 +33,7 @@ public:
 
 		void AddLOD(unsigned aLODLevel, std::vector<Vertex>&& aVertexList, std::vector<unsigned>&& aIndexList);
 		const LOD& GetLOD(unsigned aLODLevel) const;
-		unsigned GetAppropriateLODLevel(float aDistance) const;
+		unsigned GetAppropriateLODLevel(float aScreenPercentage) const;
 
 		unsigned MaterialIndex = 0;
 

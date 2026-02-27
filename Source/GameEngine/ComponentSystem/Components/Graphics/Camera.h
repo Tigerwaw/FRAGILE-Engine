@@ -36,6 +36,7 @@ public:
 	bool GetViewcullingIntersection(const Math::AABB3D<float>& aObjectAABB);
 	bool GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB);
 	bool GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransform, const std::array<Math::Vector3f, 8>& aLightFrustum);
+	float GetBoundingBoxScreenPercentage(std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB);
 
 	bool Serialize(nl::json& outJsonObject) override;
 	bool Deserialize(nl::json& aJsonObject) override;

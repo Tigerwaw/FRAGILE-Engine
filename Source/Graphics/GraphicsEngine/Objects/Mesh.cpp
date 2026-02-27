@@ -34,7 +34,7 @@ void Mesh::Submesh::AddLOD(unsigned aLODLevel, std::vector<Vertex>&& aVertexList
 {
 	const auto [it, status] = myLODs.insert({ aLODLevel, LOD() });
 	Submesh::LOD& lod = it->second;
-	lod.Distance = aLODLevel * 1000.0f * 1000.0f; // TEMP Distance heuristic
+	lod.ScreenPercentage = 1 / pow(4.0f, static_cast<float>(it->first));
 	lod.myVertices = std::move(aVertexList);
 	lod.myIndices = std::move(aIndexList);
 	GraphicsEngine::Get().GetResourceVendor().CreateVertexBuffer("Vertex Buffer", lod.myVertices, lod.myVertexBuffer);
@@ -49,15 +49,18 @@ const Mesh::Submesh::LOD& Mesh::Submesh::GetLOD(unsigned aLODLevel) const
 	return myLODs.begin()->second;
 }
 
-unsigned Mesh::Submesh::GetAppropriateLODLevel(float aDistance) const
+unsigned Mesh::Submesh::GetAppropriateLODLevel(float aScreenPercentage) const
 {
-	unsigned index = static_cast<unsigned>(myLODs.size() - 1);
-	for (auto it = myLODs.rbegin(); it != myLODs.rend(); ++it)
+	unsigned index = 0;
+	for (auto it = myLODs.begin(); it != myLODs.end(); ++it)
 	{
-		if (aDistance >= it->second.Distance)
-			return index;
+		if (aScreenPercentage >= it->second.ScreenPercentage)
+			break;
 
-		index--;
+		if (index == myLODs.size() - 1)
+			break;
+
+		index++;
 	}
 
 	return index;

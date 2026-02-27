@@ -721,19 +721,16 @@ void RenderAssembler::QueueDeferredLightPasses(SceneRenderData& aRenderData)
 void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Queue All Deferred Objects");
-	
-	Math::Vector3f cameraWorldPos = aRenderData.mainCamera->gameObject->GetComponent<Transform>()->GetTranslation(true);
-
 	for (auto& gameObject : aRenderData.drawDeferred)
 	{
 		auto transform = gameObject->GetComponent<Transform>();
-		float lodHeuristic = (transform->GetTranslation(true) - cameraWorldPos).LengthSqr();
 
 		if (auto model = gameObject->GetComponent<Model>())
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
 				UpdateBoundingBox(transform, model->GetBoundingBox());
+				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, model->GetBoundingBox());
 
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Mesh Data");
 
@@ -752,6 +749,7 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
 				UpdateBoundingBox(transform, animModel->GetBoundingBox());
+				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, animModel->GetBoundingBox());
 
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Anim Mesh Data");
 				
@@ -787,17 +785,16 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Queue All Forward Objects");
 
-	Math::Vector3f cameraWorldPos = aRenderData.mainCamera->gameObject->GetComponent<Transform>()->GetTranslation(true);
-
 	for (auto& gameObject : aRenderData.drawForward)
 	{
 		auto transform = gameObject->GetComponent<Transform>();
-		float lodHeuristic = (transform->GetTranslation(true) - cameraWorldPos).LengthSqr();
 
 		if (auto model = gameObject->GetComponent<Model>())
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
+				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, model->GetBoundingBox());
+
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Mesh Data");
 
 				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMesh>(
@@ -814,6 +811,8 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
+				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, animModel->GetBoundingBox());
+
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Anim Mesh Data");
 
 				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMesh>(
@@ -1208,17 +1207,15 @@ void RenderAssembler::QueueObjectShadows(const std::vector<std::shared_ptr<GameO
 
 void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 {
-	Math::Vector3f cameraWorldPos = aRenderData.mainCamera->gameObject->GetComponent<Transform>()->GetTranslation(true);
-
 	for (auto& gameObject : aRenderData.drawForward)
 	{
 		auto transform = gameObject->GetComponent<Transform>();
-		float lodHeuristic = (transform->GetTranslation(true) - cameraWorldPos).LengthSqr();
 
 		if (auto model = gameObject->GetComponent<Model>())
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
+				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, model->GetBoundingBox());
 				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshDebugPass>(
 					model->GetMesh(), 
 					model->GetMaterials(), 
@@ -1233,6 +1230,7 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
+				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, animModel->GetBoundingBox());
 				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshDebugPass>(
 					animModel->GetMesh(), 
 					animModel->GetMaterials(), 
@@ -1259,12 +1257,12 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 	for (auto& gameObject : aRenderData.drawDeferred)
 	{
 		auto transform = gameObject->GetComponent<Transform>();
-		float lodHeuristic = (transform->GetTranslation(true) - cameraWorldPos).LengthSqr();
 
 		if (auto model = gameObject->GetComponent<Model>())
 		{
 			if (!model->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, model->GetBoundingBox()))
 			{
+				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, model->GetBoundingBox());
 				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderMeshDebugPass>(
 					model->GetMesh(),
 					model->GetMaterials(),
@@ -1279,6 +1277,7 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
+				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, animModel->GetBoundingBox());
 				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshDebugPass>(
 					animModel->GetMesh(),
 					animModel->GetMaterials(),
