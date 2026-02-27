@@ -174,7 +174,7 @@ void Drawer::RenderMeshDebugPass(const Mesh& aMesh, const std::vector<std::share
 	ge.ClearTextureResource_PS(127);
 }
 
-void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const std::vector<std::shared_ptr<Material>>& aMaterialList, DynamicVertexBuffer& aInstanceBuffer, float aLODHeuristic)
+void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const std::vector<std::shared_ptr<Material>>& aMaterialList, DynamicVertexBuffer& aInstanceBuffer)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Instanced Mesh");
 	GraphicsEngine& ge = GraphicsEngine::Get();
@@ -189,7 +189,7 @@ void Drawer::RenderInstancedMesh(const Mesh& aMesh, unsigned aMeshCount, const s
 		std::vector<unsigned> strides;
 		std::vector<unsigned> offsets;
 
-		const Mesh::Submesh::LOD& lod = submesh.GetLOD(submesh.GetAppropriateLODLevel(aLODHeuristic));
+		const Mesh::Submesh::LOD& lod = submesh.GetLOD(0);
 		buffers.emplace_back(*lod.GetVertexBuffer().GetAddressOf());
 		buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
 
@@ -277,7 +277,7 @@ void Drawer::RenderInstancedMeshShadow(const Mesh& aMesh, unsigned aMeshCount, D
 	}
 }
 
-void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount, const std::vector<std::shared_ptr<Material>>& aMaterialList, DynamicVertexBuffer& aInstanceBuffer, float aLODHeuristic)
+void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount, const std::vector<std::shared_ptr<Material>>& aMaterialList, DynamicVertexBuffer& aInstanceBuffer)
 {
 	PIXScopedEvent(PIX_COLOR_INDEX(1), "GE Render Instanced Mesh Debug Pass");
 	GraphicsEngine& ge = GraphicsEngine::Get();
@@ -292,7 +292,7 @@ void Drawer::RenderInstancedMeshDebugPass(const Mesh& aMesh, unsigned aMeshCount
 		std::vector<unsigned> strides;
 		std::vector<unsigned> offsets;
 
-		const Mesh::Submesh::LOD& lod = submesh.GetLOD(submesh.GetAppropriateLODLevel(aLODHeuristic));
+		const Mesh::Submesh::LOD& lod = submesh.GetLOD(0);
 		buffers.emplace_back(*lod.GetVertexBuffer().GetAddressOf());
 		buffers.emplace_back(*aInstanceBuffer.GetVertexBuffer().GetAddressOf());
 

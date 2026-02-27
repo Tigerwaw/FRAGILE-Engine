@@ -749,7 +749,6 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
 				UpdateBoundingBox(transform, animModel->GetBoundingBox());
-				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, animModel->GetBoundingBox());
 
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Anim Mesh Data");
 				
@@ -757,8 +756,7 @@ void RenderAssembler::QueueDeferredObjects(SceneRenderData& aRenderData)
 					animModel->GetMesh(),
 					animModel->GetMaterials(),
 					transform->GetWorldMatrix(),
-					animModel->GetCurrentPose(),
-					lodHeuristic);
+					animModel->GetCurrentPose());
 			}
 		}
 
@@ -811,16 +809,13 @@ void RenderAssembler::QueueForwardObjects(SceneRenderData& aRenderData)
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
-				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, animModel->GetBoundingBox());
-
 				PIXScopedEvent(PIX_COLOR_INDEX(6), "RenderAssembler Create Anim Mesh Data");
 
 				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMesh>(
 					animModel->GetMesh(),
 					animModel->GetMaterials(),
 					transform->GetWorldMatrix(),
-					animModel->GetCurrentPose(),
-					lodHeuristic);
+					animModel->GetCurrentPose());
 			}
 		}
 
@@ -1230,13 +1225,11 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
-				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, animModel->GetBoundingBox());
 				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshDebugPass>(
 					animModel->GetMesh(), 
 					animModel->GetMaterials(), 
 					transform->GetWorldMatrix(), 
-					animModel->GetCurrentPose(),
-					lodHeuristic);
+					animModel->GetCurrentPose());
 			}
 		}
 
@@ -1277,13 +1270,11 @@ void RenderAssembler::QueueObjectsDebug(SceneRenderData& aRenderData)
 		{
 			if (!animModel->GetShouldViewcull() || IsInsideFrustum(aRenderData.mainCamera, transform, animModel->GetBoundingBox()))
 			{
-				float lodHeuristic = aRenderData.mainCamera->GetBoundingBoxScreenPercentage(transform, animModel->GetBoundingBox());
 				GraphicsEngine::Get().GetGraphicsCommandList().Enqueue<RenderAnimatedMeshDebugPass>(
 					animModel->GetMesh(),
 					animModel->GetMaterials(),
 					transform->GetWorldMatrix(),
-					animModel->GetCurrentPose(),
-					lodHeuristic);
+					animModel->GetCurrentPose());
 			}
 		}
 

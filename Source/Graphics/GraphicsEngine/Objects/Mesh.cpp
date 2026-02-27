@@ -34,7 +34,7 @@ void Mesh::Submesh::AddLOD(unsigned aLODLevel, std::vector<Vertex>&& aVertexList
 {
 	const auto [it, status] = myLODs.insert({ aLODLevel, LOD() });
 	Submesh::LOD& lod = it->second;
-	lod.ScreenPercentage = 1 / pow(4.0f, static_cast<float>(it->first));
+	lod.ScreenPercentage = 1 / pow(24.0f, static_cast<float>(it->first));
 	lod.myVertices = std::move(aVertexList);
 	lod.myIndices = std::move(aIndexList);
 	GraphicsEngine::Get().GetResourceVendor().CreateVertexBuffer("Vertex Buffer", lod.myVertices, lod.myVertexBuffer);

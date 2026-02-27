@@ -159,9 +159,8 @@ bool Camera::GetViewcullingIntersection(std::shared_ptr<Transform> aObjectTransf
 
 float Camera::GetBoundingBoxScreenPercentage(std::shared_ptr<Transform> aObjectTransform, const Math::AABB3D<float>& aObjectAABB)
 {
-	Math::Matrix4x4f camWorldInv = gameObject->GetComponent<Transform>()->GetWorldMatrixInverse();
 	Math::AABB3D<float> aabbWorldSpace = aObjectAABB.GetAABBinNewSpace(aObjectTransform->GetWorldMatrix());
-	Math::AABB3D<float> aabbViewSpace = aabbWorldSpace.GetAABBinNewSpace(camWorldInv);
+	Math::AABB3D<float> aabbViewSpace = aabbWorldSpace.GetAABBinNewSpace(gameObject->GetComponent<Transform>()->GetWorldMatrixInverse());
 
 	Math::Vector3f newMin = { FLT_MAX, FLT_MAX, FLT_MAX };
 	Math::Vector3f newMax = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
@@ -184,6 +183,8 @@ float Camera::GetBoundingBoxScreenPercentage(std::shared_ptr<Transform> aObjectT
 
 	newMin.x = ((newMin.x + 1.0f) * 0.5f) * myViewportDimensions.x;
 	newMin.y = ((newMin.y + 1.0f) * 0.5f) * myViewportDimensions.y;
+	newMax.x = ((newMax.x + 1.0f) * 0.5f) * myViewportDimensions.x;
+	newMax.y = ((newMax.y + 1.0f) * 0.5f) * myViewportDimensions.y;
 
 	Math::Vector2f objectSides;
 	objectSides.x = newMax.x - newMin.x;
